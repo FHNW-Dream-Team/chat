@@ -1,5 +1,6 @@
 package com.orbitrondev;
 
+import com.orbitrondev.Controller.CliController;
 import com.orbitrondev.Controller.MainController;
 import com.orbitrondev.Model.MainModel;
 import com.orbitrondev.View.MainView;
@@ -9,7 +10,18 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     public static void main(String[] args) {
-        launch(args);
+        boolean openGui = true;
+        for (String arg : args) {
+            if (arg.equals("--no-gui")) {
+                openGui = false;
+                break;
+            }
+        }
+        if (openGui) {
+            launch(args);
+        }
+        MainModel model = new MainModel();
+        new CliController(model);
     }
 
     @Override
