@@ -136,7 +136,7 @@ public class BackendController implements Closeable {
      * After creating an account, you still have to login
      */
     public boolean sendCreateLogin(String username, String password) throws IOException {
-        sendCommand(new String[] { "CreateLogin", username, password });
+        sendCommand(new String[]{"CreateLogin", username, password});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
@@ -148,7 +148,7 @@ public class BackendController implements Closeable {
      * Fails if name/password do not match
      */
     public String sendLogin(String username, String password) throws IOException {
-        sendCommand(new String[] { "Login", username, password });
+        sendCommand(new String[]{"Login", username, password});
 
         waitForResultResponse();
         if (lastMessage.get(1).equals("true")) {
@@ -164,7 +164,7 @@ public class BackendController implements Closeable {
      * Fails only if token is invalid
      */
     public boolean sendChangePassword(String token, String newPassword) throws IOException {
-        sendCommand(new String[] { "ChangePassword", token, newPassword });
+        sendCommand(new String[]{"ChangePassword", token, newPassword});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
@@ -176,7 +176,7 @@ public class BackendController implements Closeable {
      * Fails only if token is invalid; after delete, token becomes invalid
      */
     public boolean sendDeleteLogin(String token) throws IOException {
-        sendCommand(new String[] { "DeleteLogin", token });
+        sendCommand(new String[]{"DeleteLogin", token});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
@@ -188,7 +188,7 @@ public class BackendController implements Closeable {
      * Never fails; token becomes invalid
      */
     public boolean sendLogout() throws IOException {
-        sendCommand(new String[] { "Logout" });
+        sendCommand(new String[]{"Logout"});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
@@ -201,7 +201,7 @@ public class BackendController implements Closeable {
      * After creating a chatroom, you still have to join
      */
     public boolean sendCreateChatroom(String token, String name, boolean isPublic) throws IOException {
-        sendCommand(new String[] { "CreateChatroom", token, name, (isPublic ? "true" : "false") });
+        sendCommand(new String[]{"CreateChatroom", token, name, (isPublic ? "true" : "false")});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
@@ -214,7 +214,7 @@ public class BackendController implements Closeable {
      * Only the creator can add user to a private chatroom
      */
     public boolean sendJoinChatroom(String token, String chatroom, String username) throws IOException {
-        sendCommand(new String[] { "JoinChatroom", token, chatroom, username });
+        sendCommand(new String[]{"JoinChatroom", token, chatroom, username});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
@@ -231,7 +231,7 @@ public class BackendController implements Closeable {
      * Chatroom creator can remove anyone
      */
     public boolean sendLeaveChatroom(String token, String chatroom, String username) throws IOException {
-        sendCommand(new String[] { "LeaveChatroom", token, chatroom, username });
+        sendCommand(new String[]{"LeaveChatroom", token, chatroom, username});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
@@ -247,7 +247,7 @@ public class BackendController implements Closeable {
      * Only the creator can delete a chatroom
      */
     public boolean sendDeleteChatroom(String token, String chatroom) throws IOException {
-        sendCommand(new String[] { "DeleteChatroom", token, chatroom });
+        sendCommand(new String[]{"DeleteChatroom", token, chatroom});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
@@ -259,7 +259,7 @@ public class BackendController implements Closeable {
      * Returns a list of all public chatrooms
      */
     public ArrayList<String> sendListChatrooms(String token) throws IOException {
-        sendCommand(new String[] { "ListChatrooms", token });
+        sendCommand(new String[]{"ListChatrooms", token});
 
         waitForResultResponse();
         if (lastMessage.get(1).equals("true")) {
@@ -279,15 +279,16 @@ public class BackendController implements Closeable {
      * With token: succeeds only if token is valid
      */
     public boolean sendPing() throws IOException {
-        sendCommand(new String[] { "Ping" });
+        sendCommand(new String[]{"Ping"});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
         lastMessage.clear();
         return result;
     }
+
     public boolean sendPing(String token) throws IOException {
-        sendCommand(new String[] { "Ping", token });
+        sendCommand(new String[]{"Ping", token});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
@@ -300,7 +301,7 @@ public class BackendController implements Closeable {
      * Fails if user not online / Fails if not a member of the chatroom
      */
     public boolean sendSendMessage(String token, String target, String message) throws IOException {
-        sendCommand(new String[] { "SendMessage", token, target, message });
+        sendCommand(new String[]{"SendMessage", token, target, message});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
@@ -312,7 +313,7 @@ public class BackendController implements Closeable {
      * Succeeds if the user is currently logged in
      */
     public boolean sendUserOnline(String token, String username) throws IOException {
-        sendCommand(new String[] { "UserOnline", token, username });
+        sendCommand(new String[]{"UserOnline", token, username});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
@@ -329,7 +330,7 @@ public class BackendController implements Closeable {
      * You must be a member of this chatroom
      */
     public ArrayList<String> sendListChatroomUsers(String token, String chatroom) throws IOException {
-        sendCommand(new String[] { "ListChatroomUsers", token, chatroom });
+        sendCommand(new String[]{"ListChatroomUsers", token, chatroom});
 
         waitForResultResponse();
         if (lastMessage.get(1).equals("true")) {

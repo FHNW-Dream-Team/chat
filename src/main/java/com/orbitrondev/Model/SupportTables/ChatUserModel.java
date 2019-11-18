@@ -5,7 +5,10 @@ import com.orbitrondev.Model.ChatModel;
 import com.orbitrondev.Model.UserModel;
 
 public class ChatUserModel {
-    /** FIELDS ////////////////////////////////*/
+
+    /**
+     * FIELDS ////////////////////////////////
+     */
 
     @DatabaseField(id = true, generatedId = true)
     int id;
@@ -18,7 +21,9 @@ public class ChatUserModel {
     @DatabaseField(foreign = true, canBeNull = false)
     private ChatModel chat;
 
-    /** CONSTRUCTORS //////////////////////////*/
+    /**
+     * CONSTRUCTORS //////////////////////////
+     */
 
     ChatUserModel() {
         // For ORMLite
@@ -31,7 +36,9 @@ public class ChatUserModel {
         this.chat = chat;
     }
 
-    /** METHODS ///////////////////////////////*/
+    /**
+     * METHODS ///////////////////////////////
+     */
 
     public UserModel getUser() {
         return user;

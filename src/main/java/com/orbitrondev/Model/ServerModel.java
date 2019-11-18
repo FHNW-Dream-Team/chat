@@ -6,7 +6,9 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "server")
 public class ServerModel {
 
-    /** FIELDS ////////////////////////////////*/
+    /**
+     * FIELDS ////////////////////////////////
+     */
 
     @DatabaseField(id = true, generatedId = true)
     private int id;
@@ -23,7 +25,9 @@ public class ServerModel {
     @DatabaseField(defaultValue = "false")
     private boolean defaultServer = false;
 
-    /** CONSTRUCTORS //////////////////////////*/
+    /**
+     * CONSTRUCTORS //////////////////////////
+     */
 
     ServerModel() {
         // For ORMLite
@@ -35,11 +39,13 @@ public class ServerModel {
         this.ip = ip;
         this.port = port;
     }
+
     public ServerModel(String ip, int port, boolean secure) {
         this.ip = ip;
         this.port = port;
         this.secure = secure;
     }
+
     public ServerModel(String ip, int port, boolean secure, boolean defaultServer) {
         this.ip = ip;
         this.port = port;
@@ -47,7 +53,9 @@ public class ServerModel {
         this.defaultServer = defaultServer;
     }
 
-    /** METHODS ///////////////////////////////*/
+    /**
+     * METHODS ///////////////////////////////
+     */
 
     public int getId() {
         return id;

@@ -6,7 +6,9 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "login")
 public class LoginModel {
 
-    /** FIELDS ////////////////////////////////*/
+    /**
+     * FIELDS ////////////////////////////////
+     */
 
     @DatabaseField(id = true, generatedId = true)
     private int id;
@@ -20,7 +22,9 @@ public class LoginModel {
     @DatabaseField
     private String token;
 
-    /** CONSTRUCTORS //////////////////////////*/
+    /**
+     * CONSTRUCTORS //////////////////////////
+     */
 
     LoginModel() {
         // For ORMLite
@@ -39,7 +43,9 @@ public class LoginModel {
         this.token = token;
     }
 
-    /** METHODS ///////////////////////////////*/
+    /**
+     * METHODS ///////////////////////////////
+     */
 
     public int getId() {
         return id;

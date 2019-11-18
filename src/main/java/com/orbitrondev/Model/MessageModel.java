@@ -9,7 +9,9 @@ import java.time.format.DateTimeFormatter;
 @DatabaseTable(tableName = "messages")
 public class MessageModel {
 
-    /** FIELDS ////////////////////////////////*/
+    /**
+     * FIELDS ////////////////////////////////
+     */
 
     @DatabaseField(id = true, generatedId = true)
     private int id;
@@ -22,7 +24,9 @@ public class MessageModel {
 
     private UserModel user;
 
-    /** CONSTRUCTORS //////////////////////////*/
+    /**
+     * CONSTRUCTORS //////////////////////////
+     */
 
     MessageModel() {
         // For ORMLite
@@ -36,7 +40,9 @@ public class MessageModel {
         this.user = user;
     }
 
-    /** METHODS ///////////////////////////////*/
+    /**
+     * METHODS ///////////////////////////////
+     */
 
     public int getId() {
         return id;

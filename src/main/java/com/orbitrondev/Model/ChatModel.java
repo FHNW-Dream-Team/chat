@@ -9,7 +9,9 @@ import java.util.ArrayList;
 @DatabaseTable(tableName = "chats")
 public class ChatModel {
 
-    /** FIELDS ////////////////////////////////*/
+    /**
+     * FIELDS ////////////////////////////////
+     */
 
     @DatabaseField(id = true, generatedId = true)
     private int id;
@@ -23,7 +25,9 @@ public class ChatModel {
     @DatabaseField(canBeNull = false)
     protected ChatType chatType;
 
-    /** CONSTRUCTORS //////////////////////////*/
+    /**
+     * CONSTRUCTORS //////////////////////////
+     */
 
     ChatModel() {
         // For ORMLite
@@ -35,7 +39,9 @@ public class ChatModel {
         this.name = name;
     }
 
-    /** METHODS ///////////////////////////////*/
+    /**
+     * METHODS ///////////////////////////////
+     */
 
     public int getId() {
         return id;

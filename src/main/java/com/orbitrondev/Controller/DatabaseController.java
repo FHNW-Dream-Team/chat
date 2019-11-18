@@ -106,7 +106,9 @@ public class DatabaseController implements Closeable {
 
 
     /** Create Many-To-Many Relations ************************************************/
-    /** Source: https://github.com/j256/ormlite-jdbc/blob/master/src/test/java/com/j256/ormlite/examples/manytomany/ManyToManyMain.java */
+    /**
+     * Source: https://github.com/j256/ormlite-jdbc/blob/master/src/test/java/com/j256/ormlite/examples/manytomany/ManyToManyMain.java
+     */
     private PreparedQuery<ChatModel> chatsForUserQuery = null;
     private PreparedQuery<UserModel> usersForChatQuery = null;
 

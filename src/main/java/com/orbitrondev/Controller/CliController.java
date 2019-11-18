@@ -5,12 +5,8 @@ import com.orbitrondev.Exception.InvalidPortException;
 import com.orbitrondev.Main;
 import com.orbitrondev.Model.MainModel;
 import com.orbitrondev.Model.ServerModel;
-import com.orbitrondev.View.MainView;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.Scanner;
 
 public class CliController {

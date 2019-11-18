@@ -6,7 +6,9 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "cached_users")
 public class UserModel {
 
-    /** FIELDS ////////////////////////////////*/
+    /**
+     * FIELDS ////////////////////////////////
+     */
 
     @DatabaseField(id = true, generatedId = true)
     private int id;
@@ -17,7 +19,9 @@ public class UserModel {
     @DatabaseField(defaultValue = "false", canBeNull = false)
     private boolean online = false;
 
-    /** CONSTRUCTORS //////////////////////////*/
+    /**
+     * CONSTRUCTORS //////////////////////////
+     */
 
     UserModel() {
         // For ORMLite
@@ -30,7 +34,9 @@ public class UserModel {
         this.online = online;
     }
 
-    /** METHODS ///////////////////////////////*/
+    /**
+     * METHODS ///////////////////////////////
+     */
 
     public int getId() {
         return id;
