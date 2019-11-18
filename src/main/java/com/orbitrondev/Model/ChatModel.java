@@ -13,7 +13,7 @@ public class ChatModel {
      * FIELDS ////////////////////////////////
      */
 
-    @DatabaseField(id = true, generatedId = true)
+    @DatabaseField(generatedId = true)
     private int id;
 
     @DatabaseField(canBeNull = false)

@@ -10,7 +10,7 @@ public class ChatUserModel {
      * FIELDS ////////////////////////////////
      */
 
-    @DatabaseField(id = true, generatedId = true)
+    @DatabaseField(generatedId = true)
     int id;
 
     // This is a foreign object which just stores the id from the User object in this table.
