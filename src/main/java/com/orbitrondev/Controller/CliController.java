@@ -23,6 +23,7 @@ public class CliController {
         int portNumber = -1;
         boolean secure = false;
         boolean askForSecure = true;
+        boolean addToDB = true;
 
         if (Main.connectToDb) {
             db = new DatabaseController("chat.sqlite");
@@ -32,6 +33,7 @@ public class CliController {
                     portNumber = server.getPort();
                     secure = server.isSecure();
                     askForSecure = false;
+                    addToDB = false;
                 }
             }
         }
@@ -64,7 +66,7 @@ public class CliController {
             secure = s.equalsIgnoreCase("yes");
         }
 
-        if (Main.connectToDb && db != null) {
+        if (Main.connectToDb && db != null && addToDB) {
             try {
                 ServerModel server = new ServerModel(ipAddress, portNumber, secure, true);
                 db.serverDao.create(server);
