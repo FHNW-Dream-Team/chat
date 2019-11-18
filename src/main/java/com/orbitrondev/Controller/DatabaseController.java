@@ -29,16 +29,6 @@ public class DatabaseController implements Closeable {
     public Dao<ServerModel, String> serverDao;
 
     public DatabaseController(String databaseLocation) {
-        if (!databaseFileExists(databaseLocation)) {
-            // Create the database file
-            try {
-                createDatabaseFile(databaseLocation);
-            } catch (IOException e) {
-                // TODO: Handle what happens if file was not added
-                e.printStackTrace();
-            }
-        }
-
         try {
             // this uses h2 but you can change it to match your database
             String databaseUrl = "jdbc:sqlite:" + databaseLocation;
@@ -59,7 +49,7 @@ public class DatabaseController implements Closeable {
      */
     private void setupDatabase(ConnectionSource connectionSource) throws SQLException {
 
-        /**
+        /*
          * Create our DAOs. One for each class and associated table.
          */
         chatDao = DaoManager.createDao(connectionSource, ChatModel.class);
@@ -71,7 +61,7 @@ public class DatabaseController implements Closeable {
         loginDao = DaoManager.createDao(connectionSource, LoginModel.class);
         serverDao = DaoManager.createDao(connectionSource, ServerModel.class);
 
-        /**
+        /*
          * Create the tables for our example. This would not be necessary if the tables already existed.
          */
         // TODO: Check whether tables already exist
@@ -85,14 +75,8 @@ public class DatabaseController implements Closeable {
         TableUtils.createTable(connectionSource, ServerModel.class);
     }
 
-    private boolean databaseFileExists(String databaseLocation) {
-        File file = new File(databaseLocation);
-        return file.exists();
-    }
-
-    private void createDatabaseFile(String databaseLocation) throws IOException {
-        File file = new File(databaseLocation);
-        file.createNewFile(); // if file already exists will do nothing
+        TableUtils.createTableIfNotExists(connectionSource, LoginModel.class);
+        TableUtils.createTableIfNotExists(connectionSource, ServerModel.class);
     }
 
     @Override
@@ -105,7 +89,7 @@ public class DatabaseController implements Closeable {
     }
 
 
-    /** Create Many-To-Many Relations ************************************************/
+    /* Create Many-To-Many Relations ************************************************/
     /**
      * Source: https://github.com/j256/ormlite-jdbc/blob/master/src/test/java/com/j256/ormlite/examples/manytomany/ManyToManyMain.java
      */
