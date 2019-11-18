@@ -14,12 +14,6 @@ import javax.net.ssl.SSLSocket;
 import com.sun.net.ssl.internal.ssl.Provider;
 
 /**
- * Official site: http://javaprojects.ch
- * Official ip: 147.86.8.31
- * Port: 50001
- */
-
-/**
  * This is a really simple test client: It reads from the scanner, sends to the
  * server, and prints the server's response. This is all in plain-text - it is
  * up to the user to type in correctly formatted messages.

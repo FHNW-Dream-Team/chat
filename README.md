@@ -18,6 +18,10 @@ Please make sure to update tests as appropriate.
 
 # Documentation
 
+ * Official site: http://javaprojects.ch
+ * Official ip: 147.86.8.31
+ * Official port: 50001
+
 ## Client -> Server
 
 | MessageType       | Data               | Notes                                                                                                         |
