@@ -25,6 +25,9 @@ public class ChatModel {
     @DatabaseField(canBeNull = false)
     protected ChatType chatType;
 
+    @DatabaseField(defaultValue = "false", canBeNull = false)
+    private boolean archived = false;
+
     /**
      * CONSTRUCTORS //////////////////////////
      */
@@ -69,5 +72,13 @@ public class ChatModel {
 
     public ChatType getChatType() {
         return chatType;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 }
