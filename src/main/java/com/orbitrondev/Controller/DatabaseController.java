@@ -8,12 +8,11 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import com.orbitrondev.Model.ChatModel;
-import com.orbitrondev.Model.MessageModel;
+import com.orbitrondev.Model.*;
 import com.orbitrondev.Model.SupportTables.ChatUserModel;
-import com.orbitrondev.Model.UserModel;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -26,10 +25,18 @@ public class DatabaseController implements Closeable {
     public Dao<UserModel, String> userDao;
     public Dao<ChatUserModel, String> chatUserDao;
 
+    public Dao<LoginModel, String> loginDao;
+    public Dao<ServerModel, String> serverDao;
+
     public DatabaseController(String databaseLocation) {
         if (!databaseFileExists(databaseLocation)) {
             // Create the database file
-            createDatabaseFile(databaseLocation);
+            try {
+                createDatabaseFile(databaseLocation);
+            } catch (IOException e) {
+                // TODO: Handle what happens if file was not added
+                e.printStackTrace();
+            }
         }
 
         try {
@@ -61,6 +68,9 @@ public class DatabaseController implements Closeable {
 
         chatUserDao = DaoManager.createDao(connectionSource, ChatUserModel.class);
 
+        loginDao = DaoManager.createDao(connectionSource, LoginModel.class);
+        serverDao = DaoManager.createDao(connectionSource, ServerModel.class);
+
         /**
          * Create the tables for our example. This would not be necessary if the tables already existed.
          */
@@ -70,14 +80,19 @@ public class DatabaseController implements Closeable {
         TableUtils.createTable(connectionSource, UserModel.class);
 
         TableUtils.createTable(connectionSource, ChatUserModel.class);
+
+        TableUtils.createTable(connectionSource, LoginModel.class);
+        TableUtils.createTable(connectionSource, ServerModel.class);
     }
 
     private boolean databaseFileExists(String databaseLocation) {
-        return false;
+        File file = new File(databaseLocation);
+        return file.exists();
     }
 
-    private void createDatabaseFile(String databaseLocation) {
-
+    private void createDatabaseFile(String databaseLocation) throws IOException {
+        File file = new File(databaseLocation);
+        file.createNewFile(); // if file already exists will do nothing
     }
 
     @Override
