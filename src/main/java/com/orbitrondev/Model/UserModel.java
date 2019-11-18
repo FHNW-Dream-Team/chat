@@ -19,6 +19,9 @@ public class UserModel {
     @DatabaseField(defaultValue = "false", canBeNull = false)
     private boolean online = false;
 
+    @DatabaseField(defaultValue = "false", canBeNull = false)
+    private boolean friend = false;
+
     /**
      * CONSTRUCTORS //////////////////////////
      */
@@ -60,5 +63,13 @@ public class UserModel {
 
     public void toggleOnline() {
         this.online = !this.online;
+    }
+
+    public boolean isFriend() {
+        return friend;
+    }
+
+    public void setFriend(boolean friend) {
+        this.friend = friend;
     }
 }
