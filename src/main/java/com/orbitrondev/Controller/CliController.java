@@ -2,6 +2,7 @@ package com.orbitrondev.Controller;
 
 import com.orbitrondev.Exception.InvalidIpException;
 import com.orbitrondev.Exception.InvalidPortException;
+import com.orbitrondev.Main;
 import com.orbitrondev.Model.MainModel;
 import com.orbitrondev.Model.ServerModel;
 import com.orbitrondev.View.MainView;
@@ -20,19 +21,21 @@ public class CliController {
 
     public CliController(MainModel model) {
         this.model = model;
-        db = new DatabaseController("chat.sqlite");
 
         String ipAddress = null;
         int portNumber = -1;
         boolean secure = true;
         boolean askForSecure = true;
 
-        for (ServerModel server : db.serverDao) {
-            if (server.isDefaultServer()) {
-                ipAddress = server.getIp();
-                portNumber = server.getPort();
-                secure = server.isSecure();
-                askForSecure = false;
+        if (Main.connectToDb) {
+            db = new DatabaseController("chat.sqlite");
+            for (ServerModel server : db.serverDao) {
+                if (server.isDefaultServer()) {
+                    ipAddress = server.getIp();
+                    portNumber = server.getPort();
+                    secure = server.isSecure();
+                    askForSecure = false;
+                }
             }
         }
 

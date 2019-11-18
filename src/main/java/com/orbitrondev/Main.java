@@ -8,13 +8,16 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+    public static boolean connectToDb = true;
 
     public static void main(String[] args) {
         boolean openGui = true;
         for (String arg : args) {
             if (arg.equals("--no-gui")) {
                 openGui = false;
-                break;
+            }
+            if (arg.equals("--no-db")) {
+                connectToDb = false;
             }
         }
         if (openGui) {
