@@ -7,6 +7,7 @@ import com.orbitrondev.Model.MainModel;
 import com.orbitrondev.Model.ServerModel;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class CliController {
@@ -20,7 +21,7 @@ public class CliController {
 
         String ipAddress = null;
         int portNumber = -1;
-        boolean secure = true;
+        boolean secure = false;
         boolean askForSecure = true;
 
         if (Main.connectToDb) {
@@ -61,6 +62,15 @@ public class CliController {
             System.out.println("Enter 'yes' if the client should use SecureSockets");
             String s = in.nextLine().trim();
             secure = s.equalsIgnoreCase("yes");
+        }
+
+        if (Main.connectToDb && db != null) {
+            try {
+                ServerModel server = new ServerModel(ipAddress, portNumber, secure, true);
+                db.serverDao.create(server);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         try {
