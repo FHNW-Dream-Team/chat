@@ -85,7 +85,53 @@ public class CliController {
 
             while (in.hasNext()) {
                 String line = in.nextLine();
-                backend.sendCommand(line);
+                switch (line) {
+                    case "CreateLogin":
+                        System.out.println("To create a new user we need: username, password");
+                        boolean validUser = false;
+                        String username = null;
+                        String password = null;
+                        while (!validUser) {
+                            System.out.print("Username: ");
+                            username = in.nextLine();
+                            System.out.print("Password: ");
+                            password = in.nextLine();
+                            System.out.print("Repeat Password: ");
+                            String passwordRepeat = in.nextLine();
+
+                            if (password.equals(passwordRepeat)) {
+                                validUser = true;
+                            } else {
+                                System.out.println("Passwords do not match");
+                            }
+                        }
+                        if (username != null && password != null) {
+                            if (backend.sendCreateLogin(username, password)) {
+                                System.out.println("User was created");
+                            } else {
+                                System.out.println("User not created");
+                            }
+                        }
+                        break;
+                    case "Login":
+                        System.out.println("You want to login");
+                        break;
+                    case "ChangePassword":
+                    case "DeleteLogin":
+                    case "Logout":
+                    case "CreateChatroom":
+                    case "JoinChatroom":
+                    case "LeaveChatroom":
+                    case "DeleteChatroom":
+                    case "ListChatrooms":
+                    case "Ping":
+                    case "SendMessage":
+                    case "UserOnline":
+                    case "ListChatroomUsers":
+                    default:
+                        backend.sendCommand(line);
+                        break;
+                }
             }
         } catch (InvalidIpException | InvalidPortException | IOException e) {
             e.printStackTrace();
