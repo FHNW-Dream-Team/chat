@@ -1,5 +1,13 @@
-# Created by https://www.gitignore.io/api/java,maven,eclipse,intellij
-# Edit at https://www.gitignore.io/?templates=java,maven,eclipse,intellij
+# Created by https://www.gitignore.io/api/java,maven,eclipse,intellij,database
+# Edit at https://www.gitignore.io/?templates=java,maven,eclipse,intellij,database
+
+### Database ###
+*.accdb
+*.db
+*.dbf
+*.mdb
+*.pdb
+*.sqlite3
 
 ### Eclipse ###
 .metadata
@@ -196,7 +204,4 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 .flattened-pom.xml
 
-# End of https://www.gitignore.io/api/java,maven,eclipse,intellij
-
-# Personal settings
-*.sqlite
+# End of https://www.gitignore.io/api/java,maven,eclipse,intellij,database

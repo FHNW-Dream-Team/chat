@@ -26,7 +26,7 @@ public class CliController {
         boolean addToDB = true;
 
         if (Main.connectToDb) {
-            db = new DatabaseController("chat.sqlite");
+            db = new DatabaseController("chat.sqlite3");
             for (ServerModel server : db.serverDao) {
                 if (server.isDefaultServer()) {
                     ipAddress = server.getIp();
