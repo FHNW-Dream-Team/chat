@@ -1,23 +1,55 @@
 package com.orbitrondev;
 
-import com.orbitrondev.Controller.MainController;
+import com.orbitrondev.Controller.CliController;
 import com.orbitrondev.Model.MainModel;
-import com.orbitrondev.View.MainView;
-import javafx.application.Application;
-import javafx.stage.Stage;
+import org.apache.commons.cli.*;
 
-public class Main extends Application {
+public class Main {
+    public static boolean connectToDb = true;
+    public static String dbLocation = "chat.sqlite3";
 
     public static void main(String[] args) {
-        launch(args);
-    }
+        Options options = new Options();
 
-    @Override
-    public void start(Stage primaryStage) {
-        // Create and initialize the MVC components
-        MainModel model = new MainModel();
-        MainView view = new MainView(primaryStage, model);
-        new MainController(model, view);
-        view.show();
+        Option guiOption = new Option("g", "no-gui", true, "Disable the GUI and use the console");
+        guiOption.setOptionalArg(true);
+        options.addOption(guiOption);
+
+        Option dbOption = new Option("d", "no-db", true, "Disable the database usage");
+        dbOption.setOptionalArg(true);
+        options.addOption(dbOption);
+
+        Option dbLocationOption = new Option("l", "db-location", true, "Define where the database is saved");
+        dbLocationOption.setOptionalArg(true);
+        options.addOption(dbLocationOption);
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd = null;
+
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("chat.jar", options);
+
+            System.exit(1);
+        }
+        if (cmd == null) {
+            System.exit(1);
+        }
+
+        if (cmd.hasOption("no-db")) {
+            connectToDb = false;
+        } else if (cmd.hasOption("db-location")) {
+            dbLocation = cmd.getOptionValue("db-location");
+        }
+
+        if (!cmd.hasOption("no-gui")) {
+            MainGui.main(args);
+        } else {
+            MainModel model = new MainModel();
+            new CliController(model);
+        }
     }
 }
