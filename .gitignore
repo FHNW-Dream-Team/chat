@@ -199,5 +199,5 @@ buildNumber.properties
 # End of https://www.gitignore.io/api/java,maven,eclipse,intellij
 
 # Personal settings
-.idea/
 Chat.iml
+*.sqlite
