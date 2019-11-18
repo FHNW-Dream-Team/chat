@@ -1,23 +1,51 @@
 package com.orbitrondev;
 
 import com.orbitrondev.Controller.CliController;
-import com.orbitrondev.Controller.MainController;
 import com.orbitrondev.Model.MainModel;
+import org.apache.commons.cli.*;
 
 public class Main {
     public static boolean connectToDb = true;
+    public static String dbLocation = "chat.sqlite3";
 
     public static void main(String[] args) {
-        boolean openGui = true;
-        for (String arg : args) {
-            if (arg.equals("--no-gui")) {
-                openGui = false;
-            }
-            if (arg.equals("--no-db")) {
-                connectToDb = false;
-            }
+        Options options = new Options();
+
+        Option guiOption = new Option("g", "no-gui", true, "Disable the GUI and use the console");
+        guiOption.setOptionalArg(true);
+        options.addOption(guiOption);
+
+        Option dbOption = new Option("d", "no-db", true, "Disable the database usage");
+        dbOption.setOptionalArg(true);
+        options.addOption(dbOption);
+
+        Option dbLocationOption = new Option("l", "db-location", true, "Define where the database is saved");
+        dbLocationOption.setOptionalArg(true);
+        options.addOption(dbLocationOption);
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd = null;
+
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("chat.jar", options);
+
+            System.exit(1);
         }
-        if (openGui) {
+        if (cmd == null) {
+            System.exit(1);
+        }
+
+        if (cmd.hasOption("no-db")) {
+            connectToDb = false;
+        } else if (cmd.hasOption("db-location")) {
+            dbLocation = cmd.getOptionValue("db-location");
+        }
+
+        if (!cmd.hasOption("no-gui")) {
             MainGui.main(args);
         } else {
             MainModel model = new MainModel();
