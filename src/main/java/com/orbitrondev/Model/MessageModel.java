@@ -3,8 +3,10 @@ package com.orbitrondev.Model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @DatabaseTable(tableName = "messages")
 public class MessageModel {
@@ -20,7 +22,7 @@ public class MessageModel {
     private String message;
 
     @DatabaseField(canBeNull = false)
-    private LocalDateTime timeSent;
+    private Date timeSent;
 
     private UserModel user;
 
@@ -34,7 +36,7 @@ public class MessageModel {
         // with at least package visibility
     }
 
-    public MessageModel(String message, LocalDateTime timeSent, UserModel user) {
+    public MessageModel(String message, Date timeSent, UserModel user) {
         this.message = message;
         this.timeSent = timeSent;
         this.user = user;
@@ -52,13 +54,13 @@ public class MessageModel {
         return message;
     }
 
-    public LocalDateTime getTimeSent() {
+    public Date getTimeSent() {
         return timeSent;
     }
 
     public String getTimeSentFormatted() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-        return this.timeSent.format(dateTimeFormatter);
+        SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        return dateTimeFormatter.format(timeSent);
     }
 
     public UserModel getUser() {
