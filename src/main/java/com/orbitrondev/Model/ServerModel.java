@@ -18,6 +18,9 @@ public class ServerModel {
     private int port;
 
     @DatabaseField(defaultValue = "false")
+    private boolean secure = false;
+
+    @DatabaseField(defaultValue = "false")
     private boolean defaultServer = false;
 
     /** CONSTRUCTORS //////////////////////////*/
@@ -32,9 +35,15 @@ public class ServerModel {
         this.ip = ip;
         this.port = port;
     }
-    public ServerModel(String ip, int port, boolean defaultServer) {
+    public ServerModel(String ip, int port, boolean secure) {
         this.ip = ip;
         this.port = port;
+        this.secure = secure;
+    }
+    public ServerModel(String ip, int port, boolean secure, boolean defaultServer) {
+        this.ip = ip;
+        this.port = port;
+        this.secure = secure;
         this.defaultServer = defaultServer;
     }
 
@@ -50,6 +59,10 @@ public class ServerModel {
 
     public int getPort() {
         return port;
+    }
+
+    public boolean isSecure() {
+        return secure;
     }
 
     public boolean isDefaultServer() {

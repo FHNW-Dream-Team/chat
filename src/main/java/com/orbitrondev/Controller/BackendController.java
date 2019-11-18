@@ -121,13 +121,13 @@ public class BackendController implements Closeable {
         }
     }
 
-    private void sendCommand(String command) throws IOException {
+    public void sendCommand(String command) throws IOException {
         System.out.println("Sent: " + command);
         socketOut.write(command + "\n");
         socketOut.flush();
     }
 
-    private void sendCommand(String[] commandParts) throws IOException {
+    public void sendCommand(String[] commandParts) throws IOException {
         sendCommand(String.join("|", commandParts));
     }
 

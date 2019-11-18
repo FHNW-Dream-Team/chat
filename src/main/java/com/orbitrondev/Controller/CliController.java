@@ -6,6 +6,10 @@ import com.orbitrondev.Model.MainModel;
 import com.orbitrondev.Model.ServerModel;
 import com.orbitrondev.View.MainView;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Scanner;
 
 public class CliController {
@@ -20,10 +24,15 @@ public class CliController {
 
         String ipAddress = null;
         int portNumber = -1;
+        boolean secure = true;
+        boolean askForSecure = true;
+
         for (ServerModel server : db.serverDao) {
             if (server.isDefaultServer()) {
                 ipAddress = server.getIp();
                 portNumber = server.getPort();
+                secure = server.isSecure();
+                askForSecure = false;
             }
         }
 
@@ -48,10 +57,26 @@ public class CliController {
                 validPort = BackendController.isValidPortNumber(portNumber);
             }
         }
+        if (askForSecure) {
+            // Read security
+            System.out.println("Enter 'yes' if the client should use SecureSockets");
+            String s = in.nextLine().trim();
+            secure = s.equalsIgnoreCase("yes");
+        }
 
         try {
-            backend = new BackendController(ipAddress, portNumber);
-        } catch (InvalidIpException | InvalidPortException e) {
+            backend = new BackendController(ipAddress, portNumber, secure);
+
+            System.out.println("Connected");
+            // Loop, allowing the user to send messages to the server
+            // Note: We still have our scanner
+            System.out.println("Enter commands to server or ctrl-D to quit");
+
+            while (in.hasNext()) {
+                String line = in.nextLine();
+                backend.sendCommand(line);
+            }
+        } catch (InvalidIpException | InvalidPortException | IOException e) {
             e.printStackTrace();
         }
     }
