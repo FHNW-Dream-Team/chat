@@ -22,6 +22,9 @@ public class UserModel {
     @DatabaseField(defaultValue = "false", canBeNull = false)
     private boolean friend = false;
 
+    @DatabaseField(defaultValue = "false", canBeNull = false)
+    private boolean blocked = false;
+
     /**
      * CONSTRUCTORS //////////////////////////
      */
@@ -71,5 +74,13 @@ public class UserModel {
 
     public void setFriend(boolean friend) {
         this.friend = friend;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 }
