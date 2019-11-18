@@ -64,16 +64,11 @@ public class DatabaseController implements Closeable {
         /*
          * Create the tables for our example. This would not be necessary if the tables already existed.
          */
-        // TODO: Check whether tables already exist
-        TableUtils.createTable(connectionSource, ChatModel.class);
-        TableUtils.createTable(connectionSource, MessageModel.class);
-        TableUtils.createTable(connectionSource, UserModel.class);
+        TableUtils.createTableIfNotExists(connectionSource, ChatModel.class);
+        TableUtils.createTableIfNotExists(connectionSource, MessageModel.class);
+        TableUtils.createTableIfNotExists(connectionSource, UserModel.class);
 
-        TableUtils.createTable(connectionSource, ChatUserModel.class);
-
-        TableUtils.createTable(connectionSource, LoginModel.class);
-        TableUtils.createTable(connectionSource, ServerModel.class);
-    }
+        TableUtils.createTableIfNotExists(connectionSource, ChatUserModel.class);
 
         TableUtils.createTableIfNotExists(connectionSource, LoginModel.class);
         TableUtils.createTableIfNotExists(connectionSource, ServerModel.class);
