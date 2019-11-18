@@ -28,6 +28,9 @@ public class ChatModel {
     @DatabaseField(defaultValue = "false", canBeNull = false)
     private boolean archived = false;
 
+    @DatabaseField(defaultValue = "false", canBeNull = false)
+    private boolean admin = false;
+
     /**
      * CONSTRUCTORS //////////////////////////
      */
@@ -80,5 +83,13 @@ public class ChatModel {
 
     public void setArchived(boolean archived) {
         this.archived = archived;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 }
