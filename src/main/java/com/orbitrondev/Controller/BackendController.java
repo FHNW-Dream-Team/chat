@@ -298,9 +298,12 @@ public class BackendController implements Closeable {
 
     /**
      * Send message to user or chatroom
-     * Fails if user not online / Fails if not a member of the chatroom
+     * Fails if user not online / Fails if not a member of the chatroom / Fails if string is over 1024 chracters
      */
     public boolean sendSendMessage(String token, String target, String message) throws IOException {
+        if (message.length() > 1024) {
+            return false;
+        }
         sendCommand(new String[]{"SendMessage", token, target, message});
 
         waitForResultResponse();
