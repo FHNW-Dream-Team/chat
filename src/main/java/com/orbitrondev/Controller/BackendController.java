@@ -13,6 +13,13 @@ import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Backend utility class. Acts as an interface between the program and the server.
+ *
+ * @author Manuele Vaccari
+ * @version %I%, %G%
+ * @since 0.0.1
+ */
 public class BackendController implements Closeable {
 
     private Socket socket;
@@ -22,6 +29,16 @@ public class BackendController implements Closeable {
 
     private ArrayList<String> lastMessage = new ArrayList<>();
 
+    /**
+     * Creates a Socket (insecure) to the backend.
+     *
+     * @param ipAddress A String containing the ip address to reach the server.
+     * @param port      An integer containing the port which the server uses.
+     *
+     * @throws InvalidIpException   Is thrown when the IP address is not a valid IP address.
+     * @throws InvalidPortException Is thrown when the port is not in the acceptable range.
+     * @since 0.0.1
+     */
     public BackendController(String ipAddress, int port) throws InvalidIpException, InvalidPortException {
         if (!isValidIpAddress(ipAddress)) {
             throw new InvalidIpException();
@@ -43,6 +60,17 @@ public class BackendController implements Closeable {
         }
     }
 
+    /**
+     * Creates a Socket (insecure or secure) to the backend.
+     *
+     * @param ipAddress A String containing the ip address to reach the server.
+     * @param port      An integer containing the port which the server uses.
+     * @param secure    A boolean defining whether to use SSL or not.
+     *
+     * @throws InvalidIpException   Is thrown when the IP address is not a valid IP address.
+     * @throws InvalidPortException Is thrown when the port is not in the acceptable range.
+     * @since 0.0.1
+     */
     public BackendController(String ipAddress, int port, boolean secure) throws InvalidIpException, InvalidPortException {
         if (!isValidIpAddress(ipAddress)) {
             throw new InvalidIpException();
@@ -68,6 +96,11 @@ public class BackendController implements Closeable {
         }
     }
 
+    /**
+     * Creates a thread in the background, which waits for a response from the server.
+     *
+     * @since 0.0.1
+     */
     private void createResponseThread() {
         // Create thread to read incoming messages
         Runnable r = () -> {
@@ -105,10 +138,24 @@ public class BackendController implements Closeable {
         // TODO: Handle if we send wrong commands.
     }
 
+    /**
+     * Handle an incoming "MessageText" response, for when someone posts something.
+     *
+     * @param username   A string containing the name of the user who posted.
+     * @param targetChat A string containing the chat where the message was sent.
+     * @param text       A string containing the message.
+     *
+     * @since 0.0.1
+     */
     private void receivedMessageText(String username, String targetChat, String text) {
         // TODO: Handle incoming new messages.
     }
 
+    /**
+     * Wait until the a "Result" response arrives from the server.
+     *
+     * @since 0.0.1
+     */
     private void waitForResultResponse() {
         // TODO: This is somehow the reason the tests fail
         while (lastMessage.size() == 0 || !lastMessage.get(0).equals("Result")) {
@@ -121,19 +168,43 @@ public class BackendController implements Closeable {
         }
     }
 
+    /**
+     * Sends a command to the server.
+     *
+     * @param command A string containing the whole string which is sent to the server.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     public void sendCommand(String command) throws IOException {
         System.out.println("Sent: " + command);
         socketOut.write(command + "\n");
         socketOut.flush();
     }
 
+    /**
+     * Builds the command from the parts and send the command to the server.
+     *
+     * @param commandParts An array of strings containing all the command parts.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     public void sendCommand(String[] commandParts) throws IOException {
         sendCommand(String.join("|", commandParts));
     }
 
     /**
-     * Fails if name already taken (user or chatroom), or invalid
-     * After creating an account, you still have to login
+     * Register a user on the the server.
+     *
+     * @param username A string containing the name of the user.
+     * @param password A string containing the password of the user.
+     *
+     * @return "true" when user was created. "false" when name already taken (by a user or chatroom) or is simply
+     * invalid.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public boolean sendCreateLogin(String username, String password) throws IOException {
         sendCommand(new String[]{"CreateLogin", username, password});
@@ -145,7 +216,15 @@ public class BackendController implements Closeable {
     }
 
     /**
-     * Fails if name/password do not match
+     * Login to the server.
+     *
+     * @param username A string containing the name of the user.
+     * @param password A string containing the password of the user.
+     *
+     * @return A string containing the token when logged in, "null" when username/password to match existing user.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public String sendLogin(String username, String password) throws IOException {
         sendCommand(new String[]{"Login", username, password});
@@ -161,7 +240,15 @@ public class BackendController implements Closeable {
     }
 
     /**
-     * Fails only if token is invalid
+     * Overwrite the password of currently logged in user.
+     *
+     * @param token       A string containing a token given by the server.
+     * @param newPassword A string containing the new password to overwrite.
+     *
+     * @return "true" by default, "false" when the token is invalid.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public boolean sendChangePassword(String token, String newPassword) throws IOException {
         sendCommand(new String[]{"ChangePassword", token, newPassword});
@@ -173,7 +260,14 @@ public class BackendController implements Closeable {
     }
 
     /**
-     * Fails only if token is invalid; after delete, token becomes invalid
+     * Delete the currently logged in user from the server. After successful deletion, token becomes invalid
+     *
+     * @param token A string containing a token given by the server.
+     *
+     * @return "true" by default, "false" when token is invalid.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public boolean sendDeleteLogin(String token) throws IOException {
         sendCommand(new String[]{"DeleteLogin", token});
@@ -185,7 +279,12 @@ public class BackendController implements Closeable {
     }
 
     /**
-     * Never fails; token becomes invalid
+     * Logs the current user out from the server. After successful logout, token becomes invalid.
+     *
+     * @return "true" by default. Impossible to fail.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public boolean sendLogout() throws IOException {
         sendCommand(new String[]{"Logout"});
@@ -197,8 +296,17 @@ public class BackendController implements Closeable {
     }
 
     /**
-     * Fails if name already taken (user or chatroom), or invalid
-     * After creating a chatroom, you still have to join
+     * Creates a new chatroom, where people can send messages. After creation, users still have to added (also the
+     * currently logged in user). Rooms can be made private by setting the third variable false.
+     *
+     * @param token    A string containing a token given by the server.
+     * @param name     A string containing the name for the room to be created.
+     * @param isPublic A boolean defining whether the room should be public (true) or private (false)
+     *
+     * @return "true" by default, "false" when name is already taken (by a user or other chatroom), or simply invalid.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public boolean sendCreateChatroom(String token, String name, boolean isPublic) throws IOException {
         sendCommand(new String[]{"CreateChatroom", token, name, (isPublic ? "true" : "false")});
@@ -210,8 +318,17 @@ public class BackendController implements Closeable {
     }
 
     /**
-     * User can add themselves to public chatrooms
-     * Only the creator can add user to a private chatroom
+     * Adds a given user to a given chatroom. For public chatroom, people can add themselves. For private chatrooms, the
+     * creator of it has to add them.
+     *
+     * @param token    A string containing a token given by the server.
+     * @param chatroom A string containing the name for the room to be created.
+     * @param username A string containing the name of the user to be added.
+     *
+     * @return "true" by default, "false" if not added
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public boolean sendJoinChatroom(String token, String chatroom, String username) throws IOException {
         sendCommand(new String[]{"JoinChatroom", token, chatroom, username});
@@ -222,13 +339,35 @@ public class BackendController implements Closeable {
         return result;
     }
 
+    /**
+     * Adds a given user to a given chatroom. For public chatroom, people can add themselves. For private chatrooms, the
+     * creator of it has to add them.
+     *
+     * @param token    A string containing a token given by the server.
+     * @param chatroom A string containing the name of the room.
+     * @param user     A UserModel object containing at least the name of the user to be added.
+     *
+     * @return "true" by default, "false" if not added
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     public boolean sendJoinChatroom(String token, String chatroom, UserModel user) throws IOException {
         return sendJoinChatroom(token, chatroom, user.getUsername());
     }
 
     /**
-     * You can always remove yourself
-     * Chatroom creator can remove anyone
+     * Removes a user from a given chatroom.
+     *
+     * @param token    A string containing a token given by the server.
+     * @param chatroom A string containing the name of the room.
+     * @param username A string containing the name of the user to be removed.
+     *
+     * @return "true" when removed successfully, "false" if not. (Hint) Logged in user can always remove himself, admin
+     * can remove anyone.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public boolean sendLeaveChatroom(String token, String chatroom, String username) throws IOException {
         sendCommand(new String[]{"LeaveChatroom", token, chatroom, username});
@@ -239,12 +378,31 @@ public class BackendController implements Closeable {
         return result;
     }
 
+    /**
+     * Removes a user from a given chatroom.
+     *
+     * @param token    A string containing a token given by the server.
+     * @param chatroom A string containing the name of the room.
+     * @param user     A UserModel object containing at least the name of the user to be added.
+     *
+     * @return "true" when removed successfully, "false" if not. (Hint) Logged in user can always remove himself, admin
+     * can remove anyone.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     public boolean sendLeaveChatroom(String token, String chatroom, UserModel user) throws IOException {
         return sendLeaveChatroom(token, chatroom, user.getUsername());
     }
 
     /**
-     * Only the creator can delete a chatroom
+     * @param token    A string containing a token given by the server.
+     * @param chatroom A string containing the name of the room.
+     *
+     * @return "true" if removed successfully, "false" if not. (Hint) Only the creator can delete a room.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public boolean sendDeleteChatroom(String token, String chatroom) throws IOException {
         sendCommand(new String[]{"DeleteChatroom", token, chatroom});
@@ -256,7 +414,14 @@ public class BackendController implements Closeable {
     }
 
     /**
-     * Returns a list of all public chatrooms
+     * Returns a list of all public chatrooms.
+     *
+     * @param token A string containing a token given by the server.
+     *
+     * @return "ArrayList" if 0 or more chatrooms available, "null" if failed
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public ArrayList<String> sendListChatrooms(String token) throws IOException {
         sendCommand(new String[]{"ListChatrooms", token});
@@ -275,8 +440,12 @@ public class BackendController implements Closeable {
     }
 
     /**
-     * Without a token: always succeeds
-     * With token: succeeds only if token is valid
+     * Sends a ping to the server
+     *
+     * @return "true" if succeeds (basically always), "false" if not
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public boolean sendPing() throws IOException {
         sendCommand(new String[]{"Ping"});
@@ -287,6 +456,14 @@ public class BackendController implements Closeable {
         return result;
     }
 
+    /**
+     * @param token A string containing a token given by the server.
+     *
+     * @return "true" if succeeds and token is valid, "false" if one or both cases are not the case.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     public boolean sendPing(String token) throws IOException {
         sendCommand(new String[]{"Ping", token});
 
@@ -297,8 +474,17 @@ public class BackendController implements Closeable {
     }
 
     /**
-     * Send message to user or chatroom
-     * Fails if user not online / Fails if not a member of the chatroom / Fails if string is over 1024 chracters
+     * Sends a message to a given user or chatroom
+     *
+     * @param token   A string containing a token given by the server.
+     * @param target  A string containing the name of a chatroom or a user.
+     * @param message A string containing the message (max length of 1024 characters).
+     *
+     * @return "true" if message was sent, "false" if 1) target user not online 2) current logged in user is not member
+     * of the chatroom 3) if he message is over 1024 characters
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public boolean sendSendMessage(String token, String target, String message) throws IOException {
         if (message.length() > 1024) {
@@ -313,7 +499,15 @@ public class BackendController implements Closeable {
     }
 
     /**
-     * Succeeds if the user is currently logged in
+     * Checks whether the user is currently logged in.
+     *
+     * @param token    A string containing a token given by the server.
+     * @param username A string containing the username of the wanted user.
+     *
+     * @return "true" if user is currently logged in, "false" if not.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public boolean sendUserOnline(String token, String username) throws IOException {
         sendCommand(new String[]{"UserOnline", token, username});
@@ -324,13 +518,32 @@ public class BackendController implements Closeable {
         return result;
     }
 
+    /**
+     * Checks whether the user is currently logged in.
+     *
+     * @param token A string containing a token given by the server.
+     * @param user  A UserModel object containing at least the name of the user.
+     *
+     * @return "true" if user is currently logged in, "false" if not.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     public boolean sendUserOnline(String token, UserModel user) throws IOException {
         return sendUserOnline(token, user.getUsername());
     }
 
     /**
-     * Returns a list of all users in the given chatroom
-     * You must be a member of this chatroom
+     * Get a list of all members inside a chatroom.
+     *
+     * @param token    A string containing a token given by the server.
+     * @param chatroom A string containing the name of the chatroom.
+     *
+     * @return "ArrayList" of 0 or more users inside the chat, "null" if failed or currently logged in user is not a
+     * member
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
      */
     public ArrayList<String> sendListChatroomUsers(String token, String chatroom) throws IOException {
         sendCommand(new String[]{"ListChatroomUsers", token, chatroom});
@@ -348,10 +561,28 @@ public class BackendController implements Closeable {
         return null;
     }
 
+    /**
+     * Creates a normal socket to the server.
+     *
+     * @param ipAddress A String containing the ip address to reach the server.
+     * @param port      An integer containing the port which the server uses.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     public void createStandardSocket(String ipAddress, int port) throws IOException {
         socket = new Socket(ipAddress, port);
     }
 
+    /**
+     * Creates a secure socket (SSL) to the server.
+     *
+     * @param ipAddress A String containing the ip address to reach the server.
+     * @param port      An integer containing the port which the server uses.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     public void createSecureSocket(String ipAddress, int port) throws IOException {
         // TODO: SSL is not properly setup
         // Check out: https://gitlab.fhnw.ch/bradley.richards/java-projects/blob/master/src/chatroom/Howto_SSL_Certificates_in_Java.odt
@@ -375,16 +606,40 @@ public class BackendController implements Closeable {
     }
 
     /**
+     * Verifies that the string is a valid ip address.
+     *
+     * @param ipAddress A String containing the ip address.
+     *
+     * @return "true" if valid, "false" if not.
+     *
+     * @since 0.0.1
+     */
+    /*
      * Reference: https://stackoverflow.com/questions/5667371/validate-ipv4-address-in-java
      */
     public static boolean isValidIpAddress(String ipAddress) {
         return ipAddress.matches("^((0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)\\.){3}(0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)$");
     }
 
+    /**
+     * Verifies that the string is in the valid range of open ports.
+     *
+     * @param port An integer containing the port.
+     *
+     * @return "true" if valid, "false" if not.
+     *
+     * @since 0.0.1
+     */
     public static boolean isValidPortNumber(int port) {
         return port >= 1024 && port <= 65535;
     }
 
+    /**
+     * Closes the socket.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     @Override
     public void close() throws IOException {
         if (socket != null) {
