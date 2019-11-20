@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -132,6 +133,8 @@ public class CliController {
             // Loop, allowing the user to send messages to the server
             // Note: We still have our scanner
             System.out.println("Enter commands to server or ctrl-D to quit");
+            System.out.println();
+            handleHelpCommand();
 
             handleCommandInput();
         } catch (InvalidIpException | InvalidPortException | IOException e) {
@@ -191,6 +194,8 @@ public class CliController {
                 case "ListChatroomUsers":
                     handleListChatroomUsersCommand();
                     break;
+                case "Help":
+                    handleHelpCommand();
                 default:
                     backend.sendCommand(line);
                     break;
@@ -650,5 +655,14 @@ public class CliController {
         usersInChatroom = backend.sendListChatroomUsers(login.getToken(), chatroom);
         System.out.println("Following users are inside the room " + chatroom + ":");
         usersInChatroom.forEach(s -> System.out.println("* " + s));
+    }
+
+    private void handleHelpCommand() {
+        System.out.println("Following commands are available:");
+        Arrays.asList(new String[]{"CreateLogin", "Login", "ChangePassword", "DeleteLogin", "Logout", "CreateChatroom",
+            "JoinChatroom", "LeaveChatroom", "DeleteChatroom", "ListChatrooms", "Ping", "SendMessage", "UserOnline",
+            "ListChatroomUsers", "Help"})
+            .forEach(s -> System.out.print(" * " + s));
+        System.out.println();
     }
 }
