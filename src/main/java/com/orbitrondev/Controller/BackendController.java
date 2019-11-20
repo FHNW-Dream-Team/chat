@@ -31,7 +31,7 @@ public class BackendController implements Closeable {
     private BufferedReader socketIn;
     private OutputStreamWriter socketOut;
 
-    private ArrayList<String> lastMessage = new ArrayList<>();
+    private volatile ArrayList<String> lastMessage = new ArrayList<>();
 
     /**
      * Creates a Socket (insecure) to the backend.
