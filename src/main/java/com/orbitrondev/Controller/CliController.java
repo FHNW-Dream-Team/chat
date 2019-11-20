@@ -12,6 +12,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * A class to handle the full console application. The connection, input and output.
+ *
+ * @author Manuele Vaccari
+ * @version %I%, %G%
+ * @since 0.0.1
+ */
 public class CliController {
     private MainModel model;
 
@@ -20,6 +27,14 @@ public class CliController {
 
     private LoginModel login = null;
 
+    /**
+     * If desired, connect to the local database and use it's information.
+     * If nowhere saved, ask for IP address, port and whether to use SSL.
+     *
+     * @param model An object containing the model to access all data and DB.
+     *
+     * @since 0.0.1
+     */
     public CliController(MainModel model) {
         this.model = model;
 
@@ -93,6 +108,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for the command to be sent to the server. If it's a known command, execute the corresponding function.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleCommandInput(Scanner in) throws IOException {
         while (in.hasNext()) {
             String line = in.nextLine();
@@ -146,6 +169,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "CreateLogin" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleCreateLoginCommand(Scanner in) throws IOException {
         System.out.println("To create a new user we need: username, password");
         boolean valid = false;
@@ -175,6 +206,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "Login" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleLoginCommand(Scanner in) throws IOException {
         System.out.println("To login you need to have created a user");
         String username, password;
@@ -193,6 +232,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "ChangePassword" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleChangePasswordCommand(Scanner in) throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
@@ -225,6 +272,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "DeleteLogin" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleDeleteLoginCommand(Scanner in) throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
@@ -253,6 +308,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "Logout" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleLogoutCommand(Scanner in) throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
@@ -267,6 +330,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "Ping" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handlePingCommand(Scanner in) throws IOException {
         if (login != null) {
             System.out.println("Sending ping with token...");
@@ -285,6 +356,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "CreateChatroom" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleCreateChatroomCommand(Scanner in) throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
@@ -315,6 +394,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "JoinChatroom" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleJoinChatroomCommand(Scanner in) throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
@@ -348,6 +435,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "LeaveChatroom" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleLeaveChatroomCommand(Scanner in) throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
@@ -381,6 +476,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "DeleteChatroom" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleDeleteChatroomCommand(Scanner in) throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
@@ -411,6 +514,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "ListChatrooms" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleListChatroomsCommand(Scanner in) throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
@@ -426,6 +537,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "SendMessage" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleSendMessageCommand(Scanner in) throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
@@ -474,6 +593,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "UserOnline" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleUserOnlineCommand(Scanner in) throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
@@ -491,6 +618,14 @@ public class CliController {
         }
     }
 
+    /**
+     * Ask for information required for the "ListChatroomUsers" command and send it to the server.
+     *
+     * @param in An object to read inputs from the console.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.1
+     */
     private void handleListChatroomUsersCommand(Scanner in) throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");

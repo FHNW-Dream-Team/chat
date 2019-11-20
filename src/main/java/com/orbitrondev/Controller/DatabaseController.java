@@ -12,11 +12,17 @@ import com.orbitrondev.Model.*;
 import com.orbitrondev.Model.SupportTables.ChatUserModel;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * A class to create a database connection.
+ *
+ * @author Manuele Vaccari
+ * @version %I%, %G%
+ * @since 0.0.1
+ */
 public class DatabaseController implements Closeable {
     private ConnectionSource connectionSource;
 
@@ -28,6 +34,13 @@ public class DatabaseController implements Closeable {
     public Dao<LoginModel, String> loginDao;
     public Dao<ServerModel, String> serverDao;
 
+    /**
+     * Create a database connection
+     *
+     * @param databaseLocation A string containing the location of the file to be accessed (and if necessary created)
+     *
+     * @since 0.0.1
+     */
     public DatabaseController(String databaseLocation) {
         try {
             // this uses h2 but you can change it to match your database
@@ -37,7 +50,7 @@ public class DatabaseController implements Closeable {
             connectionSource = new JdbcConnectionSource(databaseUrl);
 
             // setup our database and DAOs
-            setupDatabase(connectionSource);
+            setupDatabase();
         } catch (SQLException e) {
             // TODO: Handle exception
             e.printStackTrace();
@@ -45,9 +58,12 @@ public class DatabaseController implements Closeable {
     }
 
     /**
-     * Setup our database and DAOs
+     * Setup our database and DAOs, for the created connection.
+     *
+     * @throws SQLException If an SQL error occurs.
+     * @since 0.0.1
      */
-    private void setupDatabase(ConnectionSource connectionSource) throws SQLException {
+    private void setupDatabase() throws SQLException {
 
         /*
          * Create our DAOs. One for each class and associated table.
@@ -62,7 +78,7 @@ public class DatabaseController implements Closeable {
         serverDao = DaoManager.createDao(connectionSource, ServerModel.class);
 
         /*
-         * Create the tables for our example. This would not be necessary if the tables already existed.
+         * Create the tables, if they don't exist yet.
          */
         TableUtils.createTableIfNotExists(connectionSource, ChatModel.class);
         TableUtils.createTableIfNotExists(connectionSource, MessageModel.class);
@@ -74,6 +90,11 @@ public class DatabaseController implements Closeable {
         TableUtils.createTableIfNotExists(connectionSource, ServerModel.class);
     }
 
+    /**
+     * Close the database connection.
+     *
+     * @since 0.0.1
+     */
     @Override
     public void close() {
         if (connectionSource != null) try {

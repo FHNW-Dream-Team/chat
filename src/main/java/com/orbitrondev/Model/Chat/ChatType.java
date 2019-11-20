@@ -1,5 +1,12 @@
 package com.orbitrondev.Model.Chat;
 
+/**
+ * An enum defining the different chat types.
+ *
+ * @author Manuele Vaccari
+ * @version %I%, %G%
+ * @since 0.0.1
+ */
 public enum ChatType {
     DirectChat, PublicGroupChat, PrivateGroupChat;
 

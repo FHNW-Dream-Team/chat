@@ -3,6 +3,13 @@ package com.orbitrondev.Model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+/**
+ * A model with all known (and cached) users.
+ *
+ * @author Manuele Vaccari
+ * @version %I%, %G%
+ * @since 0.0.1
+ */
 @DatabaseTable(tableName = "cached_users")
 public class UserModel {
 

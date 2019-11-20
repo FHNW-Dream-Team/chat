@@ -8,6 +8,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+/**
+ * A model with all the messages available in all chats (that were caught while being online).
+ *
+ * @author Manuele Vaccari
+ * @version %I%, %G%
+ * @since 0.0.1
+ */
 @DatabaseTable(tableName = "messages")
 public class MessageModel {
 

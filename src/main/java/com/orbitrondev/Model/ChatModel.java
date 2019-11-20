@@ -6,6 +6,13 @@ import com.orbitrondev.Model.Chat.ChatType;
 
 import java.util.ArrayList;
 
+/**
+ * A model for the direct and group chats.
+ *
+ * @author Manuele Vaccari
+ * @version %I%, %G%
+ * @since 0.0.1
+ */
 @DatabaseTable(tableName = "chats")
 public class ChatModel {
 
