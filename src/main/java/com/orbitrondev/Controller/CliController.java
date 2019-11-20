@@ -6,6 +6,8 @@ import com.orbitrondev.Main;
 import com.orbitrondev.Model.LoginModel;
 import com.orbitrondev.Model.MainModel;
 import com.orbitrondev.Model.ServerModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -20,6 +22,9 @@ import java.util.Scanner;
  * @since 0.0.1
  */
 public class CliController {
+
+    private static final Logger logger = LogManager.getLogger(BackendController.class);
+
     private MainModel model;
 
     private BackendController backend;
@@ -97,7 +102,7 @@ public class CliController {
         try {
             backend = new BackendController(ipAddress, portNumber, secure);
 
-            System.out.println("Connected");
+            logger.info("Connected to server");
             // Loop, allowing the user to send messages to the server
             // Note: We still have our scanner
             System.out.println("Enter commands to server or ctrl-D to quit");

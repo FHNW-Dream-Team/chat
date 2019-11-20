@@ -4,6 +4,8 @@ import com.orbitrondev.Exception.InvalidIpException;
 import com.orbitrondev.Exception.InvalidPortException;
 import com.orbitrondev.Model.UserModel;
 import com.sun.net.ssl.internal.ssl.Provider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -21,6 +23,8 @@ import java.util.Arrays;
  * @since 0.0.1
  */
 public class BackendController implements Closeable {
+
+    private static final Logger logger = LogManager.getLogger(BackendController.class);
 
     private Socket socket;
 
@@ -109,7 +113,7 @@ public class BackendController implements Closeable {
                 String[] msgSplit;
                 try {
                     msg = socketIn.readLine();
-                    System.out.println("Received: " + msg);
+                    logger.info("Response received: " + msg);
 
                     if (msg != null && msg.length() > 0) {
                         msgSplit = msg.split("\\|");
@@ -177,7 +181,7 @@ public class BackendController implements Closeable {
      * @since 0.0.1
      */
     public void sendCommand(String command) throws IOException {
-        System.out.println("Sent: " + command);
+        logger.info("Command sent: " + command);
         socketOut.write(command + "\n");
         socketOut.flush();
     }
@@ -571,6 +575,7 @@ public class BackendController implements Closeable {
      * @since 0.0.1
      */
     public void createStandardSocket(String ipAddress, int port) throws IOException {
+        logger.info("Connecting to server at: " + ipAddress + ":" + port);
         socket = new Socket(ipAddress, port);
     }
 
@@ -584,6 +589,8 @@ public class BackendController implements Closeable {
      * @since 0.0.1
      */
     public void createSecureSocket(String ipAddress, int port) throws IOException {
+        logger.info("Connecting to server at: " + ipAddress + ":" + port + " (with SSL)");
+
         // TODO: SSL is not properly setup
         // Check out: https://gitlab.fhnw.ch/bradley.richards/java-projects/blob/master/src/chatroom/Howto_SSL_Certificates_in_Java.odt
 
