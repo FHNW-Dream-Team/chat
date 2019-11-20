@@ -3,6 +3,10 @@ package com.orbitrondev;
 import com.orbitrondev.Controller.CliController;
 import com.orbitrondev.Model.MainModel;
 import org.apache.commons.cli.*;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
 
 public class Main {
     public static boolean connectToDb = true;
@@ -23,6 +27,10 @@ public class Main {
         dbLocationOption.setOptionalArg(true);
         options.addOption(dbLocationOption);
 
+        Option verboseOption = new Option("v", "verbose", true, "Show more extensive logs");
+        verboseOption.setOptionalArg(true);
+        options.addOption(verboseOption);
+
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd = null;
@@ -41,8 +49,15 @@ public class Main {
 
         if (cmd.hasOption("no-db")) {
             connectToDb = false;
-        } else if (cmd.hasOption("db-location")) {
+        }
+        if (cmd.hasOption("db-location")) {
             dbLocation = cmd.getOptionValue("db-location");
+        }
+        if (cmd.hasOption("verbose")) {
+            final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+            final Configuration config = ctx.getConfiguration();
+            config.getRootLogger().addAppender(config.getAppender("Console"), Level.INFO, null);
+            ctx.updateLoggers();
         }
 
         if (!cmd.hasOption("no-gui")) {
