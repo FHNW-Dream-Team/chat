@@ -51,20 +51,44 @@ public class CliController {
         boolean askForSecure = true;
         boolean addToDB = true;
 
+        input = new Scanner(System.in);
+
         if (Main.connectToDb) {
             db = new DatabaseController(Main.dbLocation);
+
+            int serverCounter = 0;
+            ArrayList<ServerModel> serverList = new ArrayList<>();
+            boolean validServer = false;
+
+            System.out.println("Choose one of the following servers, or enter 0 to create a new one:");
+            System.out.println(serverCounter + ") Create new connection...");
             for (ServerModel server : db.serverDao) {
-                if (server.isDefaultServer()) {
-                    ipAddress = server.getIp();
-                    portNumber = server.getPort();
-                    secure = server.isSecure();
+                serverCounter++;
+                serverList.add(server);
+                System.out.println(serverCounter + ") " + server.getIp() + ":" + server.getPort() + (server.isSecure() ? " (SSL)" : ""));
+            }
+
+            while (!validServer) {
+                System.out.print("$ ");
+                String chosenServer = input.nextLine();
+                int chosenServerInt = Integer.parseInt(chosenServer);
+
+                if (chosenServerInt > serverCounter | chosenServerInt < 0) {
+                    System.out.println("That server config does not exist. Retry!");
+                } else if (chosenServerInt == 0) {
+                    validServer = true;
+                } else {
+                    chosenServerInt--; // The array starts at 0, but the output starts at 1
+                    validServer = true;
+                    ipAddress = serverList.get(chosenServerInt).getIp();
+                    portNumber = serverList.get(chosenServerInt).getPort();
+                    secure = serverList.get(chosenServerInt).isSecure();
                     askForSecure = false;
                     addToDB = false;
                 }
             }
         }
 
-        input = new Scanner(System.in);
         if (ipAddress == null) {
             boolean validIp = false;
 
