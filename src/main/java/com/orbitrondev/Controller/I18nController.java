@@ -85,7 +85,7 @@ public final class I18nController {
      * @since 0.0.1
      */
     public static String get(final String key, final Object... args) {
-        ResourceBundle bundle = ResourceBundle.getBundle("messages", getLocale());
+        ResourceBundle bundle = ResourceBundle.getBundle("i18n/messages", getLocale());
         return MessageFormat.format(bundle.getString(key), args);
     }
 
