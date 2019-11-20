@@ -36,8 +36,8 @@ public class CliController {
     private Scanner input;
 
     /**
-     * If desired, connect to the local database and use it's information.
-     * If nowhere saved, ask for IP address, port and whether to use SSL.
+     * If desired, connect to the local database and use it's information. If nowhere saved, ask for IP address, port
+     * and whether to use SSL.
      *
      * @param model An object containing the model to access all data and DB.
      *
@@ -95,7 +95,8 @@ public class CliController {
 
             // Read IP address
             while (!validIp) {
-                System.out.println("Enter the address of the server");
+                System.out.println("Enter the address of the server:");
+                System.out.print("$ ");
                 ipAddress = input.nextLine();
                 validIp = BackendController.isValidIpAddress(ipAddress);
             }
@@ -104,7 +105,8 @@ public class CliController {
             boolean validPort = false;
             // Read port
             while (!validPort) {
-                System.out.println("Enter the port number on the server (1024-65535)");
+                System.out.println("Enter the port number on the server (1024-65535):");
+                System.out.print("$ ");
                 String strPort = input.nextLine();
                 portNumber = Integer.parseInt(strPort);
                 validPort = BackendController.isValidPortNumber(portNumber);
@@ -113,6 +115,7 @@ public class CliController {
         if (askForSecure) {
             // Read security
             System.out.println("Enter 'yes' if the client should use SecureSockets");
+            System.out.print("$ ");
             String s = input.nextLine().trim();
             secure = s.equalsIgnoreCase("yes");
         }
@@ -149,6 +152,7 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleCommandInput() throws IOException {
+        System.out.print("$ ");
         while (input.hasNext()) {
             String line = input.nextLine();
             switch (line) {
@@ -200,6 +204,7 @@ public class CliController {
                     backend.sendCommand(line);
                     break;
             }
+            System.out.print("$ ");
         }
     }
 
@@ -396,7 +401,7 @@ public class CliController {
         System.out.print("Chatroom name: ");
         name = input.nextLine();
 
-        System.out.print("Should the room be accessible publicly? If so, enter \"yes\"");
+        System.out.print("Should the room be accessible publicly? If so, enter \"yes\": ");
         String s = input.nextLine().trim();
         isPublic = s.equalsIgnoreCase("yes");
 
