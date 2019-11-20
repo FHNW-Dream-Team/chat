@@ -32,6 +32,8 @@ public class CliController {
 
     private LoginModel login = null;
 
+    private Scanner input;
+
     /**
      * If desired, connect to the local database and use it's information.
      * If nowhere saved, ask for IP address, port and whether to use SSL.
@@ -62,14 +64,14 @@ public class CliController {
             }
         }
 
-        Scanner in = new Scanner(System.in);
+        input = new Scanner(System.in);
         if (ipAddress == null) {
             boolean validIp = false;
 
             // Read IP address
             while (!validIp) {
                 System.out.println("Enter the address of the server");
-                ipAddress = in.nextLine();
+                ipAddress = input.nextLine();
                 validIp = BackendController.isValidIpAddress(ipAddress);
             }
         }
@@ -78,7 +80,7 @@ public class CliController {
             // Read port
             while (!validPort) {
                 System.out.println("Enter the port number on the server (1024-65535)");
-                String strPort = in.nextLine();
+                String strPort = input.nextLine();
                 portNumber = Integer.parseInt(strPort);
                 validPort = BackendController.isValidPortNumber(portNumber);
             }
@@ -86,7 +88,7 @@ public class CliController {
         if (askForSecure) {
             // Read security
             System.out.println("Enter 'yes' if the client should use SecureSockets");
-            String s = in.nextLine().trim();
+            String s = input.nextLine().trim();
             secure = s.equalsIgnoreCase("yes");
         }
 
@@ -107,7 +109,7 @@ public class CliController {
             // Note: We still have our scanner
             System.out.println("Enter commands to server or ctrl-D to quit");
 
-            handleCommandInput(in);
+            handleCommandInput();
         } catch (InvalidIpException | InvalidPortException | IOException e) {
             e.printStackTrace();
         }
@@ -116,56 +118,54 @@ public class CliController {
     /**
      * Ask for the command to be sent to the server. If it's a known command, execute the corresponding function.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleCommandInput(Scanner in) throws IOException {
-        while (in.hasNext()) {
-            String line = in.nextLine();
+    private void handleCommandInput() throws IOException {
+        while (input.hasNext()) {
+            String line = input.nextLine();
             switch (line) {
                 case "CreateLogin":
-                    handleCreateLoginCommand(in);
+                    handleCreateLoginCommand();
                     break;
                 case "Login":
-                    handleLoginCommand(in);
+                    handleLoginCommand();
                     break;
                 case "ChangePassword":
-                    handleChangePasswordCommand(in);
+                    handleChangePasswordCommand();
                     break;
                 case "DeleteLogin":
-                    handleDeleteLoginCommand(in);
+                    handleDeleteLoginCommand();
                     break;
                 case "Logout":
-                    handleLogoutCommand(in);
+                    handleLogoutCommand();
                     break;
                 case "CreateChatroom":
-                    handleCreateChatroomCommand(in);
+                    handleCreateChatroomCommand();
                     break;
                 case "JoinChatroom":
-                    handleJoinChatroomCommand(in);
+                    handleJoinChatroomCommand();
                     break;
                 case "LeaveChatroom":
-                    handleLeaveChatroomCommand(in);
+                    handleLeaveChatroomCommand();
                     break;
                 case "DeleteChatroom":
-                    handleDeleteChatroomCommand(in);
+                    handleDeleteChatroomCommand();
                     break;
                 case "ListChatrooms":
-                    handleListChatroomsCommand(in);
+                    handleListChatroomsCommand();
                     break;
                 case "Ping":
-                    handlePingCommand(in);
+                    handlePingCommand();
                     break;
                 case "SendMessage":
-                    handleSendMessageCommand(in);
+                    handleSendMessageCommand();
                     break;
                 case "UserOnline":
-                    handleUserOnlineCommand(in);
+                    handleUserOnlineCommand();
                     break;
                 case "ListChatroomUsers":
-                    handleListChatroomUsersCommand(in);
+                    handleListChatroomUsersCommand();
                     break;
                 default:
                     backend.sendCommand(line);
@@ -177,23 +177,21 @@ public class CliController {
     /**
      * Ask for information required for the "CreateLogin" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleCreateLoginCommand(Scanner in) throws IOException {
+    private void handleCreateLoginCommand() throws IOException {
         System.out.println("To create a new user we need: username, password");
         boolean valid = false;
         String username = null, password = null, verifyPassword = null;
 
         while (!valid) {
             System.out.print("Username: ");
-            username = in.nextLine();
+            username = input.nextLine();
             System.out.print("Password: ");
-            password = in.nextLine();
+            password = input.nextLine();
             System.out.print("Repeat Password: ");
-            verifyPassword = in.nextLine();
+            verifyPassword = input.nextLine();
 
             if (password.equals(verifyPassword)) {
                 valid = true;
@@ -214,19 +212,17 @@ public class CliController {
     /**
      * Ask for information required for the "Login" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleLoginCommand(Scanner in) throws IOException {
+    private void handleLoginCommand() throws IOException {
         System.out.println("To login you need to have created a user");
         String username, password;
 
         System.out.print("Username: ");
-        username = in.nextLine();
+        username = input.nextLine();
         System.out.print("Password: ");
-        password = in.nextLine();
+        password = input.nextLine();
 
         String tokenTemp = backend.sendLogin(username, password);
         if (tokenTemp != null) {
@@ -240,12 +236,10 @@ public class CliController {
     /**
      * Ask for information required for the "ChangePassword" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleChangePasswordCommand(Scanner in) throws IOException {
+    private void handleChangePasswordCommand() throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
             return;
@@ -257,9 +251,9 @@ public class CliController {
         while (!valid) {
             // TODO: Maybe future feature to enter current password first
             System.out.print("New password: ");
-            newPassword = in.nextLine();
+            newPassword = input.nextLine();
             System.out.print("Verify new password: ");
-            verifyNewPassword = in.nextLine();
+            verifyNewPassword = input.nextLine();
 
             if (newPassword.equals(verifyNewPassword)) {
                 valid = true;
@@ -280,12 +274,10 @@ public class CliController {
     /**
      * Ask for information required for the "DeleteLogin" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleDeleteLoginCommand(Scanner in) throws IOException {
+    private void handleDeleteLoginCommand() throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
             return;
@@ -294,7 +286,7 @@ public class CliController {
         boolean verify;
 
         System.out.println("Are you sure you want to delete this account? If so, enter \"yes\".");
-        String s = in.nextLine().trim();
+        String s = input.nextLine().trim();
         verify = s.equalsIgnoreCase("yes");
 
         if (verify) {
@@ -316,12 +308,10 @@ public class CliController {
     /**
      * Ask for information required for the "Logout" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleLogoutCommand(Scanner in) throws IOException {
+    private void handleLogoutCommand() throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
             return;
@@ -338,12 +328,10 @@ public class CliController {
     /**
      * Ask for information required for the "Ping" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handlePingCommand(Scanner in) throws IOException {
+    private void handlePingCommand() throws IOException {
         if (login != null) {
             System.out.println("Sending ping with token...");
             if (backend.sendPing(login.getToken())) {
@@ -364,12 +352,10 @@ public class CliController {
     /**
      * Ask for information required for the "CreateChatroom" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleCreateChatroomCommand(Scanner in) throws IOException {
+    private void handleCreateChatroomCommand() throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
             return;
@@ -379,10 +365,10 @@ public class CliController {
         boolean isPublic = false;
 
         System.out.print("Chatroom name: ");
-        name = in.nextLine();
+        name = input.nextLine();
 
         System.out.print("Should the room be accessible publicly? If so, enter \"yes\"");
-        String s = in.nextLine().trim();
+        String s = input.nextLine().trim();
         isPublic = s.equalsIgnoreCase("yes");
 
         if (backend.sendCreateChatroom(login.getToken(), name, isPublic)) {
@@ -402,12 +388,10 @@ public class CliController {
     /**
      * Ask for information required for the "JoinChatroom" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleJoinChatroomCommand(Scanner in) throws IOException {
+    private void handleJoinChatroomCommand() throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
             return;
@@ -421,7 +405,7 @@ public class CliController {
         chatrooms.forEach(s -> System.out.println("* " + s));
         while (!validRoomName) {
             System.out.print("Room name: ");
-            roomName = in.nextLine();
+            roomName = input.nextLine();
 
             if (chatrooms.contains(roomName)) {
                 validRoomName = true;
@@ -431,7 +415,7 @@ public class CliController {
         }
 
         System.out.print("Username: ");
-        username = in.nextLine();
+        username = input.nextLine();
 
         if (backend.sendJoinChatroom(login.getToken(), roomName, username)) {
             System.out.println("Room joined successfully");
@@ -443,12 +427,10 @@ public class CliController {
     /**
      * Ask for information required for the "LeaveChatroom" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleLeaveChatroomCommand(Scanner in) throws IOException {
+    private void handleLeaveChatroomCommand() throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
             return;
@@ -462,7 +444,7 @@ public class CliController {
         chatrooms.forEach(s -> System.out.println("* " + s));
         while (!validRoomName) {
             System.out.print("Room name: ");
-            roomName = in.nextLine();
+            roomName = input.nextLine();
 
             if (chatrooms.contains(roomName)) {
                 validRoomName = true;
@@ -472,7 +454,7 @@ public class CliController {
         }
 
         System.out.print("Username: ");
-        username = in.nextLine();
+        username = input.nextLine();
 
         if (backend.sendLeaveChatroom(login.getToken(), roomName, username)) {
             System.out.println("Room left successfully");
@@ -484,12 +466,10 @@ public class CliController {
     /**
      * Ask for information required for the "DeleteChatroom" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleDeleteChatroomCommand(Scanner in) throws IOException {
+    private void handleDeleteChatroomCommand() throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
             return;
@@ -503,7 +483,7 @@ public class CliController {
         chatrooms.forEach(s -> System.out.println("* " + s));
         while (!validRoomName) {
             System.out.print("Room name: ");
-            roomName = in.nextLine();
+            roomName = input.nextLine();
 
             if (chatrooms.contains(roomName)) {
                 validRoomName = true;
@@ -522,12 +502,10 @@ public class CliController {
     /**
      * Ask for information required for the "ListChatrooms" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleListChatroomsCommand(Scanner in) throws IOException {
+    private void handleListChatroomsCommand() throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
             return;
@@ -545,12 +523,10 @@ public class CliController {
     /**
      * Ask for information required for the "SendMessage" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleSendMessageCommand(Scanner in) throws IOException {
+    private void handleSendMessageCommand() throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
             return;
@@ -565,7 +541,7 @@ public class CliController {
 
         while (!validTarget) {
             System.out.print("Room name/Username: ");
-            target = in.nextLine();
+            target = input.nextLine();
 
             // Check if it's a room
             if (chatrooms.contains(target)) {
@@ -581,7 +557,7 @@ public class CliController {
 
         while (!validMessage) {
             System.out.print("Message (max. 1024 characters): ");
-            message = in.nextLine();
+            message = input.nextLine();
 
             // Check if it is not more than 1024 characters
             if (message.length() <= 1024) {
@@ -601,12 +577,10 @@ public class CliController {
     /**
      * Ask for information required for the "UserOnline" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleUserOnlineCommand(Scanner in) throws IOException {
+    private void handleUserOnlineCommand() throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
             return;
@@ -614,7 +588,7 @@ public class CliController {
 
         String username = null;
         System.out.print("Username: ");
-        username = in.nextLine();
+        username = input.nextLine();
 
         if (backend.sendUserOnline(login.getToken(), username)) {
             System.out.println("The user is online");
@@ -626,12 +600,10 @@ public class CliController {
     /**
      * Ask for information required for the "ListChatroomUsers" command and send it to the server.
      *
-     * @param in An object to read inputs from the console.
-     *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    private void handleListChatroomUsersCommand(Scanner in) throws IOException {
+    private void handleListChatroomUsersCommand() throws IOException {
         if (login == null) {
             System.out.println("To do this action, you need to be logged in!");
             return;
@@ -649,7 +621,7 @@ public class CliController {
         }
 
         System.out.print("Chatroom: ");
-        chatroom = in.nextLine();
+        chatroom = input.nextLine();
 
         usersInChatroom = backend.sendListChatroomUsers(login.getToken(), chatroom);
         System.out.println("Following users are inside the room " + chatroom + ":");
