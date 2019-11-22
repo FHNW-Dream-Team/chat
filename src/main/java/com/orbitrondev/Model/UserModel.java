@@ -41,6 +41,9 @@ public class UserModel {
         // all persisted classes must define a no-arg constructor
         // with at least package visibility
     }
+    public UserModel(String username) {
+        this.username = username;
+    }
 
     public UserModel(String username, boolean online) {
         this.username = username;
