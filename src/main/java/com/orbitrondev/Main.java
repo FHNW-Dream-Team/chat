@@ -11,6 +11,7 @@ import org.apache.logging.log4j.core.config.Configuration;
 public class Main {
     public static boolean connectToDb = true;
     public static String dbLocation = "chat.sqlite3";
+    public static boolean isGui = false;
 
     public static void main(String[] args) {
         Options options = new Options();
@@ -61,6 +62,7 @@ public class Main {
         }
 
         if (!cmd.hasOption("no-gui")) {
+            isGui = true;
             MainGui.main(args);
         } else {
             MainModel model = new MainModel();
