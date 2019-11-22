@@ -28,9 +28,16 @@ public class MessageModel {
     @DatabaseField(canBeNull = false)
     private String message;
 
+    @DatabaseField(foreign = true)
+    private UserModel userTarget;
+
+    @DatabaseField(foreign = true)
+    private ChatModel chatTarget;
+
     @DatabaseField(canBeNull = false)
     private Date timeSent;
 
+    @DatabaseField(canBeNull = false, foreign = true)
     private UserModel user;
 
     /**
@@ -43,8 +50,10 @@ public class MessageModel {
         // with at least package visibility
     }
 
-    public MessageModel(String message, Date timeSent, UserModel user) {
+    public MessageModel(String message, UserModel userTarget, ChatModel chatTarget, Date timeSent, UserModel user) {
         this.message = message;
+        this.userTarget = userTarget;
+        this.chatTarget = chatTarget;
         this.timeSent = timeSent;
         this.user = user;
     }
@@ -59,6 +68,24 @@ public class MessageModel {
 
     public String getMessage() {
         return message;
+    }
+
+    public UserModel getUserTarget() {
+        return userTarget;
+    }
+
+    public ChatModel getChatTarget() {
+        return chatTarget;
+    }
+
+    public Object getTarget() {
+        if (userTarget != null) {
+            return userTarget;
+        } else if (chatTarget != null) {
+            return chatTarget;
+        } else {
+            return null;
+        }
     }
 
     public Date getTimeSent() {
