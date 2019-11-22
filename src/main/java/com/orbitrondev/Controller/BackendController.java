@@ -23,7 +23,7 @@ import java.util.Arrays;
  * @since 0.0.1
  */
 public class BackendController implements Closeable {
-
+    private ServiceLocator sl;
     private static final Logger logger = LogManager.getLogger(BackendController.class);
 
     private Socket socket;
@@ -50,6 +50,7 @@ public class BackendController implements Closeable {
         if (!isValidPortNumber(port)) {
             throw new InvalidPortException();
         }
+        sl = ServiceLocator.getServiceLocator();
 
         try {
             createStandardSocket(ipAddress, port);
@@ -82,6 +83,7 @@ public class BackendController implements Closeable {
         if (!isValidPortNumber(port)) {
             throw new InvalidPortException();
         }
+        sl = ServiceLocator.getServiceLocator();
 
         try {
             if (secure) {

@@ -23,13 +23,12 @@ import java.util.Scanner;
  * @since 0.0.1
  */
 public class CliController {
-
+    private ServiceLocator sl;
     private static final Logger logger = LogManager.getLogger(CliController.class);
 
     private MainModel model;
 
     private BackendController backend;
-    private DatabaseController db;
 
     private Scanner input;
 
@@ -43,6 +42,7 @@ public class CliController {
      */
     public CliController(MainModel model) {
         this.model = model;
+        sl = ServiceLocator.getServiceLocator();
 
         String ipAddress = null;
         int portNumber = -1;
@@ -53,7 +53,7 @@ public class CliController {
         input = new Scanner(System.in);
 
         if (Main.connectToDb) {
-            db = new DatabaseController(Main.dbLocation);
+            sl.setDb(new DatabaseController(Main.dbLocation));
 
             int serverCounter = 0;
             ArrayList<ServerModel> serverList = new ArrayList<>();
@@ -61,7 +61,7 @@ public class CliController {
 
             System.out.println(I18nController.get("console.setup.server.select"));
             System.out.println(I18nController.get("console.setup.server.create"));
-            for (ServerModel server : db.getServerDao()) {
+            for (ServerModel server : sl.getDb().getServerDao()) {
                 serverCounter++;
                 serverList.add(server);
                 if (server.isSecure()) {
@@ -122,10 +122,10 @@ public class CliController {
             secure = s.equalsIgnoreCase("yes");
         }
 
-        if (Main.connectToDb && db != null && addToDB) {
+        if (Main.connectToDb && sl.getDb() != null && addToDB) {
             try {
                 ServerModel server = new ServerModel(ipAddress, portNumber, secure, true);
-                db.getServerDao().create(server);
+                sl.getDb().getServerDao().create(server);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
