@@ -24,14 +24,12 @@ import java.util.Scanner;
  */
 public class CliController {
 
-    private static final Logger logger = LogManager.getLogger(BackendController.class);
+    private static final Logger logger = LogManager.getLogger(CliController.class);
 
     private MainModel model;
 
     private BackendController backend;
     private DatabaseController db;
-
-    private LoginModel login = null;
 
     private Scanner input;
 
@@ -264,7 +262,7 @@ public class CliController {
 
         String tokenTemp = backend.sendLogin(username, password);
         if (tokenTemp != null) {
-            login = new LoginModel(username, password, tokenTemp);
+            model.setCurrentLogin(new LoginModel(username, password, tokenTemp));
             System.out.println(I18nController.get("console.login.success"));
         } else {
             System.out.println(I18nController.get("console.login.fail"));
@@ -278,7 +276,7 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleChangePasswordCommand() throws IOException {
-        if (login == null) {
+        if (model.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -301,7 +299,7 @@ public class CliController {
         }
 
         if (newPassword != null) {
-            if (backend.sendChangePassword(login.getToken(), newPassword)) {
+            if (backend.sendChangePassword(model.getCurrentLogin().getToken(), newPassword)) {
                 System.out.println(I18nController.get("console.changePassword.success"));
             } else {
                 System.out.println(I18nController.get("console.changePassword.fail"));
@@ -316,7 +314,7 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleDeleteLoginCommand() throws IOException {
-        if (login == null) {
+        if (model.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -329,7 +327,7 @@ public class CliController {
         verify = s.equalsIgnoreCase("yes");
 
         if (verify) {
-            if (backend.sendDeleteLogin(login.getToken())) {
+            if (backend.sendDeleteLogin(model.getCurrentLogin().getToken())) {
                 System.out.println(I18nController.get("console.deleteLogin.success"));
 
                 handleLogoutCommand();
@@ -346,7 +344,7 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleLogoutCommand() throws IOException {
-        if (login == null) {
+        if (model.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -354,7 +352,7 @@ public class CliController {
         System.out.println(I18nController.get("console.logout.init"));
         if (backend.sendLogout()) {
             System.out.println(I18nController.get("console.logout.success"));
-            login = null;
+            model.setCurrentLogin(null);
         } else {
             System.out.println(I18nController.get("console.logout.fail"));
         }
@@ -367,9 +365,9 @@ public class CliController {
      * @since 0.0.1
      */
     private void handlePingCommand() throws IOException {
-        if (login != null) {
+        if (model.getCurrentLogin() != null) {
             System.out.println(I18nController.get("console.ping.token.init"));
-            if (backend.sendPing(login.getToken())) {
+            if (backend.sendPing(model.getCurrentLogin().getToken())) {
                 System.out.println(I18nController.get("console.ping.success"));
             } else {
                 System.out.println(I18nController.get("console.ping.fail"));
@@ -391,7 +389,7 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleCreateChatroomCommand() throws IOException {
-        if (login == null) {
+        if (model.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -406,11 +404,11 @@ public class CliController {
         String s = input.nextLine().trim();
         isPublic = s.equalsIgnoreCase("yes");
 
-        if (backend.sendCreateChatroom(login.getToken(), name, isPublic)) {
+        if (backend.sendCreateChatroom(model.getCurrentLogin().getToken(), name, isPublic)) {
             System.out.println(I18nController.get("console.createGroupChat.success"));
 
             System.out.println(I18nController.get("console.joinChatroom.task"));
-            if (backend.sendJoinChatroom(login.getToken(), name, login.getUsername())) {
+            if (backend.sendJoinChatroom(model.getCurrentLogin().getToken(), name, model.getCurrentLogin().getUsername())) {
                 System.out.println(I18nController.get("console.joinChatroom.success"));
             } else {
                 System.out.println(I18nController.get("console.joinChatroom.fail"));
@@ -427,7 +425,7 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleJoinChatroomCommand() throws IOException {
-        if (login == null) {
+        if (model.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -437,7 +435,7 @@ public class CliController {
 
         System.out.println(I18nController.get("console.joinChatroom.init"));
         handleListChatroomsCommand();
-        ArrayList<String> chatrooms = backend.sendListChatrooms(login.getToken());
+        ArrayList<String> chatrooms = backend.sendListChatrooms(model.getCurrentLogin().getToken());
         while (!validRoomName) {
             System.out.print(I18nController.get("console.joinChatroom.name") + " ");
             roomName = input.nextLine();
@@ -453,7 +451,7 @@ public class CliController {
         username = input.nextLine();
 
         System.out.println(I18nController.get("console.joinChatroom.task"));
-        if (backend.sendJoinChatroom(login.getToken(), roomName, username)) {
+        if (backend.sendJoinChatroom(model.getCurrentLogin().getToken(), roomName, username)) {
             System.out.println(I18nController.get("console.joinChatroom.success"));
         } else {
             System.out.println(I18nController.get("console.joinChatroom.fail"));
@@ -467,7 +465,7 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleLeaveChatroomCommand() throws IOException {
-        if (login == null) {
+        if (model.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -476,7 +474,7 @@ public class CliController {
         boolean validRoomName = false;
 
         handleListChatroomsCommand();
-        ArrayList<String> chatrooms = backend.sendListChatrooms(login.getToken());
+        ArrayList<String> chatrooms = backend.sendListChatrooms(model.getCurrentLogin().getToken());
         while (!validRoomName) {
             System.out.print(I18nController.get("console.leaveChatroom.name") + " ");
             roomName = input.nextLine();
@@ -491,7 +489,7 @@ public class CliController {
         System.out.print(I18nController.get("console.leaveChatroom.user") + " ");
         username = input.nextLine();
 
-        if (backend.sendLeaveChatroom(login.getToken(), roomName, username)) {
+        if (backend.sendLeaveChatroom(model.getCurrentLogin().getToken(), roomName, username)) {
             System.out.println(I18nController.get("console.leaveChatroom.success"));
         } else {
             System.out.println(I18nController.get("console.leaveChatroom.fail"));
@@ -505,7 +503,7 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleDeleteChatroomCommand() throws IOException {
-        if (login == null) {
+        if (model.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -514,7 +512,7 @@ public class CliController {
         boolean validRoomName = false;
 
         handleListChatroomsCommand();
-        ArrayList<String> chatrooms = backend.sendListChatrooms(login.getToken());
+        ArrayList<String> chatrooms = backend.sendListChatrooms(model.getCurrentLogin().getToken());
         while (!validRoomName) {
             System.out.print(I18nController.get("console.deleteChatroom.name") + " ");
             roomName = input.nextLine();
@@ -526,7 +524,7 @@ public class CliController {
             }
         }
 
-        if (backend.sendDeleteChatroom(login.getToken(), roomName)) {
+        if (backend.sendDeleteChatroom(model.getCurrentLogin().getToken(), roomName)) {
             System.out.println(I18nController.get("console.deleteChatroom.success"));
         } else {
             System.out.println(I18nController.get("console.deleteChatroom.fail"));
@@ -540,12 +538,12 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleListChatroomsCommand() throws IOException {
-        if (login == null) {
+        if (model.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
-        ArrayList<String> chatrooms = backend.sendListChatrooms(login.getToken());
+        ArrayList<String> chatrooms = backend.sendListChatrooms(model.getCurrentLogin().getToken());
         if (chatrooms == null) {
             System.out.println(I18nController.get("console.listChatrooms.fail"));
         } else if (chatrooms.size() > 0) {
@@ -563,7 +561,7 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleSendMessageCommand() throws IOException {
-        if (login == null) {
+        if (model.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -573,7 +571,7 @@ public class CliController {
 
         System.out.println(I18nController.get("console.sendMessage.init"));
         handleListChatroomsCommand();
-        ArrayList<String> chatrooms = backend.sendListChatrooms(login.getToken());
+        ArrayList<String> chatrooms = backend.sendListChatrooms(model.getCurrentLogin().getToken());
 
         while (!validTarget) {
             System.out.print(I18nController.get("console.sendMessage.target") + " ");
@@ -583,7 +581,7 @@ public class CliController {
             if (chatrooms.contains(target)) {
                 validTarget = true;
             } else {
-                if (backend.sendUserOnline(login.getToken(), target)) {
+                if (backend.sendUserOnline(model.getCurrentLogin().getToken(), target)) {
                     validTarget = true;
                 } else {
                     System.out.println(I18nController.get("console.sendMessage.target.invalid"));
@@ -603,7 +601,7 @@ public class CliController {
             }
         }
 
-        if (backend.sendSendMessage(login.getToken(), target, message)) {
+        if (backend.sendSendMessage(model.getCurrentLogin().getToken(), target, message)) {
             System.out.println(I18nController.get("console.sendMessage.success"));
         } else {
             System.out.println(I18nController.get("console.sendMessage.fail"));
@@ -617,7 +615,7 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleUserOnlineCommand() throws IOException {
-        if (login == null) {
+        if (model.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -626,7 +624,7 @@ public class CliController {
         System.out.print(I18nController.get("console.userOnline.user") + " ");
         username = input.nextLine();
 
-        if (backend.sendUserOnline(login.getToken(), username)) {
+        if (backend.sendUserOnline(model.getCurrentLogin().getToken(), username)) {
             System.out.println(I18nController.get("console.userOnline.success"));
         } else {
             System.out.println(I18nController.get("console.userOnline.fail"));
@@ -640,7 +638,7 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleListChatroomUsersCommand() throws IOException {
-        if (login == null) {
+        if (model.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -653,7 +651,7 @@ public class CliController {
         System.out.print(I18nController.get("console.listChatroomUsers.name") + " ");
         chatroom = input.nextLine();
 
-        usersInChatroom = backend.sendListChatroomUsers(login.getToken(), chatroom);
+        usersInChatroom = backend.sendListChatroomUsers(model.getCurrentLogin().getToken(), chatroom);
         if (usersInChatroom == null) {
             System.out.println(I18nController.get("console.listChatroomUsers.failed"));
         } else if (usersInChatroom.size() > 0) {
