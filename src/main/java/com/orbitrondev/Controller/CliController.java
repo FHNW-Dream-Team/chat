@@ -61,12 +61,16 @@ public class CliController {
             ArrayList<ServerModel> serverList = new ArrayList<>();
             boolean validServer = false;
 
-            System.out.println("Choose one of the following servers, or enter 0 to create a new one:");
-            System.out.println(serverCounter + ") Create new connection...");
+            System.out.println(I18nController.get("console.setup.server.select"));
+            System.out.println(I18nController.get("console.setup.server.create"));
             for (ServerModel server : db.serverDao) {
                 serverCounter++;
                 serverList.add(server);
-                System.out.println(serverCounter + ") " + server.getIp() + ":" + server.getPort() + (server.isSecure() ? " (SSL)" : ""));
+                if (server.isSecure()) {
+                    System.out.println(I18nController.get("console.setup.server.entry.ssl", serverCounter, server.getIp(), Integer.toString(server.getPort())));
+                } else {
+                    System.out.println(I18nController.get("console.setup.server.entry", serverCounter, server.getIp(), Integer.toString(server.getPort())));
+                }
             }
 
             while (!validServer) {
@@ -75,7 +79,7 @@ public class CliController {
                 int chosenServerInt = Integer.parseInt(chosenServer);
 
                 if (chosenServerInt > serverCounter | chosenServerInt < 0) {
-                    System.out.println("That server config does not exist. Retry!");
+                    System.out.println(I18nController.get("console.setup.server.entry.invalid"));
                 } else if (chosenServerInt == 0) {
                     validServer = true;
                 } else {
@@ -95,7 +99,7 @@ public class CliController {
 
             // Read IP address
             while (!validIp) {
-                System.out.println("Enter the address of the server:");
+                System.out.println(I18nController.get("console.setup.ip"));
                 System.out.print("$ ");
                 ipAddress = input.nextLine();
                 validIp = BackendController.isValidIpAddress(ipAddress);
@@ -105,7 +109,7 @@ public class CliController {
             boolean validPort = false;
             // Read port
             while (!validPort) {
-                System.out.println("Enter the port number on the server (1024-65535):");
+                System.out.println(I18nController.get("console.setup.port"));
                 System.out.print("$ ");
                 String strPort = input.nextLine();
                 portNumber = Integer.parseInt(strPort);
@@ -114,7 +118,7 @@ public class CliController {
         }
         if (askForSecure) {
             // Read security
-            System.out.println("Enter 'yes' if the client should use SecureSockets");
+            System.out.println(I18nController.get("console.setup.ssl"));
             System.out.print("$ ");
             String s = input.nextLine().trim();
             secure = s.equalsIgnoreCase("yes");
@@ -132,10 +136,10 @@ public class CliController {
         try {
             backend = new BackendController(ipAddress, portNumber, secure);
 
-            logger.info("Connected to server");
+            logger.info(I18nController.get("console.connection.successful"));
             // Loop, allowing the user to send messages to the server
             // Note: We still have our scanner
-            System.out.println("Enter commands to server or ctrl-D to quit");
+            System.out.println(I18nController.get("console.command.init"));
             System.out.println();
             handleHelpCommand();
 
@@ -215,30 +219,30 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleCreateLoginCommand() throws IOException {
-        System.out.println("To create a new user we need: username, password");
+        System.out.println(I18nController.get("console.createLogin.init"));
         boolean valid = false;
-        String username = null, password = null, verifyPassword = null;
+        String username = null, password = null, verifyPassword;
 
         while (!valid) {
-            System.out.print("Username: ");
+            System.out.print(I18nController.get("console.createLogin.username") + " ");
             username = input.nextLine();
-            System.out.print("Password: ");
+            System.out.print(I18nController.get("console.createLogin.password") + " ");
             password = input.nextLine();
-            System.out.print("Repeat Password: ");
+            System.out.print(I18nController.get("console.createLogin.password.repeat") + " ");
             verifyPassword = input.nextLine();
 
             if (password.equals(verifyPassword)) {
                 valid = true;
             } else {
-                System.out.println("Passwords do not match");
+                System.out.println(I18nController.get("console.createLogin.password.invalid"));
             }
         }
 
         if (username != null && password != null) {
             if (backend.sendCreateLogin(username, password)) {
-                System.out.println("User was created");
+                System.out.println(I18nController.get("console.createLogin.success"));
             } else {
-                System.out.println("User not created");
+                System.out.println(I18nController.get("console.createLogin.fail"));
             }
         }
     }
@@ -250,20 +254,20 @@ public class CliController {
      * @since 0.0.1
      */
     private void handleLoginCommand() throws IOException {
-        System.out.println("To login you need to have created a user");
+        System.out.println(I18nController.get("console.login.init"));
         String username, password;
 
-        System.out.print("Username: ");
+        System.out.print(I18nController.get("console.login.username") + " ");
         username = input.nextLine();
-        System.out.print("Password: ");
+        System.out.print(I18nController.get("console.login.password") + " ");
         password = input.nextLine();
 
         String tokenTemp = backend.sendLogin(username, password);
         if (tokenTemp != null) {
             login = new LoginModel(username, password, tokenTemp);
-            System.out.println("Successfully logged in");
+            System.out.println(I18nController.get("console.login.success"));
         } else {
-            System.out.println("Not logged in");
+            System.out.println(I18nController.get("console.login.fail"));
         }
     }
 
@@ -275,32 +279,32 @@ public class CliController {
      */
     private void handleChangePasswordCommand() throws IOException {
         if (login == null) {
-            System.out.println("To do this action, you need to be logged in!");
+            System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
-        String newPassword = null, verifyNewPassword = null;
+        String newPassword = null, verifyNewPassword;
         boolean valid = false;
 
         while (!valid) {
             // TODO: Maybe future feature to enter current password first
-            System.out.print("New password: ");
+            System.out.print(I18nController.get("console.changePassword.password") + " ");
             newPassword = input.nextLine();
-            System.out.print("Verify new password: ");
+            System.out.print(I18nController.get("console.changePassword.password.verify") + " ");
             verifyNewPassword = input.nextLine();
 
             if (newPassword.equals(verifyNewPassword)) {
                 valid = true;
             } else {
-                System.out.println("Passwords do not match");
+                System.out.println(I18nController.get("console.changePassword.password.invalid"));
             }
         }
 
         if (newPassword != null) {
             if (backend.sendChangePassword(login.getToken(), newPassword)) {
-                System.out.println("Password was changed");
+                System.out.println(I18nController.get("console.changePassword.success"));
             } else {
-                System.out.println("Password was NOT changed");
+                System.out.println(I18nController.get("console.changePassword.fail"));
             }
         }
     }
@@ -313,28 +317,24 @@ public class CliController {
      */
     private void handleDeleteLoginCommand() throws IOException {
         if (login == null) {
-            System.out.println("To do this action, you need to be logged in!");
+            System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
         boolean verify;
 
-        System.out.println("Are you sure you want to delete this account? If so, enter \"yes\".");
+        System.out.println(I18nController.get("console.deleteLogin.init"));
+        System.out.print("$ ");
         String s = input.nextLine().trim();
         verify = s.equalsIgnoreCase("yes");
 
         if (verify) {
             if (backend.sendDeleteLogin(login.getToken())) {
-                System.out.println("User was successfully deleted");
+                System.out.println(I18nController.get("console.deleteLogin.success"));
 
-                System.out.println("Logging out...");
-                if (backend.sendLogout()) {
-                    System.out.println("Logged out");
-                } else {
-                    System.out.println("Not logged out");
-                }
+                handleLogoutCommand();
             } else {
-                System.out.println("User was not deleted");
+                System.out.println(I18nController.get("console.deleteLogin.fail"));
             }
         }
     }
@@ -347,15 +347,16 @@ public class CliController {
      */
     private void handleLogoutCommand() throws IOException {
         if (login == null) {
-            System.out.println("To do this action, you need to be logged in!");
+            System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
+        System.out.println(I18nController.get("console.logout.init"));
         if (backend.sendLogout()) {
-            System.out.println("Logged out");
+            System.out.println(I18nController.get("console.logout.success"));
             login = null;
         } else {
-            System.out.println("Not logged out");
+            System.out.println(I18nController.get("console.logout.fail"));
         }
     }
 
@@ -367,18 +368,18 @@ public class CliController {
      */
     private void handlePingCommand() throws IOException {
         if (login != null) {
-            System.out.println("Sending ping with token...");
+            System.out.println(I18nController.get("console.ping.token.init"));
             if (backend.sendPing(login.getToken())) {
-                System.out.println("Ping was successful");
+                System.out.println(I18nController.get("console.ping.success"));
             } else {
-                System.out.println("Ping was NOT successful");
+                System.out.println(I18nController.get("console.ping.fail"));
             }
         } else {
-            System.out.println("Sending ping...");
+            System.out.println(I18nController.get("console.ping.init"));
             if (backend.sendPing()) {
-                System.out.println("Ping was successful");
+                System.out.println(I18nController.get("console.ping.success"));
             } else {
-                System.out.println("Ping was NOT successful");
+                System.out.println(I18nController.get("console.ping.fail"));
             }
         }
     }
@@ -391,31 +392,31 @@ public class CliController {
      */
     private void handleCreateChatroomCommand() throws IOException {
         if (login == null) {
-            System.out.println("To do this action, you need to be logged in!");
+            System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
         String name;
-        boolean isPublic = false;
+        boolean isPublic;
 
-        System.out.print("Chatroom name: ");
+        System.out.print(I18nController.get("console.createGroupChat.name") + " ");
         name = input.nextLine();
 
-        System.out.print("Should the room be accessible publicly? If so, enter \"yes\": ");
+        System.out.print(I18nController.get("console.createGroupChat.public") + " ");
         String s = input.nextLine().trim();
         isPublic = s.equalsIgnoreCase("yes");
 
         if (backend.sendCreateChatroom(login.getToken(), name, isPublic)) {
-            System.out.println("Chatroom was created");
+            System.out.println(I18nController.get("console.createGroupChat.success"));
 
-            System.out.println("Joining the room...");
+            System.out.println(I18nController.get("console.joinChatroom.task"));
             if (backend.sendJoinChatroom(login.getToken(), name, login.getUsername())) {
-                System.out.println("Room joined successfully");
+                System.out.println(I18nController.get("console.joinChatroom.success"));
             } else {
-                System.out.println("Room was not joined");
+                System.out.println(I18nController.get("console.joinChatroom.fail"));
             }
         } else {
-            System.out.println("Chatroom was not created");
+            System.out.println(I18nController.get("console.createGroupChat.fail"));
         }
     }
 
@@ -427,34 +428,35 @@ public class CliController {
      */
     private void handleJoinChatroomCommand() throws IOException {
         if (login == null) {
-            System.out.println("To do this action, you need to be logged in!");
+            System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
-        String roomName = null, username = null;
+        String roomName = null, username;
         boolean validRoomName = false;
 
+        System.out.println(I18nController.get("console.joinChatroom.init"));
+        handleListChatroomsCommand();
         ArrayList<String> chatrooms = backend.sendListChatrooms(login.getToken());
-        System.out.println("Enter the room name you want to enter. Following are available:");
-        chatrooms.forEach(s -> System.out.println("* " + s));
         while (!validRoomName) {
-            System.out.print("Room name: ");
+            System.out.print(I18nController.get("console.joinChatroom.name") + " ");
             roomName = input.nextLine();
 
             if (chatrooms.contains(roomName)) {
                 validRoomName = true;
             } else {
-                System.out.println("The given room name is invalid. Retry!");
+                System.out.println(I18nController.get("console.joinChatroom.name.invalid"));
             }
         }
 
-        System.out.print("Username: ");
+        System.out.print(I18nController.get("console.joinChatroom.user") + " ");
         username = input.nextLine();
 
+        System.out.println(I18nController.get("console.joinChatroom.task"));
         if (backend.sendJoinChatroom(login.getToken(), roomName, username)) {
-            System.out.println("Room joined successfully");
+            System.out.println(I18nController.get("console.joinChatroom.success"));
         } else {
-            System.out.println("Room was not joined");
+            System.out.println(I18nController.get("console.joinChatroom.fail"));
         }
     }
 
@@ -466,34 +468,33 @@ public class CliController {
      */
     private void handleLeaveChatroomCommand() throws IOException {
         if (login == null) {
-            System.out.println("To do this action, you need to be logged in!");
+            System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
-        String roomName = null, username = null;
+        String roomName = null, username;
         boolean validRoomName = false;
 
+        handleListChatroomsCommand();
         ArrayList<String> chatrooms = backend.sendListChatrooms(login.getToken());
-        System.out.println("Enter the room name you want to enter. Following are available:");
-        chatrooms.forEach(s -> System.out.println("* " + s));
         while (!validRoomName) {
-            System.out.print("Room name: ");
+            System.out.print(I18nController.get("console.leaveChatroom.name") + " ");
             roomName = input.nextLine();
 
             if (chatrooms.contains(roomName)) {
                 validRoomName = true;
             } else {
-                System.out.println("The given room name is invalid. Retry!");
+                System.out.println(I18nController.get("console.leaveChatroom.name.invalid"));
             }
         }
 
-        System.out.print("Username: ");
+        System.out.print(I18nController.get("console.leaveChatroom.user") + " ");
         username = input.nextLine();
 
         if (backend.sendLeaveChatroom(login.getToken(), roomName, username)) {
-            System.out.println("Room left successfully");
+            System.out.println(I18nController.get("console.leaveChatroom.success"));
         } else {
-            System.out.println("Room was not left");
+            System.out.println(I18nController.get("console.leaveChatroom.fail"));
         }
     }
 
@@ -505,31 +506,30 @@ public class CliController {
      */
     private void handleDeleteChatroomCommand() throws IOException {
         if (login == null) {
-            System.out.println("To do this action, you need to be logged in!");
+            System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
-        String roomName = null, username = null;
+        String roomName = null;
         boolean validRoomName = false;
 
+        handleListChatroomsCommand();
         ArrayList<String> chatrooms = backend.sendListChatrooms(login.getToken());
-        System.out.println("Enter the room name you want to enter. Following are available:");
-        chatrooms.forEach(s -> System.out.println("* " + s));
         while (!validRoomName) {
-            System.out.print("Room name: ");
+            System.out.print(I18nController.get("console.deleteChatroom.name") + " ");
             roomName = input.nextLine();
 
             if (chatrooms.contains(roomName)) {
                 validRoomName = true;
             } else {
-                System.out.println("The given room name is invalid. Retry!");
+                System.out.println(I18nController.get("console.deleteChatroom.name.invalid"));
             }
         }
 
         if (backend.sendDeleteChatroom(login.getToken(), roomName)) {
-            System.out.println("Room deleted successfully");
+            System.out.println(I18nController.get("console.deleteChatroom.success"));
         } else {
-            System.out.println("Room was not deleted");
+            System.out.println(I18nController.get("console.deleteChatroom.fail"));
         }
     }
 
@@ -541,16 +541,18 @@ public class CliController {
      */
     private void handleListChatroomsCommand() throws IOException {
         if (login == null) {
-            System.out.println("To do this action, you need to be logged in!");
+            System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
         ArrayList<String> chatrooms = backend.sendListChatrooms(login.getToken());
-        System.out.println("Following chatrooms are available:");
-        if (chatrooms != null) {
+        if (chatrooms == null) {
+            System.out.println(I18nController.get("console.listChatrooms.fail"));
+        } else if (chatrooms.size() > 0) {
+            System.out.println("console.listChatrooms.list");
             chatrooms.forEach(s -> System.out.println("* " + s));
         } else {
-            System.out.println("Couldn't get chatrooms");
+            System.out.println("console.listChatrooms.list.empty");
         }
     }
 
@@ -562,19 +564,19 @@ public class CliController {
      */
     private void handleSendMessageCommand() throws IOException {
         if (login == null) {
-            System.out.println("To do this action, you need to be logged in!");
+            System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
         String target = null, message = null;
         boolean validTarget = false, validMessage = false;
 
+        System.out.println(I18nController.get("console.sendMessage.init"));
+        handleListChatroomsCommand();
         ArrayList<String> chatrooms = backend.sendListChatrooms(login.getToken());
-        System.out.println("Enter the room name or the username you want to message. Following chatrooms are available:");
-        chatrooms.forEach(s -> System.out.println("* " + s));
 
         while (!validTarget) {
-            System.out.print("Room name/Username: ");
+            System.out.print(I18nController.get("console.sendMessage.target") + " ");
             target = input.nextLine();
 
             // Check if it's a room
@@ -584,27 +586,27 @@ public class CliController {
                 if (backend.sendUserOnline(login.getToken(), target)) {
                     validTarget = true;
                 } else {
-                    System.out.println("The given room name/username is invalid. Retry!");
+                    System.out.println(I18nController.get("console.sendMessage.target.invalid"));
                 }
             }
         }
 
         while (!validMessage) {
-            System.out.print("Message (max. 1024 characters): ");
+            System.out.print(I18nController.get("console.sendMessage.message") + " ");
             message = input.nextLine();
 
             // Check if it is not more than 1024 characters
             if (message.length() <= 1024) {
                 validMessage = true;
             } else {
-                System.out.println("The message is too long. Retry!");
+                System.out.println("console.sendMessage.message.invalid.maxLength");
             }
         }
 
         if (backend.sendSendMessage(login.getToken(), target, message)) {
-            System.out.println("Message sent successfully");
+            System.out.println(I18nController.get("console.sendMessage.success"));
         } else {
-            System.out.println("Message was not sent");
+            System.out.println(I18nController.get("console.sendMessage.fail"));
         }
     }
 
@@ -616,18 +618,18 @@ public class CliController {
      */
     private void handleUserOnlineCommand() throws IOException {
         if (login == null) {
-            System.out.println("To do this action, you need to be logged in!");
+            System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
-        String username = null;
-        System.out.print("Username: ");
+        String username;
+        System.out.print(I18nController.get("console.userOnline.user") + " ");
         username = input.nextLine();
 
         if (backend.sendUserOnline(login.getToken(), username)) {
-            System.out.println("The user is online");
+            System.out.println(I18nController.get("console.userOnline.success"));
         } else {
-            System.out.println("The given room name/username is invalid. Retry!");
+            System.out.println(I18nController.get("console.userOnline.fail"));
         }
     }
 
@@ -639,35 +641,48 @@ public class CliController {
      */
     private void handleListChatroomUsersCommand() throws IOException {
         if (login == null) {
-            System.out.println("To do this action, you need to be logged in!");
+            System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
-        String chatroom = null;
-        ArrayList<String> usersInChatroom = null;
+        String chatroom;
+        ArrayList<String> usersInChatroom;
 
-        ArrayList<String> chatrooms = backend.sendListChatrooms(login.getToken());
-        System.out.println("Following chatrooms are available:");
-        if (chatrooms != null) {
-            chatrooms.forEach(s -> System.out.println("* " + s));
-        } else {
-            System.out.println("Couldn't get chatrooms");
-        }
+        handleListChatroomsCommand();
 
-        System.out.print("Chatroom: ");
+        System.out.print(I18nController.get("console.listChatroomUsers.name") + " ");
         chatroom = input.nextLine();
 
         usersInChatroom = backend.sendListChatroomUsers(login.getToken(), chatroom);
-        System.out.println("Following users are inside the room " + chatroom + ":");
-        usersInChatroom.forEach(s -> System.out.println("* " + s));
+        if (usersInChatroom == null) {
+            System.out.println(I18nController.get("console.listChatroomUsers.failed"));
+        } else if (usersInChatroom.size() > 0) {
+            System.out.println(I18nController.get("console.listChatroomUsers.list", chatroom));
+            usersInChatroom.forEach(s -> System.out.println("* " + s));
+        } else {
+            System.out.println(I18nController.get("console.listChatroomUsers.empty", chatroom));
+        }
     }
 
     private void handleHelpCommand() {
-        System.out.println("Following commands are available:");
-        Arrays.asList(new String[]{"CreateLogin", "Login", "ChangePassword", "DeleteLogin", "Logout", "CreateChatroom",
-            "JoinChatroom", "LeaveChatroom", "DeleteChatroom", "ListChatrooms", "Ping", "SendMessage", "UserOnline",
-            "ListChatroomUsers", "Help"})
-            .forEach(s -> System.out.print(" * " + s));
+        System.out.println(I18nController.get("console.help.init"));
+        Arrays.asList(new String[]{
+            "CreateLogin",
+            "Login",
+            "ChangePassword",
+            "DeleteLogin",
+            "Logout",
+            "CreateChatroom",
+            "JoinChatroom",
+            "LeaveChatroom",
+            "DeleteChatroom",
+            "ListChatrooms",
+            "Ping",
+            "SendMessage",
+            "UserOnline",
+            "ListChatroomUsers",
+            "Help"
+        }).forEach(s -> System.out.print("* " + s));
         System.out.println();
     }
 }
