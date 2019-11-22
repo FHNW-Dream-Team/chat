@@ -26,13 +26,13 @@ import java.util.List;
 public class DatabaseController implements Closeable {
     private ConnectionSource connectionSource;
 
-    public Dao<ChatModel, String> chatDao;
-    public Dao<MessageModel, String> messageDao;
-    public Dao<UserModel, String> userDao;
-    public Dao<ChatUserModel, String> chatUserDao;
+    private Dao<ChatModel, String> chatDao;
+    private Dao<MessageModel, String> messageDao;
+    private Dao<UserModel, String> userDao;
+    private Dao<ChatUserModel, String> chatUserDao;
 
-    public Dao<LoginModel, String> loginDao;
-    public Dao<ServerModel, String> serverDao;
+    private Dao<LoginModel, String> loginDao;
+    private Dao<ServerModel, String> serverDao;
 
     /**
      * Create a database connection
@@ -105,6 +105,60 @@ public class DatabaseController implements Closeable {
     }
 
 
+    /**
+     * @return DAO object for the chats
+     *
+     * @since 0.0.2
+     */
+    public Dao<ChatModel, String> getChatDao() {
+        return chatDao;
+    }
+
+    /**
+     * @return DAO object for the messages inside chats
+     *
+     * @since 0.0.2
+     */
+    public Dao<MessageModel, String> getMessageDao() {
+        return messageDao;
+    }
+
+    /**
+     * @return DAO object for the users
+     *
+     * @since 0.0.2
+     */
+    public Dao<UserModel, String> getUserDao() {
+        return userDao;
+    }
+
+    /**
+     * @return DAO object for the many-to-many connection between chats and users
+     *
+     * @since 0.0.2
+     */
+    public Dao<ChatUserModel, String> getChatUserDao() {
+        return chatUserDao;
+    }
+
+    /**
+     * @return DAO object for the saved logins
+     *
+     * @since 0.0.2
+     */
+    public Dao<LoginModel, String> getLoginDao() {
+        return loginDao;
+    }
+
+    /**
+     * @return DAO object for the saved servers
+     *
+     * @since 0.0.2
+     */
+    public Dao<ServerModel, String> getServerDao() {
+        return serverDao;
+    }
+
     /* Create Many-To-Many Relations ************************************************/
     /**
      * Source: https://github.com/j256/ormlite-jdbc/blob/master/src/test/java/com/j256/ormlite/examples/manytomany/ManyToManyMain.java
@@ -163,5 +217,4 @@ public class DatabaseController implements Closeable {
         userQb.where().in("id", userChatQb);
         return userQb.prepare();
     }
-
 }

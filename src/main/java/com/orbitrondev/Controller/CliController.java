@@ -63,7 +63,7 @@ public class CliController {
 
             System.out.println(I18nController.get("console.setup.server.select"));
             System.out.println(I18nController.get("console.setup.server.create"));
-            for (ServerModel server : db.serverDao) {
+            for (ServerModel server : db.getServerDao()) {
                 serverCounter++;
                 serverList.add(server);
                 if (server.isSecure()) {
@@ -127,7 +127,7 @@ public class CliController {
         if (Main.connectToDb && db != null && addToDB) {
             try {
                 ServerModel server = new ServerModel(ipAddress, portNumber, secure, true);
-                db.serverDao.create(server);
+                db.getServerDao().create(server);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
