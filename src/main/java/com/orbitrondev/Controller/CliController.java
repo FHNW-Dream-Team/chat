@@ -43,6 +43,7 @@ public class CliController {
     public CliController(MainModel model) {
         this.model = model;
         sl = ServiceLocator.getServiceLocator();
+        sl.setModel(model);
 
         String ipAddress = null;
         int portNumber = -1;
