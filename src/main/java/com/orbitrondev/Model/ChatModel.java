@@ -1,10 +1,18 @@
 package com.orbitrondev.Model;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.table.DatabaseTable;
 import com.orbitrondev.Controller.ServiceLocator;
+import com.orbitrondev.Model.SupportTables.ChatUserModel;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A model for the direct and group chats.
@@ -26,8 +34,11 @@ public class ChatModel {
     @DatabaseField(canBeNull = false)
     private String name;
 
-    private ArrayList<MessageModel> messages;
-    private ArrayList<UserModel> members;
+    @ForeignCollectionField
+    private ForeignCollection<MessageModel> messages;
+
+    @ForeignCollectionField
+    private ForeignCollection<ChatUserModel> members;
 
     @DatabaseField(canBeNull = false)
     protected ChatType chatType;
@@ -65,7 +76,7 @@ public class ChatModel {
         return name;
     }
 
-    public ArrayList<MessageModel> getMessages() {
+    public ForeignCollection<MessageModel> getMessages() {
         return messages;
     }
 
@@ -73,12 +84,45 @@ public class ChatModel {
         this.messages.add(message);
     }
 
-    public ArrayList<UserModel> getMembers() {
-        return members;
+    public List<UserModel> getMembers() {
+        ServiceLocator sl = ServiceLocator.getServiceLocator();
+        List<UserModel> list = null;
+        try {
+            QueryBuilder<ChatUserModel, String> userChatQb = sl.getDb().getChatUserDao().queryBuilder();
+            // this time selecting for the user-id field
+            userChatQb.selectColumns("user_id");
+            userChatQb.where().eq("chat_id", id);
+
+            // build our outer query
+            QueryBuilder<UserModel, String> userQb = sl.getDb().getUserDao().queryBuilder();
+            // where the user-id matches the inner query's user-id field
+            list = userQb.where().in("id", userChatQb).query();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
-    public void addMembers(UserModel user) {
-        this.members.add(user);
+    public void addMember(UserModel user) {
+        ServiceLocator sl = ServiceLocator.getServiceLocator();
+        ChatUserModel chatUserConnection = new ChatUserModel(user, this);
+        try {
+            sl.getDb().getChatUserDao().create(chatUserConnection);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeMember(UserModel user) {
+        ServiceLocator sl = ServiceLocator.getServiceLocator();
+        try {
+            ChatUserModel result = sl.getDb().getChatUserDao().queryBuilder().where().eq("user_id", user.getId()).and().eq("chat_id", id).queryForFirst();
+            if (result != null) {
+                sl.getDb().getChatUserDao().delete(result);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public ChatType getChatType() {
