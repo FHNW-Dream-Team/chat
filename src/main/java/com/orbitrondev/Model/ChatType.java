@@ -1,4 +1,4 @@
-package com.orbitrondev.Model.Chat;
+package com.orbitrondev.Model;
 
 /**
  * An enum defining the different chat types.

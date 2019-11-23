@@ -2,7 +2,7 @@ package com.orbitrondev.Model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import com.orbitrondev.Model.Chat.ChatType;
+import com.orbitrondev.Controller.ServiceLocator;
 
 import java.util.ArrayList;
 
@@ -48,8 +48,9 @@ public class ChatModel {
         // with at least package visibility
     }
 
-    public ChatModel(String name) {
+    public ChatModel(String name, ChatType chatType) {
         this.name = name;
+        this.chatType = chatType;
     }
 
     /**
