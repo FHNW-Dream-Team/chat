@@ -203,6 +203,7 @@ public class CliController {
                     break;
                 case "Help":
                     handleHelpCommand();
+                    break;
                 default:
                     backend.sendCommand(line);
                     break;
@@ -681,7 +682,7 @@ public class CliController {
             "UserOnline",
             "ListChatroomUsers",
             "Help"
-        }).forEach(s -> System.out.print("* " + s));
+        }).forEach(s -> System.out.print(" * " + s));
         System.out.println();
     }
 }
