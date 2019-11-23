@@ -2,6 +2,9 @@ package com.orbitrondev.Controller;
 
 import com.orbitrondev.Exception.InvalidIpException;
 import com.orbitrondev.Exception.InvalidPortException;
+import com.orbitrondev.Model.ChatType;
+import com.orbitrondev.Model.ChatModel;
+import com.orbitrondev.Model.MessageModel;
 import com.orbitrondev.Model.UserModel;
 import com.sun.net.ssl.internal.ssl.Provider;
 import org.apache.logging.log4j.LogManager;
@@ -14,6 +17,7 @@ import java.net.Socket;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * Backend utility class. Acts as an interface between the program and the server.
@@ -154,7 +158,91 @@ public class BackendController implements Closeable {
      * @since 0.0.1
      */
     private void receivedMessageText(String username, String targetChat, String text) {
-        // TODO: Handle incoming new messages.
+        logger.debug("Handling incoming message...");
+        DatabaseController db = sl.getDb();
+        LoginModel login = sl.getModel().getCurrentLogin();
+        UserModel loginUser;
+
+        UserModel fromUser = null;
+        ChatModel toUserOrGroup = null;
+        MessageModel message = null;
+        try {
+            // Get the user with the username, otherwise cache him in the local db
+            fromUser = db.getUserOrCreate(username);
+
+            // Figure out the target
+            loginUser = db.getUserOrCreate(login.getUsername());
+            if (loginUser.getUsername().equals(targetChat)) {
+                logger.debug("Incoming message is going directly to us...");
+                // If the user sent us a message directly...
+                toUserOrGroup = db.getGroupChatOrCreate(loginUser.getUsername() + "_" + fromUser.getUsername(), ChatType.DirectChat);
+
+                // According to the function above, we could have just started this conversation, so we need to figure
+                // that out (by checking, whether the users have already been added.
+                boolean fromUserAdded = false;
+                boolean toUserAdded = false;
+
+                for (UserModel userInGroup : toUserOrGroup.getMembers()) {
+                    if (login.getUsername().equals(userInGroup.getUsername())) {
+                        toUserAdded = true;
+                    }
+                    if (fromUser.getUsername().equals(userInGroup.getUsername())) {
+                        fromUserAdded = true;
+                    }
+                }
+
+                // Add the currently logged in user to the direct chat.
+                if (!toUserAdded) {
+                    toUserOrGroup.addMember(loginUser);
+                    db.getChatDao().update(toUserOrGroup);
+                }
+                // Add the other guy to the direct chat
+                if (!fromUserAdded) {
+                    toUserOrGroup.addMember(fromUser);
+                    db.getChatDao().update(toUserOrGroup);
+                }
+            } else {
+                logger.debug("Incoming message is a group chat...");
+                // Check whether it is a known group chat (public or private)
+                ChatModel result = db.getChatDao().queryBuilder().where().eq("name", targetChat).queryForFirst();
+                if (result != null) {
+                    toUserOrGroup = result;
+                } else {
+                    // TODO: We can't resend a command because we are already running on the listener's thread (Solution
+                    //  for now: Run ListChatrooms at the beginning of the program
+                    // Check whether it is a public group chat (by asking the server again)
+                    ArrayList<String> groupChats = sendListChatrooms(login.getToken());
+                    for (String groupChat : groupChats) {
+                        System.out.println(groupChat + " == " + targetChat);
+                        if (groupChat.equals(targetChat)) {
+                            toUserOrGroup = db.getGroupChatOrCreate(targetChat, ChatType.PublicGroupChat);
+                            break;
+                        }
+                    }
+                }
+            }
+            if (toUserOrGroup == null) {
+                // TODO: Throw unknown target (Must be a private chat we don't know about yet)
+            }
+
+            // Create the message inside the db
+            message = new MessageModel(text, toUserOrGroup, new Date(), fromUser);
+            db.getMessageDao().create(message);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (Main.isGui) {
+            // TODO: Handle incoming new messages in GUI.
+        } else {
+            // TODO: Implement target
+            System.out.println(I18nController.get("console.messageText.init",
+                fromUser.getUsername(),
+                toUserOrGroup.getName(),
+                message.getMessage()));
+        }
     }
 
     /**
