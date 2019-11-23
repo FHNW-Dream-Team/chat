@@ -9,6 +9,7 @@ import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.orbitrondev.Model.*;
+import com.orbitrondev.Model.ChatType;
 import com.orbitrondev.Model.SupportTables.ChatUserModel;
 
 import java.io.Closeable;
@@ -157,6 +158,56 @@ public class DatabaseController implements Closeable {
      */
     public Dao<ServerModel, String> getServerDao() {
         return serverDao;
+    }
+
+    /*
+     * Quick functions
+     */
+
+    /**
+     * Check inside the database if the user already exists and return it, or create a new object for it, and save it in
+     * the database.
+     *
+     * @param username A string containing the name of the user
+     *
+     * @return A UserModel object containing the user that was either found in the database or was created.
+     *
+     * @throws SQLException If an SQL error occurs.
+     * @since 0.0.2
+     */
+    public UserModel getUserOrCreate(String username) throws SQLException {
+        UserModel user;
+        List<UserModel> results = userDao.queryBuilder().where().eq("username", username).query();
+        if (results.size() != 0) {
+            user = results.get(0);
+        } else {
+            user = new UserModel(username);
+            userDao.create(user);
+        }
+        return user;
+    }
+
+    /**
+     * Check inside the database if the chat already exists and return it, or create a new object for it, and save it in
+     * the database.
+     *
+     * @param name A string containing the name of the group chat.
+     *
+     * @return A ChatModel object containing the chat that was either found in the database or was created.
+     *
+     * @throws SQLException If an SQL error occurs.
+     * @since 0.0.2
+     */
+    public ChatModel getGroupChatOrCreate(String name, ChatType chatType) throws SQLException {
+        ChatModel group;
+        List<ChatModel> results = chatDao.queryBuilder().where().eq("name", name).query();
+        if (results.size() != 0) {
+            group = results.get(0);
+        } else {
+            group = new ChatModel(name, chatType);
+            chatDao.create(group);
+        }
+        return group;
     }
 
     /* Create Many-To-Many Relations ************************************************/
