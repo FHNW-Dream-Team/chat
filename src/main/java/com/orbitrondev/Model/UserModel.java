@@ -1,7 +1,10 @@
 package com.orbitrondev.Model;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.orbitrondev.Model.SupportTables.ChatUserModel;
 
 /**
  * A model with all known (and cached) users.
@@ -31,6 +34,9 @@ public class UserModel {
 
     @DatabaseField(defaultValue = "false", canBeNull = false)
     private boolean blocked = false;
+
+    @ForeignCollectionField
+    private ForeignCollection<ChatUserModel> chats;
 
     /**
      * CONSTRUCTORS //////////////////////////
