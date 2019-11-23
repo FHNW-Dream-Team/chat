@@ -2,8 +2,10 @@ package com.orbitrondev.Controller;
 
 import com.orbitrondev.Exception.InvalidIpException;
 import com.orbitrondev.Exception.InvalidPortException;
+import com.orbitrondev.Main;
 import com.orbitrondev.Model.ChatType;
 import com.orbitrondev.Model.ChatModel;
+import com.orbitrondev.Model.LoginModel;
 import com.orbitrondev.Model.MessageModel;
 import com.orbitrondev.Model.UserModel;
 import com.sun.net.ssl.internal.ssl.Provider;
@@ -15,9 +17,11 @@ import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.Socket;
 import java.security.Security;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Backend utility class. Acts as an interface between the program and the server.
@@ -326,10 +330,67 @@ public class BackendController implements Closeable {
         waitForResultResponse();
         if (lastMessage.get(1).equals("true")) {
             String token = lastMessage.get(2);
+            LoginModel login = new LoginModel(username, password, token);
+            sl.getModel().setCurrentLogin(login);
+            try {
+                sl.getDb().getLoginDao().create(login);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             lastMessage.clear();
             return token;
         }
         lastMessage.clear();
+        return null;
+    }
+
+    /**
+     * Login to the server.
+     *
+     * @param login An LoginModel object containing the username and password.
+     *
+     * @return An object containing the user when logged in, "null" when username/password to match existing user.
+     *
+     * @throws IOException If an I/O error occurs.
+     * @since 0.0.2
+     */
+    public LoginModel sendLogin(LoginModel login) throws IOException {
+        sendCommand(new String[]{"Login", login.getUsername(), login.getPassword()});
+
+        waitForResultResponse();
+        if (lastMessage.get(1).equals("true")) {
+            login.setToken(lastMessage.get(2));
+            sl.getModel().setCurrentLogin(login);
+            try {
+                sl.getDb().getLoginDao().create(login);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            lastMessage.clear();
+            return login;
+        }
+        lastMessage.clear();
+        return null;
+    }
+
+    /**
+     * @return "true" if logged in, otherwise "false"
+     *
+     * @since 0.0.2
+     */
+    public boolean isLoggedIn() {
+        return sl.getModel().getCurrentLogin() != null;
+    }
+
+    /**
+     * @return A string containing the token if logged in, otherwise "null"
+     *
+     * @since 0.0.2
+     */
+    public String getToken() {
+        if (isLoggedIn()) {
+            return sl.getModel().getCurrentLogin().getToken();
+        }
         return null;
     }
 
@@ -407,6 +468,13 @@ public class BackendController implements Closeable {
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
+        if (result) {
+            try {
+                sl.getDb().getGroupChatOrCreate(name, isPublic ? ChatType.PublicGroupChat : ChatType.PrivateGroupChat);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
         lastMessage.clear();
         return result;
     }
@@ -429,6 +497,16 @@ public class BackendController implements Closeable {
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
+        if (result) {
+            try {
+                UserModel user = sl.getDb().getUserOrCreate(username);
+                // TODO: We can't really know the chat type, so we have to guess it's public
+                ChatModel chat = sl.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);
+                chat.addMember(user);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
         lastMessage.clear();
         return result;
     }
@@ -468,6 +546,16 @@ public class BackendController implements Closeable {
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
+        if (result) {
+            try {
+                UserModel user = sl.getDb().getUserOrCreate(username);
+                // TODO: We can't really know the chat type, so we have to guess it's public
+                ChatModel chat = sl.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);
+                chat.removeMember(user);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
         lastMessage.clear();
         return result;
     }
@@ -503,6 +591,15 @@ public class BackendController implements Closeable {
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
+        if (result) {
+            try {
+                // TODO: We can't really know the chat type, so we have to guess it's public
+                ChatModel chat = sl.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);
+                sl.getDb().getChatDao().delete(chat);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
         lastMessage.clear();
         return result;
     }
@@ -524,10 +621,20 @@ public class BackendController implements Closeable {
         if (lastMessage.get(1).equals("true")) {
             lastMessage.remove("Result");
             lastMessage.remove("true");
-            ArrayList<String> chatroomList = new ArrayList<>(lastMessage);
+            ArrayList<String> groupChatList = new ArrayList<>(lastMessage);
+
+            // Save the list to the DB
+            DatabaseController db = sl.getDb();
+            groupChatList.forEach(s -> {
+                try {
+                    db.getGroupChatOrCreate(s, ChatType.PublicGroupChat);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            });
 
             lastMessage.clear();
-            return chatroomList;
+            return groupChatList;
         }
         lastMessage.clear();
         return null;
@@ -588,6 +695,34 @@ public class BackendController implements Closeable {
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
+        if (result) {
+            try {
+                ChatModel chat = null;
+                List<UserModel> results = sl.getDb().getUserDao().queryBuilder().where().eq("username", target).query();
+                if (results.size() != 0) {
+                    // It's a message which is between two users
+                    chat = sl.getDb().getGroupChatOrCreate(sl.getModel().getCurrentLogin().getUsername() + "_" + target, ChatType.DirectChat);
+                } else {
+                    List<ChatModel> results2 = sl.getDb().getChatDao().queryBuilder().where().eq("name", target).query();
+                    if (results.size() != 0) {
+                        // It's a message which is inside a known group chat (public, private)
+                        chat = results2.get(0);
+                    } else {
+                        // It's a message for a group we don't know yet
+                        ArrayList<String> groupList = sendListChatrooms(sl.getModel().getCurrentLogin().getToken());
+                        for (String groupInList : groupList) {
+                            if (groupInList.equals(target)) {
+                                chat = sl.getDb().getGroupChatOrCreate(groupInList, ChatType.PublicGroupChat);
+                            }
+                        }
+                    }
+                }
+                MessageModel messageObject = new MessageModel(message, chat, new Date(), sl.getDb().getUserOrCreate(sl.getModel().getCurrentLogin().getUsername()));
+                sl.getDb().getMessageDao().create(messageObject);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
         lastMessage.clear();
         return result;
     }
@@ -608,6 +743,17 @@ public class BackendController implements Closeable {
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
+        try {
+            UserModel user = sl.getDb().getUserOrCreate(username);
+            if (result) {
+                user.setOnline();
+            } else {
+                user.setOffline();
+            }
+            sl.getDb().getUserDao().update(user);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         lastMessage.clear();
         return result;
     }
@@ -647,6 +793,23 @@ public class BackendController implements Closeable {
             lastMessage.remove("Result");
             lastMessage.remove("true");
             ArrayList<String> usersList = new ArrayList<>(lastMessage);
+            if(usersList.size() > 0) {
+                try {
+                    // TODO: We can't really know the chat type, so we have to guess it's public
+                    ChatModel chat = sl.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);
+                    usersList.forEach(s -> {
+                        try {
+                            UserModel user = sl.getDb().getUserOrCreate(s);
+                            // TODO: Add him only, if he isn't yet!
+                            chat.addMember(user);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
 
             lastMessage.clear();
             return usersList;
