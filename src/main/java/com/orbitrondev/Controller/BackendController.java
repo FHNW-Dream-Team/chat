@@ -171,6 +171,13 @@ public class BackendController implements Closeable {
         t.start();
     }
 
+    /**
+     * Handle an incoming "MessageError" response.
+     *
+     * @param errorMessage A string containing the error message
+     *
+     * @since 0.0.2
+     */
     private void receivedMessageError(String errorMessage) {
         if (errorListener != null) errorListener.onMessageErrorEvent(errorMessage);
     }
