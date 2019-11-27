@@ -673,24 +673,27 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
 
     private void handleHelpCommand() {
         System.out.println(I18nController.get("console.help.init"));
-        Arrays.asList(new String[]{
-            "CreateLogin",
-            "Login",
-            "ChangePassword",
-            "DeleteLogin",
-            "Logout",
-            "CreateChatroom",
-            "JoinChatroom",
-            "LeaveChatroom",
-            "DeleteChatroom",
-            "ListChatrooms",
-            "Ping",
-            "SendMessage",
-            "UserOnline",
-            "ListChatroomUsers",
-            "Help"
-        }).forEach(s -> System.out.print(" * " + s));
-        System.out.println();
+        Arrays.asList(new String[][]{
+            {"CreateLogin       ", I18nController.get("console.help.createLogin")},
+            {"Login             ", I18nController.get("console.help.login")},
+            {"ChangePassword    ", I18nController.get("console.help.changePassword")},
+            {"DeleteLogin       ", I18nController.get("console.help.deleteLogin")},
+            {"Logout            ", I18nController.get("console.help.logout")},
+            {"CreateChatroom    ", I18nController.get("console.help.createChatroom")},
+            {"JoinChatroom      ", I18nController.get("console.help.joinChatroom")},
+            {"LeaveChatroom     ", I18nController.get("console.help.leaveChatroom")},
+            {"DeleteChatroom    ", I18nController.get("console.help.deleteChatroom")},
+            {"ListChatrooms     ", I18nController.get("console.help.listChatrooms")},
+            {"Ping              ", I18nController.get("console.help.ping")},
+            {"SendMessage       ", I18nController.get("console.help.sendMessage")},
+            {"UserOnline        ", I18nController.get("console.help.userOnline")},
+            {"ListChatroomUsers ", I18nController.get("console.help.listChatroomUsers")},
+            {"Help              ", I18nController.get("console.help.help")}
+        }).forEach(s -> {
+            Arrays.asList(s).forEach(System.out::print);
+            System.out.println();
+        });
+    }
 
     @Override
     public void onMessageErrorEvent(String errorMessage) {
