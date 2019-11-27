@@ -1,5 +1,7 @@
 package com.orbitrondev.Controller;
 
+import com.orbitrondev.EventListener.MessageErrorEventListener;
+import com.orbitrondev.EventListener.MessageTextEventListener;
 import com.orbitrondev.Exception.InvalidIpException;
 import com.orbitrondev.Exception.InvalidPortException;
 import com.orbitrondev.Main;
@@ -40,6 +42,9 @@ public class BackendController implements Closeable {
     private OutputStreamWriter socketOut;
 
     private volatile ArrayList<String> lastMessage = new ArrayList<>();
+
+    private MessageTextEventListener textListener;
+    private MessageErrorEventListener errorListener;
 
     /**
      * Creates a Socket (insecure) to the backend.
@@ -111,6 +116,24 @@ public class BackendController implements Closeable {
     }
 
     /**
+     * @param listener An MessageErrorEventListener object
+     *
+     * @since 0.0.2
+     */
+    public void setMessageTextListener(MessageTextEventListener listener) {
+        this.textListener = listener;
+    }
+
+    /**
+     * @param listener An MessageErrorEventListener object
+     *
+     * @since 0.0.2
+     */
+    public void setMessageErrorListener(MessageErrorEventListener listener) {
+        this.errorListener = listener;
+    }
+
+    /**
      * Creates a thread in the background, which waits for a response from the server.
      *
      * @since 0.0.1
@@ -149,7 +172,7 @@ public class BackendController implements Closeable {
     }
 
     private void receivedMessageError(String errorMessage) {
-        // TODO: Handle if we send wrong commands.
+        if (errorListener != null) errorListener.onMessageErrorEvent(errorMessage);
     }
 
     /**
@@ -238,15 +261,8 @@ public class BackendController implements Closeable {
             e.printStackTrace();
         }
 
-        if (Main.isGui) {
-            // TODO: Handle incoming new messages in GUI.
-        } else {
-            // TODO: Implement target
-            System.out.println(I18nController.get("console.messageText.init",
-                fromUser.getUsername(),
-                toUserOrGroup.getName(),
-                message.getMessage()));
-        }
+        // After the message was saved, send it to whichever class handles the event.
+        if (textListener != null) textListener.onMessageTextEvent(fromUser, toUserOrGroup, message);
     }
 
     /**
@@ -793,7 +809,7 @@ public class BackendController implements Closeable {
             lastMessage.remove("Result");
             lastMessage.remove("true");
             ArrayList<String> usersList = new ArrayList<>(lastMessage);
-            if(usersList.size() > 0) {
+            if (usersList.size() > 0) {
                 try {
                     // TODO: We can't really know the chat type, so we have to guess it's public
                     ChatModel chat = sl.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);

@@ -1,11 +1,11 @@
 package com.orbitrondev.Controller;
 
+import com.orbitrondev.EventListener.MessageErrorEventListener;
+import com.orbitrondev.EventListener.MessageTextEventListener;
 import com.orbitrondev.Exception.InvalidIpException;
 import com.orbitrondev.Exception.InvalidPortException;
 import com.orbitrondev.Main;
-import com.orbitrondev.Model.LoginModel;
-import com.orbitrondev.Model.MainModel;
-import com.orbitrondev.Model.ServerModel;
+import com.orbitrondev.Model.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +22,7 @@ import java.util.Scanner;
  * @version %I%, %G%
  * @since 0.0.1
  */
-public class CliController {
+public class CliController implements MessageTextEventListener, MessageErrorEventListener {
     private ServiceLocator sl;
     private static final Logger logger = LogManager.getLogger(CliController.class);
 
@@ -140,8 +140,15 @@ public class CliController {
             // Note: We still have our scanner
             System.out.println(I18nController.get("console.command.init"));
             System.out.println();
+
+            // When starting the app, show the user which commands he can call
             handleHelpCommand();
 
+            // Add event listeners, when the server sends something.
+            backend.setMessageTextListener(this);
+            backend.setMessageErrorListener(this);
+
+            // Initialize user input handler
             handleCommandInput();
         } catch (InvalidIpException | InvalidPortException | IOException e) {
             e.printStackTrace();
@@ -684,5 +691,22 @@ public class CliController {
             "Help"
         }).forEach(s -> System.out.print(" * " + s));
         System.out.println();
+
+    @Override
+    public void onMessageErrorEvent(String errorMessage) {
+        // "Invalid command" is a known value, so give a more informative output
+        if (errorMessage.equals("Invalid command")) {
+            System.out.println(I18nController.get("console.messageError.command.invalid"));
+        } else {
+            System.out.println(I18nController.get("console.messageError.default", errorMessage));
+        }
+    }
+
+    @Override
+    public void onMessageTextEvent(UserModel user, ChatModel chat, MessageModel message) {
+        System.out.println(I18nController.get("console.messageText.init",
+            user.getUsername(),
+            chat.getName(),
+            message.getMessage()));
     }
 }
