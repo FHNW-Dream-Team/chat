@@ -162,6 +162,7 @@ public class BackendController implements Closeable {
                         }
                     }
                 } catch (IOException e) {
+                    e.printStackTrace();
                     break;
                 }
                 if (msg == null) break; // In case the server closes the socket
