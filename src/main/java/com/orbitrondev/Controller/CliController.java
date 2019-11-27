@@ -549,10 +549,10 @@ public class CliController {
         if (chatrooms == null) {
             System.out.println(I18nController.get("console.listChatrooms.fail"));
         } else if (chatrooms.size() > 0) {
-            System.out.println("console.listChatrooms.list");
+            System.out.println(I18nController.get("console.listChatrooms.list"));
             chatrooms.forEach(s -> System.out.println("* " + s));
         } else {
-            System.out.println("console.listChatrooms.list.empty");
+            System.out.println(I18nController.get("console.listChatrooms.list.empty"));
         }
     }
 
