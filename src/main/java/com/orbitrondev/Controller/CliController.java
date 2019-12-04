@@ -76,7 +76,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
             while (chosenServer < 0) {
                 System.out.print("$ ");
                 if (input.hasNextLine()) {
-                    String s = input.nextLine();
+                    String s = input.nextLine().trim();
 
                     // Check whether the entered string is empty
                     if (s.length() == 0) {
@@ -122,7 +122,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
             while (ipAddress == null) {
                 System.out.print("$ ");
                 if (input.hasNextLine()) {
-                    String s = input.nextLine();
+                    String s = input.nextLine().trim();
 
                     // Check whether the entered string is empty
                     if (s.length() == 0) {
@@ -151,7 +151,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
             while (portNumber == -1) {
                 System.out.print("$ ");
                 if (input.hasNextLine()) {
-                    String s = input.nextLine();
+                    String s = input.nextLine().trim();
 
                     // Check whether the entered string is empty
                     if (s.length() == 0) {
