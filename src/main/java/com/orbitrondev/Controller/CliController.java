@@ -179,17 +179,24 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
                 }
             }
         }
+
+        // If needed, ask the user whether he wants to use SSL
         if (askForSecure) {
-            // Read security
             System.out.println(I18nController.get("console.setup.ssl"));
+
             System.out.print("$ ");
-            String s = input.nextLine().trim();
-            secure = s.equalsIgnoreCase("yes");
+            if (input.hasNextLine()) {
+                String s = input.nextLine().trim();
+                secure = s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("y");
+            } else {
+                System.exit(0);
+            }
         }
+
+        ServerModel server = new ServerModel(ipAddress, portNumber, secure);
 
         if (Main.connectToDb && sl.getDb() != null && addToDB) {
             try {
-                ServerModel server = new ServerModel(ipAddress, portNumber, secure, true);
                 sl.getDb().getServerDao().create(server);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -197,7 +204,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         }
 
         try {
-            backend = new BackendController(ipAddress, portNumber, secure);
+            backend = new BackendController(server.getIp(), server.getPort(), server.isSecure());
 
             logger.info(I18nController.get("console.connection.successful"));
             // Loop, allowing the user to send messages to the server
