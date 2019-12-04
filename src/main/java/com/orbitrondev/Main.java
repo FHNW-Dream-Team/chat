@@ -68,5 +68,7 @@ public class Main {
             MainModel model = new MainModel();
             new CliController(model);
         }
+        // TODO: There is a bug inside IntelliJ which doesn't close the application, so we do it manually
+        System.exit(0);
     }
 }
