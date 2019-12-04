@@ -263,9 +263,7 @@ public class BackendController implements Closeable {
             // Create the message inside the db
             message = new MessageModel(text, toUserOrGroup, new Date(), fromUser);
             db.getMessageDao().create(message);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
 
