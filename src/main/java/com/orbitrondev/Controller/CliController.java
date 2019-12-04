@@ -103,13 +103,15 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
                 }
             }
 
-            // Save the known address
+            // Save the known address if we entered something higher than 0
             chosenServer--; // The array starts at 0, but the output starts at 1
-            ipAddress = serverList.get(chosenServer).getIp();
-            portNumber = serverList.get(chosenServer).getPort();
-            secure = serverList.get(chosenServer).isSecure();
-            askForSecure = false;
-            addToDB = false;
+            if (chosenServer >= 0) {
+                ipAddress = serverList.get(chosenServer).getIp();
+                portNumber = serverList.get(chosenServer).getPort();
+                secure = serverList.get(chosenServer).isSecure();
+                askForSecure = false;
+                addToDB = false;
+            }
         }
 
         if (ipAddress == null) {
