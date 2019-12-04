@@ -58,8 +58,8 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
 
             int serverCounter = 0;
             ArrayList<ServerModel> serverList = new ArrayList<>();
-            boolean validServer = false;
 
+            // Print all saved connections inside the database
             System.out.println(I18nController.get("console.setup.server.select"));
             System.out.println(I18nController.get("console.setup.server.create"));
             for (ServerModel server : sl.getDb().getServerDao()) {
@@ -72,25 +72,44 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
                 }
             }
 
-            while (!validServer) {
+            int chosenServer = -1;
+            while (chosenServer < 0) {
                 System.out.print("$ ");
-                String chosenServer = input.nextLine();
-                int chosenServerInt = Integer.parseInt(chosenServer);
+                if (input.hasNextLine()) {
+                    String s = input.nextLine();
 
-                if (chosenServerInt > serverCounter | chosenServerInt < 0) {
-                    System.out.println(I18nController.get("console.setup.server.entry.invalid"));
-                } else if (chosenServerInt == 0) {
-                    validServer = true;
+                    // Check whether the entered string is empty
+                    if (s.length() == 0) {
+                        System.out.println(I18nController.get("console.setup.server.entry.empty"));
+                        continue;
+                    }
+                    int tempChosenServer;
+                    try {
+                        tempChosenServer = Integer.parseInt(s);
+
+                        // Check whether we entered a known number (which refers to something)
+                        if (tempChosenServer < 0 || tempChosenServer > serverCounter) {
+                            System.out.println(I18nController.get("console.setup.server.entry.outOfRange", serverCounter));
+                            continue;
+                        }
+                    } catch (NumberFormatException e) {
+                        // Check whether we entered a number
+                        System.out.println(I18nController.get("console.setup.server.entry.nan"));
+                        continue;
+                    }
+                    chosenServer = tempChosenServer;
                 } else {
-                    chosenServerInt--; // The array starts at 0, but the output starts at 1
-                    validServer = true;
-                    ipAddress = serverList.get(chosenServerInt).getIp();
-                    portNumber = serverList.get(chosenServerInt).getPort();
-                    secure = serverList.get(chosenServerInt).isSecure();
-                    askForSecure = false;
-                    addToDB = false;
+                    System.exit(0);
                 }
             }
+
+            // Save the known address
+            chosenServer--; // The array starts at 0, but the output starts at 1
+            ipAddress = serverList.get(chosenServer).getIp();
+            portNumber = serverList.get(chosenServer).getPort();
+            secure = serverList.get(chosenServer).isSecure();
+            askForSecure = false;
+            addToDB = false;
         }
 
         if (ipAddress == null) {
@@ -152,6 +171,8 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
             handleCommandInput();
         } catch (InvalidIpException | InvalidPortException | IOException e) {
             e.printStackTrace();
+        } finally {
+            input.close();
         }
     }
 
