@@ -114,15 +114,32 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
             }
         }
 
+        // If needed, ask for an IP address from the user
         if (ipAddress == null) {
-            boolean validIp = false;
-
+            System.out.println(I18nController.get("console.setup.ip"));
+            
             // Read IP address
-            while (!validIp) {
-                System.out.println(I18nController.get("console.setup.ip"));
+            while (ipAddress == null) {
                 System.out.print("$ ");
-                ipAddress = input.nextLine();
-                validIp = BackendController.isValidIpAddress(ipAddress);
+                if (input.hasNextLine()) {
+                    String s = input.nextLine();
+
+                    // Check whether the entered string is empty
+                    if (s.length() == 0) {
+                        System.out.println(I18nController.get("console.setup.ip.empty"));
+                        continue;
+                    }
+
+                    // Check whether the entered string is a valid IP address
+                    if (!BackendController.isValidIpAddress(s)) {
+                        System.out.println(I18nController.get("console.setup.ip.notIp"));
+                        continue;
+                    }
+
+                    ipAddress = s;
+                } else {
+                    System.exit(0);
+                }
             }
         }
         if (portNumber == -1) {
