@@ -117,7 +117,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         // If needed, ask for an IP address from the user
         if (ipAddress == null) {
             System.out.println(I18nController.get("console.setup.ip"));
-            
+
             // Read IP address
             while (ipAddress == null) {
                 System.out.print("$ ");
@@ -142,15 +142,41 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
                 }
             }
         }
+
+        // If needed, ask for an port from the user
         if (portNumber == -1) {
-            boolean validPort = false;
+            System.out.println(I18nController.get("console.setup.port"));
+
             // Read port
-            while (!validPort) {
-                System.out.println(I18nController.get("console.setup.port"));
+            while (portNumber == -1) {
                 System.out.print("$ ");
-                String strPort = input.nextLine();
-                portNumber = Integer.parseInt(strPort);
-                validPort = BackendController.isValidPortNumber(portNumber);
+                if (input.hasNextLine()) {
+                    String s = input.nextLine();
+
+                    // Check whether the entered string is empty
+                    if (s.length() == 0) {
+                        System.out.println(I18nController.get("console.setup.port.empty"));
+                        continue;
+                    }
+
+                    int tempPortNumber;
+                    try {
+                        tempPortNumber = Integer.parseInt(s);
+
+                        // Check whether we entered a valid port number (inside the range)
+                        if (!BackendController.isValidPortNumber(tempPortNumber)) {
+                            System.out.println(I18nController.get("console.setup.port.outOfRange"));
+                            continue;
+                        }
+                    } catch (NumberFormatException e) {
+                        // Check whether we entered a number
+                        System.out.println(I18nController.get("console.setup.port.nan"));
+                        continue;
+                    }
+                    portNumber = tempPortNumber;
+                } else {
+                    System.exit(0);
+                }
             }
         }
         if (askForSecure) {
