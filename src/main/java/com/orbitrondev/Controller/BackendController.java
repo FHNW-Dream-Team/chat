@@ -42,10 +42,10 @@ public class BackendController implements Closeable {
 
     private volatile ArrayList<String> lastMessage = new ArrayList<>();
 
-    private MessageTextEventListener textListener;
-    private MessageErrorEventListener errorListener;
+    private ArrayList<MessageTextEventListener> textListener = new ArrayList<>();
+    private ArrayList<MessageErrorEventListener> errorListener = new ArrayList<>();
 
-    private boolean stopResponseThread = false;
+    private volatile boolean stopResponseThread = false;
 
     /**
      * Creates a Socket (insecure) to the backend.
@@ -121,8 +121,8 @@ public class BackendController implements Closeable {
      *
      * @since 0.0.2
      */
-    public void setMessageTextListener(MessageTextEventListener listener) {
-        this.textListener = listener;
+    public void addMessageTextListener(MessageTextEventListener listener) {
+        this.textListener.add(listener);
     }
 
     /**
@@ -130,8 +130,8 @@ public class BackendController implements Closeable {
      *
      * @since 0.0.2
      */
-    public void setMessageErrorListener(MessageErrorEventListener listener) {
-        this.errorListener = listener;
+    public void addMessageErrorListener(MessageErrorEventListener listener) {
+        this.errorListener.add(listener);
     }
 
     /**
@@ -187,7 +187,11 @@ public class BackendController implements Closeable {
      * @since 0.0.2
      */
     private void receivedMessageError(String errorMessage) {
-        if (errorListener != null) errorListener.onMessageErrorEvent(errorMessage);
+        if (errorListener != null) {
+            for (MessageErrorEventListener listener : errorListener) {
+                listener.onMessageErrorEvent(errorMessage);
+            }
+        }
     }
 
     /**
@@ -275,7 +279,11 @@ public class BackendController implements Closeable {
         }
 
         // After the message was saved, send it to whichever class handles the event.
-        if (textListener != null) textListener.onMessageTextEvent(fromUser, toUserOrGroup, message);
+        if (textListener != null) {
+            for (MessageTextEventListener listener : textListener) {
+                listener.onMessageTextEvent(fromUser, toUserOrGroup, message);
+            }
+        }
     }
 
     /**

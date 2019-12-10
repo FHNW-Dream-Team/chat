@@ -216,8 +216,8 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
             handleHelpCommand();
 
             // Add event listeners, when the server sends something.
-            backend.setMessageTextListener(this);
-            backend.setMessageErrorListener(this);
+            backend.addMessageTextListener(this);
+            backend.addMessageErrorListener(this);
 
             // Initialize user input handler
             handleCommandInput();
