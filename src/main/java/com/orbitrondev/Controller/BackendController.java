@@ -45,6 +45,8 @@ public class BackendController implements Closeable {
     private MessageTextEventListener textListener;
     private MessageErrorEventListener errorListener;
 
+    private boolean stopResponseThread = false;
+
     /**
      * Creates a Socket (insecure) to the backend.
      *
@@ -143,6 +145,7 @@ public class BackendController implements Closeable {
             while (true) {
                 String msg;
                 String[] msgSplit;
+
                 try {
                     msg = socketIn.readLine();
                     logger.info("Response received: " + msg);
@@ -165,10 +168,15 @@ public class BackendController implements Closeable {
                     break;
                 }
                 if (msg == null) break; // In case the server closes the socket
+                if (stopResponseThread) break;
             }
         };
         Thread t = new Thread(r);
         t.start();
+    }
+
+    public void stopResponseThread() {
+        stopResponseThread = true;
     }
 
     /**

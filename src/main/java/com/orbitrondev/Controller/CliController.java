@@ -225,6 +225,9 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
             e.printStackTrace();
         } finally {
             input.close();
+            if (backend != null) {
+                backend.stopResponseThread();
+            }
         }
     }
 
