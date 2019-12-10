@@ -4,7 +4,6 @@ import com.orbitrondev.EventListener.MessageErrorEventListener;
 import com.orbitrondev.EventListener.MessageTextEventListener;
 import com.orbitrondev.Exception.InvalidIpException;
 import com.orbitrondev.Exception.InvalidPortException;
-import com.orbitrondev.Main;
 import com.orbitrondev.Model.ChatType;
 import com.orbitrondev.Model.ChatModel;
 import com.orbitrondev.Model.LoginModel;
