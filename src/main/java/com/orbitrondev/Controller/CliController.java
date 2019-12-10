@@ -785,6 +785,11 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
     public void onMessageTextEvent(UserModel user, ChatModel chat, MessageModel message) {
         // The server also sends a message when we send one. So only show messages without our username.
         if (!user.getUsername().equals(sl.getModel().getCurrentLogin().getUsername())) {
+            try {
+                sl.getDb().getMessageDao().create(message);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             System.out.println(I18nController.get("console.messageText.init",
                 user.getUsername(),
                 chat.getName(),
