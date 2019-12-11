@@ -57,7 +57,7 @@ public class BackendController implements Closeable {
      * @throws InvalidPortException Is thrown when the port is not in the acceptable range.
      * @since 0.0.1
      */
-    public BackendController(String ipAddress, int port) throws InvalidIpException, InvalidPortException {
+    public BackendController(String ipAddress, int port) throws InvalidIpException, InvalidPortException, IOException {
         if (!isValidIpAddress(ipAddress)) {
             throw new InvalidIpException();
         }
@@ -66,17 +66,12 @@ public class BackendController implements Closeable {
         }
         sl = ServiceLocator.getServiceLocator();
 
-        try {
-            createStandardSocket(ipAddress, port);
+        createStandardSocket(ipAddress, port);
 
-            socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            socketOut = new OutputStreamWriter(socket.getOutputStream());
+        socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        socketOut = new OutputStreamWriter(socket.getOutputStream());
 
-            createResponseThread();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        createResponseThread();
     }
 
     /**
