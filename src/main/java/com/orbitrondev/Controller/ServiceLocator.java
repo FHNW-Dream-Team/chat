@@ -8,6 +8,7 @@ public class ServiceLocator {
 
     private DatabaseController db;
     private MainModel model;
+    private BackendController backend;
 
     /**
      * Factory method for returning the singleton
@@ -39,5 +40,13 @@ public class ServiceLocator {
 
     public void setModel(MainModel model) {
         this.model = model;
+    }
+
+    public BackendController getBackend() {
+        return backend;
+    }
+
+    public void setBackend(BackendController backend) {
+        this.backend = backend;
     }
 }
