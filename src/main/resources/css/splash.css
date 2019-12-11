@@ -1,0 +1,19 @@
+#splash{
+    -fx-background-image: url("/images/splash-background.png");
+    -fx-background-color: transparent;
+    -fx-background-repeat: stretch;
+    -fx-background-size: 300 300;
+    -fx-background-position: center center;
+}
+
+.jfx-progress-bar {
+    -fx-alignment: center;
+}
+
+.jfx-progress-bar > .bar {
+    -fx-background-color: #2e7d32;
+    -fx-padding: 6;
+}
+.jfx-progress-bar > .track {
+    -fx-background-color: #3c3f41;
+}

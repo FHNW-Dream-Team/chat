@@ -1,8 +1,9 @@
 package com.orbitrondev;
 
-import com.orbitrondev.Controller.MainController;
+import com.orbitrondev.Controller.*;
 import com.orbitrondev.Model.MainModel;
-import com.orbitrondev.View.MainView;
+import com.orbitrondev.Model.SplashModel;
+import com.orbitrondev.View.SplashView;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -11,12 +12,29 @@ public class MainGui extends Application {
         launch(args);
     }
 
+    private SplashView splashView;
+
+    private ServiceLocator serviceLocator;
+    private BackendController backend;
+
     @Override
     public void start(Stage primaryStage) {
-        // Create and initialize the MVC components
-        MainModel model = new MainModel();
-        MainView view = new MainView(primaryStage, model);
-        new MainController(model, view);
-        view.show();
+        SplashModel splashModel = new SplashModel();
+        splashView = new SplashView(primaryStage, splashModel);
+        new SplashController(this, splashModel, splashView);
+        splashView.start();
+        splashModel.initialize();
+    }
+
+    public void startApp() {
+        serviceLocator = ServiceLocator.getServiceLocator();
+
+        Stage appStage = new Stage();
+
+        if (backend == null) {
+
+            splashView.stop();
+            splashView = null;
+        }
     }
 }
