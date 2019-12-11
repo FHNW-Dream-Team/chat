@@ -1,0 +1,35 @@
+/*
+primary: #2e7d32;
+light: #60ad5e;
+dark: #005005;
+*/
+
+.background-white {
+    -fx-background-color: white;
+}
+
+.space-bottom-10 {
+    -fx-padding: 10px;
+}
+
+.container {
+    -fx-padding: 20px;
+    -fx-border-insets: 20px;
+    -fx-background-insets: 20px;
+}
+
+.navbar {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 15px 20px;
+    -fx-background-color: #2e7d32;
+}
+
+.jfx-button.primary {
+    -fx-padding: 10px 6px;
+    -fx-font-size: 12px;
+    -jfx-button-type: RAISED;
+    -fx-background-color: #2e7d32;
+    -fx-pref-width: 328;
+    -fx-text-fill: white;
+}

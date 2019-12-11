@@ -1,8 +1,9 @@
 package com.orbitrondev;
 
 import com.orbitrondev.Controller.*;
-import com.orbitrondev.Model.MainModel;
+import com.orbitrondev.Model.ServerConnectionModel;
 import com.orbitrondev.Model.SplashModel;
+import com.orbitrondev.View.ServerConnectionView;
 import com.orbitrondev.View.SplashView;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -32,9 +33,13 @@ public class MainGui extends Application {
         Stage appStage = new Stage();
 
         if (backend == null) {
+            ServerConnectionModel model = new ServerConnectionModel();
+            ServerConnectionView view = new ServerConnectionView(appStage, model);
+            new ServerConnectionController(model, view);
 
             splashView.stop();
             splashView = null;
+            view.start();
         }
     }
 }
