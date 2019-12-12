@@ -15,9 +15,6 @@ public class MainGui extends Application {
 
     private SplashView splashView;
 
-    private ServiceLocator serviceLocator;
-    private BackendController backend;
-
     @Override
     public void start(Stage primaryStage) {
         SplashModel splashModel = new SplashModel();
@@ -28,18 +25,14 @@ public class MainGui extends Application {
     }
 
     public void startApp() {
-        serviceLocator = ServiceLocator.getServiceLocator();
-
         Stage appStage = new Stage();
 
-        if (backend == null) {
-            ServerConnectionModel model = new ServerConnectionModel();
-            ServerConnectionView view = new ServerConnectionView(appStage, model);
-            new ServerConnectionController(model, view);
+        ServerConnectionModel model = new ServerConnectionModel();
+        ServerConnectionView view = new ServerConnectionView(appStage, model);
+        new ServerConnectionController(model, view);
 
-            splashView.stop();
-            splashView = null;
-            view.start();
-        }
+        splashView.stop();
+        splashView = null;
+        view.start();
     }
 }
