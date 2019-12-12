@@ -26,14 +26,25 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
 
     @Override
     protected Scene create_GUI() {
+        // Create root
+        VBox root = new VBox();
+        root.getStyleClass().add("background-white");
+
+        // Create body
+        VBox body = new VBox();
+        body.getStyleClass().add("container");
+
+        // Create error message container
         errorMessage = new VBox();
 
+        // Create server ip input field
         serverIp = Helper.useTextField("gui.serverConnection.ip");
         serverIp.getValidators().addAll(
             Helper.useRequiredValidator("gui.serverConnection.ip.empty"),
             Helper.useIsValidIpValidator("gui.serverConnection.ip.notIp")
         );
 
+        // Create server port input field
         port = Helper.useTextField("gui.serverConnection.port");
         port.getValidators().addAll(
             Helper.useRequiredValidator("gui.serverConnection.port.empty"),
@@ -41,6 +52,7 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
             Helper.useIsValidPortValidator("gui.serverConnection.port.outOfRange")
         );
 
+        // Create button to connect
         btnConnect = Helper.usePrimaryButton("gui.serverConnection.connect");
         btnConnect.setDisable(true);
 
@@ -67,9 +79,7 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
             }
         });
 
-        // Setup the tree
-        VBox body = new VBox();
-        body.getStyleClass().add("container");
+        // Add body content to body
         body.getChildren().addAll(
             errorMessage,
             Helper.useSpacer(10),
@@ -84,8 +94,7 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
             btnConnect
         );
 
-        VBox root = new VBox();
-        root.getStyleClass().add("background-white");
+        // Add body to root
         root.getChildren().addAll(
             Helper.useNavBar("gui.serverConnection.title"),
             body
