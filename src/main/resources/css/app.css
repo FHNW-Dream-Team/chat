@@ -8,11 +8,7 @@ dark: #005005;
     -fx-background-color: white;
 }
 
-.space-bottom-10 {
-    -fx-padding: 10px;
-}
-
-.container {
+.custom-container {
     -fx-padding: 20px;
     -fx-border-insets: 20px;
     -fx-background-insets: 20px;

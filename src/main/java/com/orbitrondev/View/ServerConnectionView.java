@@ -32,7 +32,7 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
 
         // Create body
         VBox body = new VBox();
-        body.getStyleClass().add("container");
+        body.getStyleClass().add("custom-container");
 
         // Create error message container
         errorMessage = new VBox();
@@ -96,6 +96,7 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
 
         // Add body to root
         root.getChildren().addAll(
+            Helper.useDefaultMenuBar(),
             Helper.useNavBar("gui.serverConnection.title"),
             body
         );

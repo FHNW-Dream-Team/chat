@@ -6,6 +6,13 @@ import com.jfoenix.validation.IntegerValidator;
 import com.jfoenix.validation.RegexValidator;
 import com.jfoenix.validation.RequiredFieldValidator;
 import com.orbitrondev.Controller.I18nController;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -13,7 +20,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import java.util.Locale;
+
 public class Helper {
+
+    // Shortcuts for UI elements
+
     public static Region useSpacer(int space) {
         Region spacer = new Region();
         spacer.setPrefHeight(space);
@@ -54,6 +66,8 @@ public class Helper {
         return navBar;
     }
 
+    // Shortcut for validator with UI input elements
+
     public static RequiredFieldValidator useRequiredValidator(String translatorKey) {
         RequiredFieldValidator requiredValidator = new RequiredFieldValidator();
         requiredValidator.messageProperty().bind(I18nController.createStringBinding(translatorKey));
@@ -78,5 +92,80 @@ public class Helper {
         isValidPortValidator.messageProperty().bind(I18nController.createStringBinding(translatorKey));
         isValidPortValidator.setRegexPattern("^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$");
         return isValidPortValidator;
+    }
+
+    // Shortcut for UI menus
+
+    public static MenuBar useDefaultMenuBar() {
+        MenuBar menuBar = new MenuBar();
+
+        // Create menus
+        Menu fileMenu = useMenu("gui.menu.file");
+        Menu helpMenu = useMenu("gui.menu.help");
+
+        // Add menuItems to the Menus
+        fileMenu.getItems().addAll(
+            useLanguageMenu(),
+            new SeparatorMenuItem(),
+            useExitMenuItem()
+        );
+
+        // Add Menus to the MenuBar
+        menuBar.getMenus().addAll(
+            fileMenu,
+            helpMenu
+        );
+        return menuBar;
+    }
+
+    public static Menu useMenu(String translatorKey) {
+        Menu menu = new Menu();
+        menu.textProperty().bind(I18nController.createStringBinding(translatorKey));
+        return menu;
+    }
+
+    public static Menu useLanguageMenu() {
+        Menu changeLanguageMenu = useMenu("gui.menu.file.changeLanguage");
+        for (Locale locale : I18nController.getSupportedLocales()) {
+            StringProperty langInLocale = new SimpleStringProperty();
+            String lang;
+            switch (locale.getLanguage()) {
+                default:
+                case "en":
+                    langInLocale.bind(I18nController.createStringBinding("gui.menu.file.changeLanguage.english"));
+                    lang = "English";
+                    break;
+                case "de":
+                    langInLocale.bind(I18nController.createStringBinding("gui.menu.file.changeLanguage.german"));
+                    lang = "Deutsch";
+                    break;
+                case "fr":
+                    langInLocale.bind(I18nController.createStringBinding("gui.menu.file.changeLanguage.french"));
+                    lang = "Français";
+                    break;
+                case "it":
+                    langInLocale.bind(I18nController.createStringBinding("gui.menu.file.changeLanguage.italian"));
+                    lang = "Italiano";
+                    break;
+            }
+
+            MenuItem language = new MenuItem(langInLocale.get() + " (" + lang + ")");
+            language.setOnAction(event -> I18nController.setLocale(locale));
+            changeLanguageMenu.getItems().add(language);
+        }
+        return changeLanguageMenu;
+    }
+
+    public static MenuItem useMenuItem(String translatorKey) {
+        MenuItem item = new MenuItem();
+        item.textProperty().bind(I18nController.createStringBinding(translatorKey));
+        return item;
+    }
+
+    public static MenuItem useExitMenuItem() {
+        MenuItem exitItem = useMenuItem("gui.menu.file.exit");
+        exitItem.setAccelerator(KeyCombination.keyCombination("Alt+F4"));
+        exitItem.setOnAction(event -> System.exit(0));
+        return exitItem;
     }
 }
