@@ -1,8 +1,12 @@
-#splash{
-    -fx-background-image: url("/images/splash-background.png");
-    -fx-background-color: transparent;
-    -fx-background-repeat: stretch;
+.splash {
+    -fx-background-color: #3c3f41;
     -fx-background-size: 300 300;
+}
+
+.icon-container {
+    -fx-background-repeat: stretch;
+    -fx-background-image: url("/images/icon.png");
+    -fx-background-size: 100 100;
     -fx-background-position: center center;
 }
 
