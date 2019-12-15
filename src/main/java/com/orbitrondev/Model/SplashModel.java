@@ -3,6 +3,7 @@ package com.orbitrondev.Model;
 import com.orbitrondev.Abstract.Model;
 import com.orbitrondev.Controller.DatabaseController;
 import com.orbitrondev.Controller.ServiceLocator;
+import com.orbitrondev.Main;
 import javafx.concurrent.Task;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class SplashModel extends Model {
 
             // List of all tasks
             ArrayList<Job> tasks = new ArrayList<>();
-            tasks.add(() -> serviceLocator.setDb(new DatabaseController("chat.sqlite3"))); // Initialize the db connection in the service locator
+            tasks.add(() -> serviceLocator.setDb(new DatabaseController(Main.dbLocation))); // Initialize the db connection in the service locator
 
             // First, take some time, update progress
             this.updateProgress(1, tasks.size() + 1); // Start the progress bar with 1 instead of 0
