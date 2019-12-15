@@ -10,6 +10,10 @@ import java.util.ArrayList;
 
 public class SplashModel extends Model {
 
+    private interface Job {
+        void run();
+    }
+
     ServiceLocator serviceLocator;
 
     public final Task<Void> initializer = new Task<Void>() {
@@ -21,19 +25,20 @@ public class SplashModel extends Model {
             serviceLocator = ServiceLocator.getServiceLocator();
 
             // List of all tasks
-            ArrayList<Runnable> tasks = new ArrayList<>();
-            tasks.add(() -> serviceLocator.setDb(new DatabaseController(Main.dbLocation)));
+            ArrayList<Job> tasks = new ArrayList<>();
+            tasks.add(() -> serviceLocator.setDb(new DatabaseController("chat.sqlite3"))); // Initialize the db connection in the service locator
 
             // First, take some time, update progress
-            int i = 0;
-            for (; i < MAX_LOOP_COUNT; i++) {
-                if (i == MAX_LOOP_COUNT / 10) {
-                    // Initialize the resources in the service locator
-                    new Thread(tasks.get(0)).start();
-                }
-                if ((i % 1000000) == 0) {
-                    this.updateProgress(i, MAX_LOOP_COUNT);
-                }
+            this.updateProgress(1, tasks.size() + 1); // Start the progress bar with 1 instead of 0
+            for (int i = 0; i < tasks.size(); i++) {
+                tasks.get(i).run();
+                this.updateProgress(i + 2, tasks.size() + 1);
+            }
+            // For better UX, let the user see the full progress bar
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // Ignore
             }
             return null;
         }
