@@ -19,8 +19,6 @@ public class SplashModel extends Model {
     public final Task<Void> initializer = new Task<Void>() {
         @Override
         protected Void call() {
-            final int MAX_LOOP_COUNT = 100000000;
-
             // Create the service locator to hold our resources
             serviceLocator = ServiceLocator.getServiceLocator();
 
