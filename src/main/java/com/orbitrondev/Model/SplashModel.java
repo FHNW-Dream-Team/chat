@@ -3,7 +3,6 @@ package com.orbitrondev.Model;
 import com.orbitrondev.Abstract.Model;
 import com.orbitrondev.Controller.DatabaseController;
 import com.orbitrondev.Controller.ServiceLocator;
-import com.orbitrondev.Main;
 import javafx.concurrent.Task;
 
 import java.util.ArrayList;
