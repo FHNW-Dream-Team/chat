@@ -1,5 +1,6 @@
 package com.orbitrondev.Abstract;
 
+import com.orbitrondev.Controller.ServiceLocator;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -12,6 +13,7 @@ import javafx.stage.Stage;
  * @author Brad Richards
  */
 public abstract class View<M extends Model> {
+    protected ServiceLocator serviceLocator;
     protected Stage stage;
     protected Scene scene;
     protected M model;
@@ -25,7 +27,8 @@ public abstract class View<M extends Model> {
     protected View(Stage stage, M model) {
         this.stage = stage;
         this.model = model;
-        
+
+        serviceLocator = ServiceLocator.getServiceLocator();
         scene = create_GUI(); // Create all controls within "root"
         stage.getIcons().add(new Image(getClass().getResource("/images/icon.png").toString())); // Add icon to window
         stage.setScene(scene);
