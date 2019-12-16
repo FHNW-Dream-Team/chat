@@ -3,14 +3,14 @@ package com.orbitrondev.Controller;
 import com.orbitrondev.Abstract.Controller;
 import com.orbitrondev.Exception.InvalidIpException;
 import com.orbitrondev.Exception.InvalidPortException;
-import com.orbitrondev.Model.MainModel;
-import com.orbitrondev.Model.ServerConnectionModel;
-import com.orbitrondev.Model.ServerModel;
+import com.orbitrondev.Model.*;
 import com.orbitrondev.View.Helper;
+import com.orbitrondev.View.LoginView;
 import com.orbitrondev.View.ServerConnectionView;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -110,14 +110,14 @@ public class ServerConnectionController extends Controller<ServerConnectionModel
 
                 Platform.runLater(() -> {
                     // Open login window and close server connection window
-                    // TODO: Open Login window
-                    //LoginModel model = new LoginModel();
-                    //LoginView newView = new LoginView(model);
-                    //new LoginController(model, view);
+                    Stage appStage = new Stage();
+                    LoginsModel model = new LoginsModel();
+                    LoginView newView = new LoginView(appStage, model);
+                    new LoginController(model, newView);
 
                     view.stop();
                     view = null;
-                    //newView.start();
+                    newView.start();
                 });
             }
         };
