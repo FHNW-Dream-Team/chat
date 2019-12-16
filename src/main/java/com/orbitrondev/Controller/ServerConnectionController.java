@@ -18,14 +18,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class ServerConnectionController extends Controller<ServerConnectionModel, ServerConnectionView> {
-    ServiceLocator serviceLocator;
     private static final Logger logger = LogManager.getLogger(ServerConnectionController.class);
 
     public ServerConnectionController(ServerConnectionModel model, ServerConnectionView view) {
         super(model, view);
 
-        serviceLocator = ServiceLocator.getServiceLocator();
-
+        // register ourselves to listen for changes in the dropdown
         view.getChooseServer().setOnAction(event -> updateChosenServer());
 
         // register ourselves to listen for button clicks
