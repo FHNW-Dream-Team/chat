@@ -11,16 +11,22 @@ import com.orbitrondev.View.ServerConnectionView;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class ServerConnectionController extends Controller<ServerConnectionModel, ServerConnectionView> {
     ServiceLocator serviceLocator;
+    private static final Logger logger = LogManager.getLogger(ServerConnectionController.class);
 
     public ServerConnectionController(ServerConnectionModel model, ServerConnectionView view) {
         super(model, view);
 
         serviceLocator = ServiceLocator.getServiceLocator();
+
+        view.getChooseServer().setOnAction(event -> updateChosenServer());
 
         // register ourselves to listen for button clicks
         view.getBtnConnect().setOnAction(event -> buttonClick());
@@ -29,21 +35,43 @@ public class ServerConnectionController extends Controller<ServerConnectionModel
         view.getStage().setOnCloseRequest(event -> Platform.exit());
     }
 
+    public void updateChosenServer() {
+        ServerModel server = view.getChooseServer().getSelectionModel().getSelectedItem();
+
+        if (server == null || server.getIp() == null) {
+            enableInputs();
+            view.getServerIp().setText("");
+            view.getPort().setText("");
+        } else {
+            disableInputs();
+            view.getServerIp().setText(server.getIp());
+            view.getPort().setText(Integer.toString(server.getPort()));
+        }
+    }
+
     public void disableInputs() {
         view.getServerIp().setDisable(true);
         view.getPort().setDisable(true);
+    }
+
+    public void disableAll() {
+        disableInputs();
         view.getBtnConnect().setDisable(true);
     }
 
     public void enableInputs() {
         view.getServerIp().setDisable(false);
         view.getPort().setDisable(false);
+    }
+
+    public void enableAll() {
+        enableInputs();
         view.getBtnConnect().setDisable(false);
     }
 
     public void buttonClick() {
         // Disable everything to prevent something while working on the data
-        disableInputs();
+        disableAll();
 
         MainModel mainModel = new MainModel();
         serviceLocator.setModel(mainModel);
@@ -62,7 +90,7 @@ public class ServerConnectionController extends Controller<ServerConnectionModel
                 // Ignore exceptions, because we made sure about the variables beforehand.
             } catch (IOException e) {
                 // This exception contains ConnectException, which basically means, it couldn't connect to the server.
-                enableInputs();
+                enableAll();
                 Platform.runLater(() -> {
                     Text text = Helper.useText("gui.serverConnection.connectionFailed");
                     text.setFill(Color.RED);
@@ -72,6 +100,16 @@ public class ServerConnectionController extends Controller<ServerConnectionModel
             }
 
             if (backend != null) {
+                // If the user selected "Create new connection" add it to the DB
+                ServerModel selectedItem = view.getChooseServer().getSelectionModel().getSelectedItem();
+                if (selectedItem != null && selectedItem.getIp() == null) {
+                    try {
+                        serviceLocator.getDb().getServerDao().create(server);
+                    } catch (SQLException e) {
+                        logger.error("Server connection not saved to database");
+                    }
+                }
+
                 Platform.runLater(() -> {
                     // Open login window and close server connection window
                     // TODO: Open Login window
