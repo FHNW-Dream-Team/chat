@@ -293,7 +293,6 @@ public class BackendController implements Closeable {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 // We don't care
-                e.printStackTrace();
             }
         }
     }
