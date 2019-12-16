@@ -1,14 +1,17 @@
 package com.orbitrondev.View;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.orbitrondev.Abstract.View;
 import com.orbitrondev.Controller.I18nController;
 import com.orbitrondev.Model.ServerConnectionModel;
+import com.orbitrondev.Model.ServerModel;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -17,6 +20,7 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
     private JFXTextField serverIp;
     private JFXTextField port;
     private JFXButton btnConnect;
+    private JFXComboBox<ServerModel> chooseServer;
 
     public ServerConnectionView(Stage stage, ServerConnectionModel model) {
         super(stage, model);
@@ -36,6 +40,32 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
 
         // Create error message container
         errorMessage = new VBox();
+
+        // Create dropdown to choose existing server connection
+        chooseServer = new JFXComboBox<>();
+        chooseServer.setConverter(new StringConverter<ServerModel>() {
+            @Override
+            public String toString(ServerModel server) {
+                return
+                    server == null || server.getIp() == null
+                        ? I18nController.get("gui.serverConnection.create")
+                        : (
+                        server.isSecure()
+                            ? I18nController.get("gui.serverConnection.entry.ssl", server.getIp(), Integer.toString(server.getPort()))
+                            : I18nController.get("gui.serverConnection.entry", server.getIp(), Integer.toString(server.getPort()))
+                        );
+            }
+
+            @Override
+            public ServerModel fromString(String string) {
+                return null;
+            }
+        });
+        chooseServer.getItems().add(new ServerModel(null, 0));
+        chooseServer.getSelectionModel().selectFirst();
+        for (ServerModel server : serviceLocator.getDb().getServerDao()) {
+            chooseServer.getItems().add(server);
+        }
 
         // Create server ip input field
         serverIp = Helper.useTextField("gui.serverConnection.ip");
@@ -83,6 +113,8 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
         body.getChildren().addAll(
             errorMessage,
             Helper.useSpacer(10),
+            chooseServer,
+            Helper.useSpacer(25),
             serverIp,
             Helper.useSpacer(25),
             Helper.useText("gui.serverConnection.ip.hint"),
@@ -117,6 +149,10 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
 
     public VBox getErrorMessage() {
         return errorMessage;
+    }
+
+    public JFXComboBox<ServerModel> getChooseServer() {
+        return chooseServer;
     }
 
     public JFXTextField getServerIp() {
