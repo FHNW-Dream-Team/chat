@@ -7,5 +7,11 @@
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/chat.sqlite3</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="chat.sqlite3 [2]" uuid="7016ac33-b2b5-475e-8425-4dc1c8b18010">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/chat.sqlite3</jdbc-url>
+    </data-source>
   </component>
 </project>
