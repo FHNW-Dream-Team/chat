@@ -9,11 +9,6 @@ import javafx.concurrent.Task;
 import java.util.ArrayList;
 
 public class SplashModel extends Model {
-
-    private interface Job {
-        void run();
-    }
-
     ServiceLocator serviceLocator;
 
     public final Task<Void> initializer = new Task<Void>() {
@@ -23,7 +18,7 @@ public class SplashModel extends Model {
             serviceLocator = ServiceLocator.getServiceLocator();
 
             // List of all tasks
-            ArrayList<Job> tasks = new ArrayList<>();
+            ArrayList<Runnable> tasks = new ArrayList<>();
             tasks.add(() -> serviceLocator.setDb(new DatabaseController(Main.dbLocation))); // Initialize the db connection in the service locator
 
             // First, take some time, update progress
