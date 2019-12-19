@@ -117,11 +117,11 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
             Helper.useSpacer(25),
             serverIp,
             Helper.useSpacer(25),
-            Helper.useText("gui.serverConnection.ip.hint"),
+            Helper.useText("gui.serverConnection.ip.hint", stage),
             Helper.useSpacer(15),
             port,
             Helper.useSpacer(25),
-            Helper.useText("gui.serverConnection.port.hint"),
+            Helper.useText("gui.serverConnection.port.hint", stage),
             Helper.useSpacer(15),
             btnConnect
         );

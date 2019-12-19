@@ -6,6 +6,10 @@ import com.jfoenix.validation.IntegerValidator;
 import com.jfoenix.validation.RegexValidator;
 import com.jfoenix.validation.RequiredFieldValidator;
 import com.orbitrondev.Controller.I18nController;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.NumberBinding;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Menu;
@@ -13,12 +17,10 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 import java.util.Locale;
 
@@ -36,6 +38,15 @@ public class Helper {
     public static Text useText(String translatorKey) {
         Text textField = new Text();
         textField.textProperty().bind(I18nController.createStringBinding(translatorKey));
+        return textField;
+    }
+
+    public static Text useText(String translatorKey, Stage paneToBindWidth) {
+        // https://stackoverflow.com/questions/51199903/how-to-bind-a-value-to-the-result-of-a-calculation
+        Text textField = useText(translatorKey);
+        DoubleProperty padding = new SimpleDoubleProperty(40.0); // Check the css at .custom-container (padding left and right = 40)
+        NumberBinding wrapping = Bindings.subtract(paneToBindWidth.widthProperty(), padding);
+        textField.wrappingWidthProperty().bind(wrapping);
         return textField;
     }
 
