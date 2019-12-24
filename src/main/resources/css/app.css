@@ -8,7 +8,7 @@ dark: #005005;
     -fx-background-color: white;
 }
 
-.menu-bar{
+.menu-bar {
     -fx-background-color: white;
 }
 
@@ -32,4 +32,15 @@ dark: #005005;
     -fx-background-color: #2e7d32;
     -fx-pref-width: 328;
     -fx-text-fill: white;
+}
+
+.jfx-button.secondary {
+    -fx-padding: 10px 6px;
+    -fx-font-size: 12px;
+    -jfx-button-type: RAISED;
+    -fx-background-color: #eeeeee;
+    -fx-border-color: #616161;
+    -fx-border-radius: 3px; /* There is no radius by default */
+    -fx-pref-width: 328;
+    -fx-text-fill: black;
 }

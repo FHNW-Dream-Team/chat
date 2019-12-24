@@ -1,6 +1,7 @@
 package com.orbitrondev.View;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.IntegerValidator;
 import com.jfoenix.validation.RegexValidator;
@@ -35,6 +36,13 @@ public class Helper {
         return spacer;
     }
 
+    public static Region useHorizontalSpacer(int space) {
+        Region spacer = new Region();
+        spacer.setPrefWidth(space);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        return spacer;
+    }
+
     public static Text useText(String translatorKey) {
         Text textField = new Text();
         textField.textProperty().bind(I18nController.createStringBinding(translatorKey));
@@ -57,6 +65,13 @@ public class Helper {
         return textField;
     }
 
+    public static JFXPasswordField usePasswordField(String translatorKey) {
+        JFXPasswordField passwordField = new JFXPasswordField();
+        passwordField.setLabelFloat(true);
+        passwordField.promptTextProperty().bind(I18nController.createStringBinding(translatorKey));
+        return passwordField;
+    }
+
     public static JFXButton usePrimaryButton(String translatorKey) {
         JFXButton primaryButton = new JFXButton();
         primaryButton.textProperty().bind(I18nController.createStringBinding(() -> I18nController.get(translatorKey).toUpperCase()));
@@ -65,6 +80,16 @@ public class Helper {
         primaryButton.setMaxWidth(Double.MAX_VALUE);
         primaryButton.getStyleClass().add("primary");
         return primaryButton;
+    }
+
+    public static JFXButton useSecondaryButton(String translatorKey) {
+        JFXButton secondaryButton = new JFXButton();
+        secondaryButton.textProperty().bind(I18nController.createStringBinding(() -> I18nController.get(translatorKey).toUpperCase()));
+        secondaryButton.setButtonType(JFXButton.ButtonType.RAISED);
+        secondaryButton.setPrefWidth(Double.MAX_VALUE);
+        secondaryButton.setMaxWidth(Double.MAX_VALUE);
+        secondaryButton.getStyleClass().add("secondary");
+        return secondaryButton;
     }
 
     public static HBox useNavBar(String translatorKey) {
