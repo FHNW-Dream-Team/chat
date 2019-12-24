@@ -90,10 +90,15 @@ public class ServerConnectionController extends Controller<ServerConnectionModel
                 // This exception contains ConnectException, which basically means, it couldn't connect to the server.
                 enableAll();
                 Platform.runLater(() -> {
+
+                    if (view.getErrorMessage().getChildren().size() == 0) {
+                        // Make window larger, so it doesn't become crammed, only if we haven't done so yet
+                        view.getStage().setHeight(view.getStage().getHeight() + 30);
+                    }
                     Text text = Helper.useText("gui.serverConnection.connectionFailed");
                     text.setFill(Color.RED);
+                    view.getErrorMessage().getChildren().clear();
                     view.getErrorMessage().getChildren().addAll(text, Helper.useSpacer(20));
-                    view.getStage().setHeight(view.getStage().getHeight() + 30); // Make window larger, so it doesn't become crammed
                 });
             }
 
