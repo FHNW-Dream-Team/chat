@@ -12,6 +12,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class RegisterView extends View<RegisterModel> {
     private VBox errorMessage;
     private JFXTextField username;
