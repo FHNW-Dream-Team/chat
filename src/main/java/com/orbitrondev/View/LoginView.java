@@ -101,7 +101,7 @@ public class LoginView extends View<LoginsModel> {
             username,
             Helper.useSpacer(25),
             password,
-            Helper.useSpacer(15),
+            Helper.useSpacer(25),
             btnRow
         );
 
