@@ -7,16 +7,14 @@ import com.jfoenix.validation.IntegerValidator;
 import com.jfoenix.validation.RegexValidator;
 import com.jfoenix.validation.RequiredFieldValidator;
 import com.orbitrondev.Controller.I18nController;
+import com.orbitrondev.Validator.IsSameValidator;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -114,6 +112,12 @@ public class Helper {
         IntegerValidator isIntValidator = new IntegerValidator();
         isIntValidator.messageProperty().bind(I18nController.createStringBinding(translatorKey));
         return isIntValidator;
+    }
+
+    public static IsSameValidator useIsSameValidator(TextInputControl validateTo, String translatorKey) {
+        IsSameValidator isSameValidator = new IsSameValidator(validateTo);
+        isSameValidator.messageProperty().bind(I18nController.createStringBinding(translatorKey));
+        return isSameValidator;
     }
 
     public static RegexValidator useIsValidIpValidator(String translatorKey) {
