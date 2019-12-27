@@ -13,7 +13,7 @@ import com.orbitrondev.Model.SupportTables.ChatUserModel;
  * @version %I%, %G%
  * @since 0.0.1
  */
-@DatabaseTable(tableName = "cached_users")
+@DatabaseTable(tableName = "users")
 public class UserModel {
 
     /**
@@ -98,5 +98,10 @@ public class UserModel {
 
     public void setBlocked(boolean blocked) {
         this.blocked = blocked;
+    }
+
+    @Override
+    public String toString() {
+        return username;
     }
 }
