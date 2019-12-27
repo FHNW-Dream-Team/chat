@@ -32,7 +32,7 @@ public class MessageModel {
     @DatabaseField(canBeNull = false)
     private Date timeSent;
 
-    @DatabaseField(canBeNull = false, foreign = true)
+    @DatabaseField(canBeNull = false, foreign = true, foreignAutoRefresh = true)
     private UserModel user;
 
     /**

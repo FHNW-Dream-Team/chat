@@ -3,11 +3,11 @@ package com.orbitrondev.View;
 import com.jfoenix.controls.*;
 import com.orbitrondev.Abstract.View;
 import com.orbitrondev.Controller.I18nController;
-import com.orbitrondev.Model.ChatModel;
-import com.orbitrondev.Model.DashboardModel;
-import com.orbitrondev.Model.UserModel;
+import com.orbitrondev.Model.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
@@ -25,14 +25,20 @@ public class DashboardView extends View<DashboardModel> {
     private Label itemDeleteAccount;
     private Label itemLogout;
 
+    private JFXListView<ChatModel> chatList;
+    private JFXListView<UserModel> contactList;
+
     private JFXButton addChatButton;
     private JFXButton addContactButton;
+
+    private StringProperty navBarTitleRight;
+    private JFXListView<HBox> messageList;
 
     public DashboardView(Stage stage, DashboardModel model) {
         super(stage, model);
         stage.titleProperty().bind(I18nController.createStringBinding("gui.dashboard.title"));
-        stage.setMinHeight(200);
-        stage.setMinWidth(300);
+        stage.setMinHeight(300);
+        stage.setMinWidth(400);
     }
 
     @Override
@@ -112,7 +118,7 @@ public class DashboardView extends View<DashboardModel> {
         AnchorPane tabChatsContentInAnchor = new AnchorPane();
 
         // Create and add all joined chats
-        JFXListView<ChatModel> chatList = new JFXListView<>();
+        chatList = new JFXListView<>();
         chatList.setItems(model.getChats());
         AnchorPane.setTopAnchor(chatList, 0.0);
         AnchorPane.setLeftAnchor(chatList, 0.0);
@@ -137,7 +143,7 @@ public class DashboardView extends View<DashboardModel> {
 
         AnchorPane tabContactsContentInAnchor = new AnchorPane();
 
-        JFXListView<UserModel> contactList = new JFXListView<>();
+        contactList = new JFXListView<>();
         contactList.setItems(model.getContacts());
         AnchorPane.setTopAnchor(contactList, 0.0);
         AnchorPane.setLeftAnchor(contactList, 0.0);
@@ -175,13 +181,35 @@ public class DashboardView extends View<DashboardModel> {
         VBox bodyRight = new VBox();
 
         // Create nav bar for right side
-        StringProperty navBarTitleRight = new SimpleStringProperty(" ");
+        navBarTitleRight = new SimpleStringProperty();
 
-        // TODO: Add opened chat in here
+        messageList = new JFXListView<>();
+
+        HBox messageBox = new HBox();
+        AnchorPane messageBoxContentInAnchor = new AnchorPane();
+        HBox.setHgrow(messageBoxContentInAnchor, Priority.ALWAYS);
+
+        JFXTextArea message = new JFXTextArea();
+        AnchorPane.setTopAnchor(message, 0.0);
+        AnchorPane.setLeftAnchor(message, 0.0);
+        AnchorPane.setRightAnchor(message, 50.0);
+        AnchorPane.setBottomAnchor(message, 0.0);
+
+        JFXButton sendButton = new JFXButton();
+        sendButton.setGraphic(Helper.useIconSend(Color.WHITE));
+        sendButton.getStyleClass().addAll("primary", "square");
+        AnchorPane.setTopAnchor(sendButton, 5.0);
+        AnchorPane.setRightAnchor(sendButton, 5.0);
+        AnchorPane.setBottomAnchor(sendButton, 5.0);
+
+        messageBoxContentInAnchor.getChildren().addAll(message, sendButton);
+        messageBox.getChildren().addAll(messageBoxContentInAnchor);
 
         // Add content to right body
         bodyRight.getChildren().addAll(
-            Helper.useVariableNavBar(navBarTitleRight)
+            Helper.useVariableNavBar(navBarTitleRight),
+            messageList,
+            messageBox
         );
 
         // Add both bodies to body
@@ -217,11 +245,104 @@ public class DashboardView extends View<DashboardModel> {
         return itemLogout;
     }
 
+    public JFXListView<ChatModel> getChatList() {
+        return chatList;
+    }
+
+    public JFXListView<UserModel> getContactList() {
+        return contactList;
+    }
+
     public JFXButton getAddChatButton() {
         return addChatButton;
     }
 
     public JFXButton getAddContactButton() {
         return addContactButton;
+    }
+
+    public String getNavBarTitleRight() {
+        return navBarTitleRight.get();
+    }
+
+    public StringProperty navBarTitleRightProperty() {
+        return navBarTitleRight;
+    }
+
+    public JFXListView<HBox> getMessageList() {
+        return messageList;
+    }
+
+    public void removeAllMessages() {
+        model.getMessages().clear();
+        messageList.getItems().clear();
+    }
+
+    // https://github.com/sarafinmahtab/MakeChat-App/blob/master/MakeChatClient/src/application/chatboard/ChatBoard.java
+    public void addMessage(MessageModel message) {
+        LoginModel login = serviceLocator.getModel().getCurrentLogin();
+        if (message.getUser().getUsername().equals(login.getUsername())) {
+            // If we sent a message
+            Label messageLabel = new Label();
+            messageLabel.setText(message.getMessage());
+            messageLabel.setTextFill(Color.WHITE);
+
+            Label userLabel = new Label();
+            userLabel.setText(message.getUser().getUsername());
+            userLabel.setStyle("-fx-font-weight: bold;");
+            userLabel.setTextFill(Color.WHITE);
+
+            VBox vBox = new VBox(2);
+            CornerRadii cornerRadi = new CornerRadii(5f);
+            BackgroundFill backgroundFill = new BackgroundFill(Color.rgb(64, 128, 128), cornerRadi, null);
+            vBox.setBackground(new Background(backgroundFill));
+            vBox.setPadding(new Insets(5f));
+            vBox.getChildren().addAll(userLabel, messageLabel);
+
+            Label dateLabel = new Label();
+            dateLabel.setText(message.getTimeSentFormatted());
+            dateLabel.setStyle("-fx-font-size: 10;");
+            dateLabel.setTextFill(Color.GRAY);
+            dateLabel.setAlignment(Pos.CENTER);
+            dateLabel.setMaxHeight(Double.MAX_VALUE);
+
+            HBox x = new HBox(2);
+            x.setMaxWidth(messageList.getWidth() - 20);
+            x.setAlignment(Pos.TOP_RIGHT);
+            x.getChildren().addAll(dateLabel, vBox);
+
+            messageList.getItems().add(x);
+        } else {
+            // If we received a message
+            Label messageLabel = new Label();
+            messageLabel.setText(message.getMessage());
+            messageLabel.setTextFill(Color.BLACK);
+
+            Label userLabel = new Label();
+            userLabel.setText(message.getUser().getUsername());
+            userLabel.setStyle("-fx-font-weight: bold;");
+            userLabel.setTextFill(Color.BLACK);
+
+            VBox vBox = new VBox(2);
+            CornerRadii cornerRadi = new CornerRadii(5f);
+            BackgroundFill backgroundFill = new BackgroundFill(Color.rgb(218, 218, 218), cornerRadi, null);
+            vBox.setBackground(new Background(backgroundFill));
+            vBox.setPadding(new Insets(5f));
+            vBox.getChildren().addAll(userLabel, messageLabel);
+
+            Label dateLabel = new Label();
+            dateLabel.setText(message.getTimeSentFormatted());
+            dateLabel.setStyle("-fx-font-size: 10;");
+            dateLabel.setTextFill(Color.GRAY);
+            dateLabel.setAlignment(Pos.CENTER);
+            dateLabel.setMaxHeight(Double.MAX_VALUE);
+
+            HBox x = new HBox(2);
+            x.setMaxWidth(messageList.getWidth() - 20);
+            x.setAlignment(Pos.TOP_LEFT);
+            x.getChildren().addAll(vBox, dateLabel);
+
+            messageList.getItems().add(x);
+        }
     }
 }

@@ -9,6 +9,7 @@ import com.orbitrondev.Controller.ServiceLocator;
 import com.orbitrondev.Model.SupportTables.ChatUserModel;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,10 +33,10 @@ public class ChatModel {
     private String name;
 
     @ForeignCollectionField
-    private ForeignCollection<MessageModel> messages;
+    private ForeignCollection<MessageModel> messages = null;
 
     @ForeignCollectionField
-    private ForeignCollection<ChatUserModel> members;
+    private ForeignCollection<ChatUserModel> members = null;
 
     @DatabaseField(canBeNull = false)
     protected ChatType chatType;

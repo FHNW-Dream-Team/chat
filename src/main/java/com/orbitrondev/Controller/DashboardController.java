@@ -1,6 +1,8 @@
 package com.orbitrondev.Controller;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.orbitrondev.Abstract.Controller;
+import com.orbitrondev.EventListener.MessageTextEventListener;
 import com.orbitrondev.Model.*;
 import com.orbitrondev.View.ChangePasswordView;
 import com.orbitrondev.View.DashboardView;
@@ -21,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class DashboardController extends Controller<DashboardModel, DashboardView> {
+public class DashboardController extends Controller<DashboardModel, DashboardView> implements MessageTextEventListener {
     protected DashboardController(DashboardModel model, DashboardView view) {
         super(model, view);
 
@@ -29,8 +31,13 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
         view.getItemChangePassword().setOnMouseClicked(event -> clickOnMenuChangePassword());
         view.getItemDeleteAccount().setOnMouseClicked(event -> clickOnMenuDeleteAccount());
         view.getItemLogout().setOnMouseClicked(event -> clickOnMenuLogout());
+        view.getChatList().setOnMouseClicked(event -> clickOnChatList());
+        view.getContactList().setOnMouseClicked(event -> clickOnContactList());
         view.getAddChatButton().setOnAction(event -> clickOnAddChat());
         view.getAddContactButton().setOnAction(event -> clickOnAddContact());
+
+        // register ourselves to listen for incoming chat messages
+        serviceLocator.getBackend().addMessageTextListener(this);
 
         // register ourselves to handle window-closing event
         view.getStage().setOnCloseRequest(event -> Platform.exit());
@@ -152,18 +159,18 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
                 if (targetIsNewGroup) {
                     // TODO: Let the user choose between public and private
                     if (!backend.sendCreateChatroom(token, chatWith, true)) {
-                        showErrorDialogue("gui.dashboard.addChat.error.program.title", "gui.dashboard.addChat.error.program.content");
+                        showErrorDialogue("gui.dashboard.error.program.title", "gui.dashboard.error.program.content");
                         return;
                     }
                 }
                 if (backend.sendJoinChatroom(token, chatWith, login.getUsername())) {
                     chat = db.getGroupChatOrCreate(chatWith, ChatType.PublicGroupChat);
                 } else {
-                    showErrorDialogue("gui.dashboard.addChat.error.program.title", "gui.dashboard.addChat.error.program.content");
+                    showErrorDialogue("gui.dashboard.error.program.title", "gui.dashboard.error.program.content");
                     return;
                 }
             } else {
-                showErrorDialogue("gui.dashboard.addChat.error.program.title", "gui.dashboard.addChat.error.program.content");
+                showErrorDialogue("gui.dashboard.error.program.title", "gui.dashboard.error.program.content");
                 return;
             }
 
@@ -245,7 +252,7 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
                 showErrorDialogue("gui.dashboard.addContact.error.offline.title", "gui.dashboard.addContact.error.offline.content");
             }
         } catch (SQLException | IOException e) {
-            showErrorDialogue("gui.dashboard.addContact.error.program.title", "gui.dashboard.addContact.error.program.content");
+            showErrorDialogue("gui.dashboard.error.program.title", "gui.dashboard.error.program.content");
         }
     }
 
@@ -270,5 +277,66 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
         Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
         stage.getIcons().add(new Image(getClass().getResource("/images/icon.png").toString())); // Add icon to window
         dialog.showAndWait();
+    }
+
+    private void clickOnChatList() {
+        DatabaseController db = serviceLocator.getDb();
+
+        ChatModel selectedItem = view.getChatList().getSelectionModel().getSelectedItem();
+        ChatModel chat = null;
+        try {
+            chat = db.getGroupChatOrCreate(selectedItem.getName(), ChatType.PublicGroupChat);
+        } catch (SQLException e) {
+            showErrorDialogue("gui.dashboard.error.program.title", "gui.dashboard.error.program.content");
+        }
+        if (chat == null) {
+            showErrorDialogue("gui.dashboard.error.program.title", "gui.dashboard.error.program.content");
+        }
+
+        view.removeAllMessages();
+        view.navBarTitleRightProperty().set(chat.getName());
+        ForeignCollection<MessageModel> messages = chat.getMessages();
+        if (messages != null) {
+            messages.forEach(message -> view.addMessage(message));
+        }
+    }
+
+    private void clickOnContactList() {
+        DatabaseController db = serviceLocator.getDb();
+        LoginModel login = serviceLocator.getModel().getCurrentLogin();
+
+        UserModel selectedItem = view.getContactList().getSelectionModel().getSelectedItem();
+        ChatModel chat = null;
+        try {
+            chat = db.getGroupChatOrCreate(login.getUsername() + "_" + selectedItem.getUsername(), ChatType.DirectChat);
+        } catch (SQLException e) {
+            showErrorDialogue("gui.dashboard.error.program.title", "gui.dashboard.error.program.content");
+        }
+        if (chat == null) {
+            showErrorDialogue("gui.dashboard.error.program.title", "gui.dashboard.error.program.content");
+        }
+
+        view.removeAllMessages();
+        view.navBarTitleRightProperty().set(selectedItem.getUsername());
+        ForeignCollection<MessageModel> messages = chat.getMessages();
+        if (messages != null) {
+            messages.forEach(message -> view.addMessage(message));
+        }
+    }
+
+    @Override
+    public void onMessageTextEvent(UserModel user, ChatModel chat, MessageModel message) {
+        // The server also sends a message when we send one. So only show messages without our username.
+        if (!user.getUsername().equals(serviceLocator.getModel().getCurrentLogin().getUsername())) {
+            try {
+                serviceLocator.getDb().getMessageDao().create(message);
+            } catch (SQLException e) {
+                showErrorDialogue("gui.dashboard.error.program.title", "gui.dashboard.error.program.content");
+            }
+
+            if (chat.getName().equals(view.getNavBarTitleRight())) {
+                view.addMessage(message);
+            }
+        }
     }
 }

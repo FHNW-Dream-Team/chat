@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 public class DashboardModel extends Model {
     private ObservableList<ChatModel> chats;
     private ObservableList<UserModel> contacts;
+    private ObservableList<MessageModel> messages;
 
     public DashboardModel() {
         super();
@@ -24,6 +25,8 @@ public class DashboardModel extends Model {
                 contacts.add(contact);
             }
         });
+
+        messages = FXCollections.observableArrayList();
     }
 
     public ObservableList<ChatModel> getChats() {
@@ -32,5 +35,9 @@ public class DashboardModel extends Model {
 
     public ObservableList<UserModel> getContacts() {
         return contacts;
+    }
+
+    public ObservableList<MessageModel> getMessages() {
+        return messages;
     }
 }

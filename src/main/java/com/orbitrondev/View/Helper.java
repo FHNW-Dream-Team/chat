@@ -253,4 +253,8 @@ public class Helper {
     public static IconNode useIconChat(Color color) {
         return useIcon(GoogleMaterialDesignIcons.FORUM, color);
     }
+
+    public static IconNode useIconSend(Color color) {
+        return useIcon(GoogleMaterialDesignIcons.SEND, color);
+    }
 }

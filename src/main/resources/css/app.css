@@ -45,6 +45,14 @@ dark: #005005;
     -fx-text-fill: black;
 }
 
+.jfx-button.square {
+    -fx-padding: 6px;
+    -fx-min-width: 40px;
+    -fx-max-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-height: 40px;
+}
+
 .tab-header-background {
     -fx-background-color: #2e7d32;
 }
