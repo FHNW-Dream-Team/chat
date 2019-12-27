@@ -44,3 +44,43 @@ dark: #005005;
     -fx-pref-width: 328;
     -fx-text-fill: black;
 }
+
+.tab-header-background {
+    -fx-background-color: #2e7d32;
+}
+
+/* Menu button in dashboard */
+.jfx-hamburger StackPane { /* This corresponds to every line in the hamburger */
+    -fx-background-color: white;
+    -fx-pref-width: 25px;
+    -fx-pref-height: 3px;
+}
+
+.jfx-hamburger {
+    -fx-cursor: hand;
+}
+
+.jfx-popup-container {
+    -fx-background-color: white;
+}
+
+.jfx-list-cell.selected {
+    -fx-background-color: #2e7d32;
+}
+
+.jfx-list-cell .jfx-rippler {
+    -fx-rippler-fill: #60ad5e;
+}
+
+.fx-list-cell:hover {
+    -fx-background-color: #60ad5e;
+}
+
+.animated-option-button {
+    -fx-pref-width: 50px;
+    -fx-pref-height: 50px;
+    -fx-text-fill: white;
+    -fx-background-color: #005005;
+    -fx-background-radius: 50px;
+    -fx-border-radius: 50px;
+}

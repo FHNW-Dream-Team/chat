@@ -14,12 +14,16 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import jiconfont.IconCode;
+import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
+import jiconfont.javafx.IconNode;
 
 import java.util.Locale;
 
@@ -94,6 +98,25 @@ public class Helper {
         HBox navBar = new HBox();
         Text title = new Text();
         title.textProperty().bind(I18nController.createStringBinding(() -> I18nController.get(translatorKey).toUpperCase()));
+        title.setFill(Color.WHITE);
+        navBar.getStyleClass().add("navbar");
+        navBar.getChildren().add(title);
+        return navBar;
+    }
+
+    public static HBox useStaticNavBar(String text) {
+        HBox navBar = new HBox();
+        Text title = new Text(text.toUpperCase());
+        title.setFill(Color.WHITE);
+        navBar.getStyleClass().add("navbar");
+        navBar.getChildren().add(title);
+        return navBar;
+    }
+
+    public static HBox useVariableNavBar(ObservableValue<String> text) {
+        HBox navBar = new HBox();
+        Text title = new Text();
+        title.textProperty().bind(text);
         title.setFill(Color.WHITE);
         navBar.getStyleClass().add("navbar");
         navBar.getChildren().add(title);
@@ -207,5 +230,27 @@ public class Helper {
         exitItem.setAccelerator(KeyCombination.keyCombination("Alt+F4"));
         exitItem.setOnAction(event -> System.exit(0));
         return exitItem;
+    }
+
+    // Icons
+    public static IconNode useIcon(IconCode iconCode, Color color) {
+        IconNode icon = new IconNode(iconCode);
+        icon.setFill(color);
+        return icon;
+    }
+    public static IconNode useIcon(IconCode iconCode) {
+        return useIcon(iconCode, Color.BLACK);
+    }
+
+    public static IconNode useIconAdd(Color color) {
+        return useIcon(GoogleMaterialDesignIcons.ADD, color);
+    }
+
+    public static IconNode useIconContact(Color color) {
+        return useIcon(GoogleMaterialDesignIcons.CONTACTS, color);
+    }
+
+    public static IconNode useIconChat(Color color) {
+        return useIcon(GoogleMaterialDesignIcons.FORUM, color);
     }
 }
