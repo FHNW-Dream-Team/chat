@@ -46,6 +46,9 @@ public class ChatModel {
     @DatabaseField(defaultValue = "false", canBeNull = false)
     private boolean admin = false;
 
+    @DatabaseField(defaultValue = "false", canBeNull = false)
+    private boolean joined = false;
+
     /**
      * CONSTRUCTORS //////////////////////////
      */
@@ -140,5 +143,18 @@ public class ChatModel {
 
     public void setAdmin(boolean admin) {
         this.admin = admin;
+    }
+
+    public boolean isJoined() {
+        return joined;
+    }
+
+    public void setJoined(boolean joined) {
+        this.joined = joined;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
