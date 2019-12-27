@@ -7,18 +7,19 @@ import com.orbitrondev.View.DashboardView;
 import com.orbitrondev.View.DeleteAccountView;
 import com.orbitrondev.View.LoginView;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DashboardController extends Controller<DashboardModel, DashboardView> {
     protected DashboardController(DashboardModel model, DashboardView view) {
@@ -100,10 +101,103 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
         new Thread(logoutTask).start();
     }
 
-
-
     private void clickOnAddChat() {
+        final BackendController backend = serviceLocator.getBackend();
+        final LoginModel login = serviceLocator.getModel().getCurrentLogin();
+        final String token = login.getToken();
+        final DatabaseController db = serviceLocator.getDb();
 
+        String chatWith = "";
+        boolean validTarget = false;
+        boolean targetIsUser = false;
+        boolean targetIsGroup = false;
+        boolean targetIsNewGroup = false;
+        // "null" means user canceled, length "0" means no user name given, so repeat until right
+        while (chatWith != null && chatWith.length() == 0 && !validTarget) {
+            chatWith = showAddChatDialogue();
+
+            // Check if it's a group chat
+            ArrayList<String> groupChats = new ArrayList<>();
+            try {
+                // Update local list of known public group chats
+                groupChats = backend.sendListChatrooms(token);
+            } catch (IOException e) {
+                // Ignore
+            }
+            if (groupChats.contains(chatWith)) {
+                validTarget = true;
+                targetIsGroup = true;
+            } else {
+                // Check if it's a user
+                try {
+                    if (backend.sendUserOnline(token, chatWith)) {
+                        validTarget = true;
+                        targetIsUser = true;
+                    } else {
+                        targetIsGroup = true;
+                        targetIsNewGroup = true;
+                    }
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+        }
+        // Stop operation completely if no username was given in the dialogue
+        if (chatWith == null) return;
+
+        try {
+            ChatModel chat;
+            if (targetIsUser) chat = db.getGroupChatOrCreate(login.getUsername() + "_" + chatWith, ChatType.DirectChat);
+            else if (targetIsGroup) {
+                if (targetIsNewGroup) {
+                    // TODO: Let the user choose between public and private
+                    backend.sendCreateChatroom(token, chatWith, true);
+                }
+                backend.sendJoinChatroom(token, chatWith, login.getUsername());
+                chat = db.getGroupChatOrCreate(chatWith, ChatType.PublicGroupChat);
+            } else {
+                // TODO: Unknown error
+                return;
+            }
+
+            // Set as joined
+            chat.setJoined(true);
+            db.getChatDao().update(chat);
+            model.getChats().add(chat);
+        } catch (SQLException | IOException e) {
+            // Ignore
+        }
+
+    }
+
+    private String showAddChatDialogue() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.titleProperty().bind(I18nController.createStringBinding("gui.dashboard.addChat.title"));
+        AtomicReference<String> chatList = new AtomicReference<>("");
+        try {
+            serviceLocator.getBackend().sendListChatrooms(serviceLocator.getModel().getCurrentLogin().getToken()).forEach(chat -> {
+                if (chatList.get().length() != 0) {
+                    chatList.set(chatList.get() + ", ");
+                }
+                chatList.set(chatList.get() + chat);
+            });
+        } catch (IOException e) {
+            // Ignore
+        }
+        // Publicly available group chats:
+        VBox content = new VBox();
+        content.setPadding(new Insets(5));
+        Text headerText = new Text("Publicly available group chats: " + chatList);
+        headerText.setWrappingWidth(500);
+        content.getChildren().add(headerText);
+        dialog.getDialogPane().setHeader(content);
+        dialog.contentTextProperty().bind(I18nController.createStringBinding("gui.dashboard.addChat.content"));
+        Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(getClass().getResource("/images/icon.png").toString())); // Add icon to window
+
+        Optional<String> result = dialog.showAndWait();
+
+        return result.orElse(null);
     }
 
     private void clickOnAddContact() {
