@@ -151,12 +151,19 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
             else if (targetIsGroup) {
                 if (targetIsNewGroup) {
                     // TODO: Let the user choose between public and private
-                    backend.sendCreateChatroom(token, chatWith, true);
+                    if (!backend.sendCreateChatroom(token, chatWith, true)) {
+                        showErrorDialogue("gui.dashboard.addChat.error.program.title", "gui.dashboard.addChat.error.program.content");
+                        return;
+                    }
                 }
-                backend.sendJoinChatroom(token, chatWith, login.getUsername());
-                chat = db.getGroupChatOrCreate(chatWith, ChatType.PublicGroupChat);
+                if (backend.sendJoinChatroom(token, chatWith, login.getUsername())) {
+                    chat = db.getGroupChatOrCreate(chatWith, ChatType.PublicGroupChat);
+                } else {
+                    showErrorDialogue("gui.dashboard.addChat.error.program.title", "gui.dashboard.addChat.error.program.content");
+                    return;
+                }
             } else {
-                // TODO: Unknown error
+                showErrorDialogue("gui.dashboard.addChat.error.program.title", "gui.dashboard.addChat.error.program.content");
                 return;
             }
 
