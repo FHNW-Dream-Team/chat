@@ -11,8 +11,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class ChangePasswordView extends View<ChangePasswordModel> {
     private VBox errorMessage;
     private JFXPasswordField oldPassword;
@@ -66,36 +64,6 @@ public class ChangePasswordView extends View<ChangePasswordModel> {
         // Create button to register
         btnChange = Helper.usePrimaryButton("gui.changePassword.change");
         btnChange.setDisable(true);
-
-        // Disable/Enable the login button depending on if the inputs are valid
-        AtomicBoolean oldPasswordValid = new AtomicBoolean(false);
-        AtomicBoolean newPasswordValid = new AtomicBoolean(false);
-        AtomicBoolean repeatNewPasswordValid = new AtomicBoolean(false);
-        Runnable updateButtonClickable = () -> {
-            if (!oldPasswordValid.get() || !newPasswordValid.get() || !repeatNewPasswordValid.get()) {
-                btnChange.setDisable(true);
-            } else {
-                btnChange.setDisable(false);
-            }
-        };
-        oldPassword.textProperty().addListener((o, oldVal, newVal) -> {
-            if (!oldVal.equals(newVal)) {
-                oldPasswordValid.set(oldPassword.validate());
-                updateButtonClickable.run();
-            }
-        });
-        newPassword.textProperty().addListener((o, oldVal, newVal) -> {
-            if (!oldVal.equals(newVal)) {
-                newPasswordValid.set(newPassword.validate());
-                updateButtonClickable.run();
-            }
-        });
-        repeatNewPassword.textProperty().addListener((o, oldVal, newVal) -> {
-            if (!oldVal.equals(newVal)) {
-                repeatNewPasswordValid.set(repeatNewPassword.validate());
-                updateButtonClickable.run();
-            }
-        });
 
         // Create button to change
         btnCancel = Helper.useSecondaryButton("gui.changePassword.cancel");
