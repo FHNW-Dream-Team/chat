@@ -325,6 +325,7 @@ public class DashboardView extends View<DashboardModel> {
             // If we sent a message
             Label messageLabel = new Label();
             messageLabel.setText(message.getMessage());
+            // TODO: Wrap text if long
             messageLabel.setTextFill(Color.WHITE);
 
             Label userLabel = new Label();
@@ -347,7 +348,8 @@ public class DashboardView extends View<DashboardModel> {
             dateLabel.setMaxHeight(Double.MAX_VALUE);
 
             HBox x = new HBox(2);
-            x.setMaxWidth(messageList.getWidth() - 20);
+            NumberBinding maxWidth = Bindings.subtract(messageList.widthProperty(), 40);
+            x.maxWidthProperty().bind(maxWidth);
             x.setAlignment(Pos.TOP_RIGHT);
             x.getChildren().addAll(dateLabel, vBox);
 
@@ -356,6 +358,7 @@ public class DashboardView extends View<DashboardModel> {
             // If we received a message
             Label messageLabel = new Label();
             messageLabel.setText(message.getMessage());
+            // TODO: Wrap text if long
             messageLabel.setTextFill(Color.BLACK);
 
             Label userLabel = new Label();
@@ -378,7 +381,7 @@ public class DashboardView extends View<DashboardModel> {
             dateLabel.setMaxHeight(Double.MAX_VALUE);
 
             HBox x = new HBox(2);
-            NumberBinding maxWidth = Bindings.subtract(messageList.widthProperty(), 20);
+            NumberBinding maxWidth = Bindings.subtract(messageList.widthProperty(), 40);
             x.maxWidthProperty().bind(maxWidth);
             x.setAlignment(Pos.TOP_LEFT);
             x.getChildren().addAll(vBox, dateLabel);
