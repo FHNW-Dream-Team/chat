@@ -50,6 +50,34 @@ public class DeleteAccountController extends Controller<DeleteAccountModel, Dele
         });
     }
 
+    private void openLoginWindow() {
+        Platform.runLater(() -> {
+            // Open login window and close delete account window
+            Stage appStage = new Stage();
+            LoginsModel model = new LoginsModel();
+            LoginView newView = new LoginView(appStage, model);
+            new LoginController(model, newView);
+
+            view.stop();
+            view = null;
+            newView.start();
+        });
+    }
+
+    private void openDashboardWindow() {
+        Platform.runLater(() -> {
+            // Open dashboard window and close delete account window
+            Stage appStage = new Stage();
+            DashboardModel model = new DashboardModel();
+            DashboardView newView = new DashboardView(appStage, model);
+            new DashboardController(model, newView);
+
+            view.stop();
+            view = null;
+            newView.start();
+        });
+    }
+
     public void clickOnDelete() {
         // Disable everything to prevent something while working on the data
         disableAll();
@@ -76,17 +104,7 @@ public class DeleteAccountController extends Controller<DeleteAccountModel, Dele
 
             if (userLoggedOut) {
                 mainModel.setCurrentLogin(null);
-                Platform.runLater(() -> {
-                    // Open login window and close delete account window
-                    Stage appStage = new Stage();
-                    LoginsModel model = new LoginsModel();
-                    LoginView newView = new LoginView(appStage, model);
-                    new LoginController(model, newView);
-
-                    view.stop();
-                    view = null;
-                    newView.start();
-                });
+                openLoginWindow();
             } else {
                 enableAll();
                 setErrorMessage("gui.deleteAccount.logoutFailed");
@@ -115,16 +133,6 @@ public class DeleteAccountController extends Controller<DeleteAccountModel, Dele
     }
 
     public void clickOnCancel() {
-        Platform.runLater(() -> {
-            // Open dashboard window and close delete account window
-            Stage appStage = new Stage();
-            DashboardModel model = new DashboardModel();
-            DashboardView newView = new DashboardView(appStage, model);
-            new DashboardController(model, newView);
-
-            view.stop();
-            view = null;
-            newView.start();
-        });
+        openDashboardWindow();
     }
 }
