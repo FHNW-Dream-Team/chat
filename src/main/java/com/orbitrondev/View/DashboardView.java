@@ -184,15 +184,25 @@ public class DashboardView extends View<DashboardModel> {
 
         // Create right body
         VBox bodyRight = new VBox();
+        AnchorPane bodyRightContentInAnchor = new AnchorPane();
+        VBox.setVgrow(bodyRightContentInAnchor, Priority.ALWAYS);
 
         // Create nav bar for right side
         navBarTitleRight = new SimpleStringProperty();
 
         messageList = new JFXListView<>();
+        VBox.setVgrow(messageList, Priority.ALWAYS);
+        AnchorPane.setTopAnchor(messageList, 0.0);
+        AnchorPane.setLeftAnchor(messageList, 0.0);
+        AnchorPane.setRightAnchor(messageList, 0.0);
+        AnchorPane.setBottomAnchor(messageList, 50.0);
 
         HBox messageBox = new HBox();
         messageBox.setMinHeight(50);
         messageBox.setMaxHeight(50);
+        AnchorPane.setLeftAnchor(messageBox, 0.0);
+        AnchorPane.setRightAnchor(messageBox, 0.0);
+        AnchorPane.setBottomAnchor(messageBox, 0.0);
         AnchorPane messageBoxContentInAnchor = new AnchorPane();
         HBox.setHgrow(messageBoxContentInAnchor, Priority.ALWAYS);
 
@@ -219,10 +229,10 @@ public class DashboardView extends View<DashboardModel> {
         messageBox.getChildren().addAll(messageBoxContentInAnchor);
 
         // Add content to right body
+        bodyRightContentInAnchor.getChildren().addAll(messageList, messageBox);
         bodyRight.getChildren().addAll(
             Helper.useVariableNavBar(navBarTitleRight),
-            messageList,
-            messageBox
+            bodyRightContentInAnchor
         );
 
         // Add both bodies to body
