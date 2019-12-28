@@ -36,7 +36,7 @@ public class DashboardView extends View<DashboardModel> {
 
     private StringProperty navBarTitleRight;
     private JFXListView<HBox> messageList;
-    private JFXTextArea message;
+    private JFXTextField message;
     private JFXButton sendButton;
 
     public DashboardView(Stage stage, DashboardModel model) {
@@ -191,14 +191,22 @@ public class DashboardView extends View<DashboardModel> {
         messageList = new JFXListView<>();
 
         HBox messageBox = new HBox();
+        messageBox.setMinHeight(50);
+        messageBox.setMaxHeight(50);
         AnchorPane messageBoxContentInAnchor = new AnchorPane();
         HBox.setHgrow(messageBoxContentInAnchor, Priority.ALWAYS);
 
-        message = new JFXTextArea();
-        AnchorPane.setTopAnchor(message, 0.0);
-        AnchorPane.setLeftAnchor(message, 0.0);
+        message = new JFXTextField();
+        AnchorPane.setTopAnchor(message, 10.0);
+        AnchorPane.setLeftAnchor(message, 5.0);
         AnchorPane.setRightAnchor(message, 50.0);
-        AnchorPane.setBottomAnchor(message, 0.0);
+        AnchorPane.setBottomAnchor(message, 10.0);
+        // Don't allow the user to enter more than 1024 characters
+        message.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 1024) {
+                message.setText(newValue.substring(0, 1024));
+            }
+        });
 
         sendButton = new JFXButton();
         sendButton.setGraphic(Helper.useIconSend(Color.WHITE));
@@ -292,7 +300,7 @@ public class DashboardView extends View<DashboardModel> {
         messageList.getItems().clear();
     }
 
-    public JFXTextArea getMessage() {
+    public JFXTextField getMessage() {
         return message;
     }
 
