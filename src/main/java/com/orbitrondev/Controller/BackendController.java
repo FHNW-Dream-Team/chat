@@ -152,9 +152,11 @@ public class BackendController implements Closeable {
                         switch (lastMessage.get(0)) {
                             case "MessageText":
                                 receivedMessageText(lastMessage.get(1), lastMessage.get(2), lastMessage.get(3));
+                                lastMessage.clear();
                                 break;
                             case "MessageError":
                                 receivedMessageError(lastMessage.get(1));
+                                lastMessage.clear();
                                 break;
                         }
                     }
