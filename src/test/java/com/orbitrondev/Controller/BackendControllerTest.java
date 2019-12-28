@@ -101,9 +101,9 @@ public class BackendControllerTest {
     @Test(priority=7)
     public void sendSendMessage() {
         try {
-            assertFalse(backend.sendSendMessage("WRONG_TOKEN", "WRONG_TOKEN_ANYWAYS", "WRONG_TOKEN_ANYWAYS"));
-            assertFalse(backend.sendSendMessage(token, "WRONG_TARGET", "WRONG_TARGET_ANYWAYS"));
-            assertTrue(backend.sendSendMessage(token, TEST_CHATROOM, "Running the test of the chat client!"));
+            assertNull(backend.sendSendMessage("WRONG_TOKEN", "WRONG_TOKEN_ANYWAYS", "WRONG_TOKEN_ANYWAYS"));
+            assertNull(backend.sendSendMessage(token, "WRONG_TARGET", "WRONG_TARGET_ANYWAYS"));
+            assertNotNull(backend.sendSendMessage(token, TEST_CHATROOM, "Running the test of the chat client!"));
         } catch (IOException e) {
             e.printStackTrace();
         }

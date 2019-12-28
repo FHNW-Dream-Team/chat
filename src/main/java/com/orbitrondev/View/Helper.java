@@ -238,6 +238,7 @@ public class Helper {
         icon.setFill(color);
         return icon;
     }
+
     public static IconNode useIcon(IconCode iconCode) {
         return useIcon(iconCode, Color.BLACK);
     }

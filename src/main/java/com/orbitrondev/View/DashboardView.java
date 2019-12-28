@@ -4,6 +4,8 @@ import com.jfoenix.controls.*;
 import com.orbitrondev.Abstract.View;
 import com.orbitrondev.Controller.I18nController;
 import com.orbitrondev.Model.*;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
@@ -12,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -33,6 +36,8 @@ public class DashboardView extends View<DashboardModel> {
 
     private StringProperty navBarTitleRight;
     private JFXListView<HBox> messageList;
+    private JFXTextArea message;
+    private JFXButton sendButton;
 
     public DashboardView(Stage stage, DashboardModel model) {
         super(stage, model);
@@ -189,13 +194,13 @@ public class DashboardView extends View<DashboardModel> {
         AnchorPane messageBoxContentInAnchor = new AnchorPane();
         HBox.setHgrow(messageBoxContentInAnchor, Priority.ALWAYS);
 
-        JFXTextArea message = new JFXTextArea();
+        message = new JFXTextArea();
         AnchorPane.setTopAnchor(message, 0.0);
         AnchorPane.setLeftAnchor(message, 0.0);
         AnchorPane.setRightAnchor(message, 50.0);
         AnchorPane.setBottomAnchor(message, 0.0);
 
-        JFXButton sendButton = new JFXButton();
+        sendButton = new JFXButton();
         sendButton.setGraphic(Helper.useIconSend(Color.WHITE));
         sendButton.getStyleClass().addAll("primary", "square");
         AnchorPane.setTopAnchor(sendButton, 5.0);
@@ -225,6 +230,15 @@ public class DashboardView extends View<DashboardModel> {
         );
 
         Scene scene = new Scene(rootInAnchor);
+        // https://stackoverflow.com/questions/29962395/how-to-write-a-keylistener-for-javafx
+        scene.setOnKeyPressed(event -> {
+            // Click the connect button by clicking ENTER
+            if (event.getCode() == KeyCode.ENTER) {
+                if (!sendButton.isDisable() && message.getLength() != 0) {
+                    sendButton.fire();
+                }
+            }
+        });
         scene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
         return scene;
     }
@@ -276,6 +290,14 @@ public class DashboardView extends View<DashboardModel> {
     public void removeAllMessages() {
         model.getMessages().clear();
         messageList.getItems().clear();
+    }
+
+    public JFXTextArea getMessage() {
+        return message;
+    }
+
+    public JFXButton getSendButton() {
+        return sendButton;
     }
 
     // https://github.com/sarafinmahtab/MakeChat-App/blob/master/MakeChatClient/src/application/chatboard/ChatBoard.java
@@ -338,7 +360,8 @@ public class DashboardView extends View<DashboardModel> {
             dateLabel.setMaxHeight(Double.MAX_VALUE);
 
             HBox x = new HBox(2);
-            x.setMaxWidth(messageList.getWidth() - 20);
+            NumberBinding maxWidth = Bindings.subtract(messageList.widthProperty(), 20);
+            x.maxWidthProperty().bind(maxWidth);
             x.setAlignment(Pos.TOP_LEFT);
             x.getChildren().addAll(vBox, dateLabel);
 

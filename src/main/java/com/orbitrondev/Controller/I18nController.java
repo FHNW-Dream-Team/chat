@@ -1,9 +1,3 @@
-/**
- * Copyright (c) 2016 sothawo
- * <p>
- * https://www.sothawo.com/2016/09/how-to-implement-a-javafx-ui-where-the-language-can-be-changed-dynamically/
- */
-
 package com.orbitrondev.Controller;
 
 import javafx.beans.binding.Bindings;
@@ -17,6 +11,10 @@ import java.util.concurrent.Callable;
 
 /**
  * I18N utility class..
+ *
+ * Copyright (c) 2016 sothawo
+ * <p>
+ * https://www.sothawo.com/2016/09/how-to-implement-a-javafx-ui-where-the-language-can-be-changed-dynamically/
  *
  * @author P.J. Meisch (pj.meisch@sothawo.com).
  * @since 0.0.1

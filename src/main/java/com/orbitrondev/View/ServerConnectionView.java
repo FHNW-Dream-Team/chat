@@ -53,7 +53,7 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
                         server.isSecure()
                             ? I18nController.get("gui.serverConnection.entry.ssl", server.getIp(), Integer.toString(server.getPort()))
                             : I18nController.get("gui.serverConnection.entry", server.getIp(), Integer.toString(server.getPort()))
-                        );
+                    );
             }
 
             @Override

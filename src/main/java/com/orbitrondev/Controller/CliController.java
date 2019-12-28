@@ -686,7 +686,8 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
             }
         }
 
-        if (backend.sendSendMessage(model.getCurrentLogin().getToken(), target, message)) {
+        MessageModel messageModel = backend.sendSendMessage(model.getCurrentLogin().getToken(), target, message);
+        if (messageModel != null) {
             System.out.println(I18nController.get("console.sendMessage.success"));
         } else {
             System.out.println(I18nController.get("console.sendMessage.fail"));

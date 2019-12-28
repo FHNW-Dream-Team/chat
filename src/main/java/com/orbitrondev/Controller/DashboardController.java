@@ -35,6 +35,7 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
         view.getContactList().setOnMouseClicked(event -> clickOnContactList());
         view.getAddChatButton().setOnAction(event -> clickOnAddChat());
         view.getAddContactButton().setOnAction(event -> clickOnAddContact());
+        view.getSendButton().setOnAction(event -> clickOnSendMessage());
 
         // register ourselves to listen for incoming chat messages
         serviceLocator.getBackend().addMessageTextListener(this);
@@ -270,19 +271,25 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
     }
 
     private void showErrorDialogue(String translatorKeyTitle, String translatorKeyContent) {
-        Alert dialog = new Alert(Alert.AlertType.ERROR);
-        dialog.titleProperty().bind(I18nController.createStringBinding(translatorKeyTitle));
-        dialog.setHeaderText(null);
-        dialog.contentTextProperty().bind(I18nController.createStringBinding(translatorKeyContent));
-        Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(getClass().getResource("/images/icon.png").toString())); // Add icon to window
-        dialog.showAndWait();
+        Platform.runLater(() -> {
+            Alert dialog = new Alert(Alert.AlertType.ERROR);
+            dialog.titleProperty().bind(I18nController.createStringBinding(translatorKeyTitle));
+            dialog.setHeaderText(null);
+            dialog.contentTextProperty().bind(I18nController.createStringBinding(translatorKeyContent));
+            Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(getClass().getResource("/images/icon.png").toString())); // Add icon to window
+            dialog.showAndWait();
+        });
     }
 
     private void clickOnChatList() {
         DatabaseController db = serviceLocator.getDb();
 
         ChatModel selectedItem = view.getChatList().getSelectionModel().getSelectedItem();
+        if (selectedItem == null) {
+            // Clicked on random place, so do nothing
+            return;
+        }
         ChatModel chat = null;
         try {
             chat = db.getGroupChatOrCreate(selectedItem.getName(), ChatType.PublicGroupChat);
@@ -322,6 +329,35 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
         if (messages != null) {
             messages.forEach(message -> view.addMessage(message));
         }
+    }
+
+    private void clickOnSendMessage() {
+        if (view.getMessage().getLength() == 0) {
+            return;
+        }
+        // Check if it is not more than 1024 characters
+        if (view.getMessage().getLength() > 1024) {
+            showErrorDialogue("gui.dashboard.error.program.title", "gui.dashboard.error.program.content");
+            return;
+        }
+
+        BackendController backend = serviceLocator.getBackend();
+        LoginModel login = serviceLocator.getModel().getCurrentLogin();
+
+        Runnable sendTask = () -> {
+            try {
+                MessageModel message = backend.sendSendMessage(login.getToken(), view.getNavBarTitleRight(), view.getMessage().getText());
+                if (message != null) {
+                    view.getMessage().setText("");
+                    view.addMessage(message);
+                } else {
+                    showErrorDialogue("gui.dashboard.error.program.title", "gui.dashboard.error.program.content");
+                }
+            } catch (IOException e) {
+                showErrorDialogue("gui.dashboard.error.program.title", "gui.dashboard.error.program.content");
+            }
+        };
+        new Thread(sendTask).start();
     }
 
     @Override

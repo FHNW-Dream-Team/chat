@@ -714,20 +714,21 @@ public class BackendController implements Closeable {
      * @param target  A string containing the name of a chatroom or a user.
      * @param message A string containing the message (max length of 1024 characters).
      *
-     * @return "true" if message was sent, "false" if 1) target user not online 2) current logged in user is not member
-     * of the chatroom 3) if he message is over 1024 characters
+     * @return Object of type MessageModel if message was sent, "null" if 1) target user not online 2) current logged in
+     * user is not member of the chatroom 3) if he message is over 1024 characters
      *
      * @throws IOException If an I/O error occurs.
      * @since 0.0.1
      */
-    public boolean sendSendMessage(String token, String target, String message) throws IOException {
+    public MessageModel sendSendMessage(String token, String target, String message) throws IOException {
         if (message.length() > 1024) {
-            return false;
+            return null;
         }
         sendCommand(new String[]{"SendMessage", token, target, message});
 
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
+        MessageModel messageObject = null;
         if (result) {
             try {
                 ChatModel chat = null;
@@ -750,14 +751,14 @@ public class BackendController implements Closeable {
                         }
                     }
                 }
-                MessageModel messageObject = new MessageModel(message, chat, new Date(), sl.getDb().getUserOrCreate(sl.getModel().getCurrentLogin().getUsername()));
+                messageObject = new MessageModel(message, chat, new Date(), sl.getDb().getUserOrCreate(sl.getModel().getCurrentLogin().getUsername()));
                 sl.getDb().getMessageDao().create(messageObject);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
         lastMessage.clear();
-        return result;
+        return messageObject;
     }
 
     /**
