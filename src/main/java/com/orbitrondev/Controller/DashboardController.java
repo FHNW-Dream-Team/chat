@@ -346,6 +346,11 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
 
         Runnable sendTask = () -> {
             try {
+                if (!backend.sendUserOnline(login.getToken(), view.getNavBarTitleRight())) {
+                    showErrorDialogue("gui.dashboard.sendMessage.error.offline.title", "gui.dashboard.sendMessage.error.offline.content");
+                    return;
+                }
+
                 MessageModel message = backend.sendSendMessage(login.getToken(), view.getNavBarTitleRight(), view.getMessage().getText());
                 if (message != null) {
                     view.getMessage().setText("");
