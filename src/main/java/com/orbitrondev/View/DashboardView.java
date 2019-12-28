@@ -23,7 +23,6 @@ import jiconfont.javafx.IconFontFX;
 import jiconfont.javafx.IconNode;
 
 public class DashboardView extends View<DashboardModel> {
-    private JFXPopup popup;
     private Label itemChangePassword;
     private Label itemDeleteAccount;
     private Label itemLogout;
@@ -87,7 +86,7 @@ public class DashboardView extends View<DashboardModel> {
         JFXHamburger menuButton = new JFXHamburger();
         JFXRippler rippler = new JFXRippler(menuButton, JFXRippler.RipplerMask.CIRCLE, JFXRippler.RipplerPos.BACK);
         JFXListView<Label> list = new JFXListView<>();
-        popup = new JFXPopup(list);
+        JFXPopup popup = new JFXPopup(list);
         IconFontFX.register(GoogleMaterialDesignIcons.getIconFont());
         itemChangePassword = new Label();
         itemChangePassword.setGraphic(new IconNode(GoogleMaterialDesignIcons.MODE_EDIT));
@@ -211,12 +210,6 @@ public class DashboardView extends View<DashboardModel> {
         AnchorPane.setLeftAnchor(message, 5.0);
         AnchorPane.setRightAnchor(message, 50.0);
         AnchorPane.setBottomAnchor(message, 10.0);
-        // Don't allow the user to enter more than 1024 characters
-        message.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.length() > 1024) {
-                message.setText(newValue.substring(0, 1024));
-            }
-        });
 
         sendButton = new JFXButton();
         sendButton.setGraphic(Helper.useIconSend(Color.WHITE));
@@ -259,10 +252,6 @@ public class DashboardView extends View<DashboardModel> {
         });
         scene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
         return scene;
-    }
-
-    public JFXPopup getPopup() {
-        return popup;
     }
 
     public Label getItemChangePassword() {
@@ -321,72 +310,41 @@ public class DashboardView extends View<DashboardModel> {
     // https://github.com/sarafinmahtab/MakeChat-App/blob/master/MakeChatClient/src/application/chatboard/ChatBoard.java
     public void addMessage(MessageModel message) {
         LoginModel login = serviceLocator.getModel().getCurrentLogin();
-        if (message.getUser().getUsername().equals(login.getUsername())) {
-            // If we sent a message
-            Label messageLabel = new Label();
-            messageLabel.setText(message.getMessage());
-            // TODO: Wrap text if long
-            messageLabel.setTextFill(Color.WHITE);
+        boolean isLoggedInUser = message.getUser().getUsername().equals(login.getUsername());
 
-            Label userLabel = new Label();
-            userLabel.setText(message.getUser().getUsername());
-            userLabel.setStyle("-fx-font-weight: bold;");
-            userLabel.setTextFill(Color.WHITE);
+        Label messageLabel = new Label();
+        messageLabel.setText(message.getMessage());
+        // TODO: Wrap text if long
+        messageLabel.setTextFill(isLoggedInUser ? Color.WHITE : Color.BLACK);
 
-            VBox vBox = new VBox(2);
-            CornerRadii cornerRadi = new CornerRadii(5f);
-            BackgroundFill backgroundFill = new BackgroundFill(Color.rgb(64, 128, 128), cornerRadi, null);
-            vBox.setBackground(new Background(backgroundFill));
-            vBox.setPadding(new Insets(5f));
-            vBox.getChildren().addAll(userLabel, messageLabel);
+        Label userLabel = new Label();
+        userLabel.setText(message.getUser().getUsername());
+        userLabel.setStyle("-fx-font-weight: bold;");
+        userLabel.setTextFill(isLoggedInUser ? Color.WHITE : Color.BLACK);
 
-            Label dateLabel = new Label();
-            dateLabel.setText(message.getTimeSentFormatted());
-            dateLabel.setStyle("-fx-font-size: 10;");
-            dateLabel.setTextFill(Color.GRAY);
-            dateLabel.setAlignment(Pos.CENTER);
-            dateLabel.setMaxHeight(Double.MAX_VALUE);
+        VBox vBox = new VBox(2);
+        CornerRadii cornerRadi = new CornerRadii(5f);
+        BackgroundFill backgroundFill = new BackgroundFill(isLoggedInUser ? Color.rgb(64, 128, 128) : Color.rgb(218, 218, 218), cornerRadi, null);
+        vBox.setBackground(new Background(backgroundFill));
+        vBox.setPadding(new Insets(5f));
+        vBox.getChildren().addAll(userLabel, messageLabel);
 
-            HBox x = new HBox(2);
-            NumberBinding maxWidth = Bindings.subtract(messageList.widthProperty(), 40);
-            x.maxWidthProperty().bind(maxWidth);
-            x.setAlignment(Pos.TOP_RIGHT);
+        Label dateLabel = new Label();
+        dateLabel.setText(message.getTimeSentFormatted());
+        dateLabel.setStyle("-fx-font-size: 10;");
+        dateLabel.setTextFill(Color.GRAY);
+        dateLabel.setAlignment(Pos.CENTER);
+        dateLabel.setMaxHeight(Double.MAX_VALUE);
+
+        HBox x = new HBox(2);
+        NumberBinding maxWidth = Bindings.subtract(messageList.widthProperty(), 40);
+        x.maxWidthProperty().bind(maxWidth);
+        x.setAlignment(isLoggedInUser ? Pos.TOP_RIGHT : Pos.TOP_LEFT);
+        if (isLoggedInUser) {
             x.getChildren().addAll(dateLabel, vBox);
-
-            messageList.getItems().add(x);
         } else {
-            // If we received a message
-            Label messageLabel = new Label();
-            messageLabel.setText(message.getMessage());
-            // TODO: Wrap text if long
-            messageLabel.setTextFill(Color.BLACK);
-
-            Label userLabel = new Label();
-            userLabel.setText(message.getUser().getUsername());
-            userLabel.setStyle("-fx-font-weight: bold;");
-            userLabel.setTextFill(Color.BLACK);
-
-            VBox vBox = new VBox(2);
-            CornerRadii cornerRadi = new CornerRadii(5f);
-            BackgroundFill backgroundFill = new BackgroundFill(Color.rgb(218, 218, 218), cornerRadi, null);
-            vBox.setBackground(new Background(backgroundFill));
-            vBox.setPadding(new Insets(5f));
-            vBox.getChildren().addAll(userLabel, messageLabel);
-
-            Label dateLabel = new Label();
-            dateLabel.setText(message.getTimeSentFormatted());
-            dateLabel.setStyle("-fx-font-size: 10;");
-            dateLabel.setTextFill(Color.GRAY);
-            dateLabel.setAlignment(Pos.CENTER);
-            dateLabel.setMaxHeight(Double.MAX_VALUE);
-
-            HBox x = new HBox(2);
-            NumberBinding maxWidth = Bindings.subtract(messageList.widthProperty(), 40);
-            x.maxWidthProperty().bind(maxWidth);
-            x.setAlignment(Pos.TOP_LEFT);
             x.getChildren().addAll(vBox, dateLabel);
-
-            messageList.getItems().add(x);
         }
+        messageList.getItems().add(x);
     }
 }

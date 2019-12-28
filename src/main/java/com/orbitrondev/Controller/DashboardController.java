@@ -37,6 +37,13 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
         view.getAddContactButton().setOnAction(event -> clickOnAddContact());
         view.getSendButton().setOnAction(event -> clickOnSendMessage());
 
+        // Don't allow the user to enter more than 1024 characters
+        view.getMessage().textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 1024) {
+                view.getMessage().setText(newValue.substring(0, 1024));
+            }
+        });
+
         // register ourselves to listen for incoming chat messages
         serviceLocator.getBackend().addMessageTextListener(this);
 
@@ -44,9 +51,20 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
         view.getStage().setOnCloseRequest(event -> Platform.exit());
     }
 
-    private void clickOnMenuChangePassword() {
+    private void showErrorDialogue(String translatorKeyTitle, String translatorKeyContent) {
         Platform.runLater(() -> {
-            // Open login window and close server connection window
+            Alert dialog = new Alert(Alert.AlertType.ERROR);
+            dialog.titleProperty().bind(I18nController.createStringBinding(translatorKeyTitle));
+            dialog.setHeaderText(null);
+            dialog.contentTextProperty().bind(I18nController.createStringBinding(translatorKeyContent));
+            Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(getClass().getResource("/images/icon.png").toString())); // Add icon to window
+            dialog.showAndWait();
+        });
+    }
+
+    private void openChangePasswordWindow() {
+        Platform.runLater(() -> {
             Stage appStage = new Stage();
             ChangePasswordModel model = new ChangePasswordModel();
             ChangePasswordView newView = new ChangePasswordView(appStage, model);
@@ -58,9 +76,8 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
         });
     }
 
-    private void clickOnMenuDeleteAccount() {
+    private void openDeleteAccountWindow() {
         Platform.runLater(() -> {
-            // Open login window and close server connection window
             Stage appStage = new Stage();
             DeleteAccountModel model = new DeleteAccountModel();
             DeleteAccountView newView = new DeleteAccountView(appStage, model);
@@ -70,6 +87,28 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
             view = null;
             newView.start();
         });
+    }
+
+    private void openLoginWindow() {
+        Platform.runLater(() -> {
+            // Open login window and close delete account window
+            Stage appStage = new Stage();
+            LoginsModel model = new LoginsModel();
+            LoginView newView = new LoginView(appStage, model);
+            new LoginController(model, newView);
+
+            view.stop();
+            view = null;
+            newView.start();
+        });
+    }
+
+    private void clickOnMenuChangePassword() {
+        openChangePasswordWindow();
+    }
+
+    private void clickOnMenuDeleteAccount() {
+        openDeleteAccountWindow();
     }
 
     private void clickOnMenuLogout() {
@@ -93,17 +132,7 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
 
             if (userLoggedOut) {
                 mainModel.setCurrentLogin(null);
-                Platform.runLater(() -> {
-                    // Open login window and close delete account window
-                    Stage appStage = new Stage();
-                    LoginsModel model = new LoginsModel();
-                    LoginView newView = new LoginView(appStage, model);
-                    new LoginController(model, newView);
-
-                    view.stop();
-                    view = null;
-                    newView.start();
-                });
+                openLoginWindow();
             }
         };
         new Thread(logoutTask).start();
@@ -268,18 +297,6 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
         Optional<String> result = dialog.showAndWait();
 
         return result.orElse(null);
-    }
-
-    private void showErrorDialogue(String translatorKeyTitle, String translatorKeyContent) {
-        Platform.runLater(() -> {
-            Alert dialog = new Alert(Alert.AlertType.ERROR);
-            dialog.titleProperty().bind(I18nController.createStringBinding(translatorKeyTitle));
-            dialog.setHeaderText(null);
-            dialog.contentTextProperty().bind(I18nController.createStringBinding(translatorKeyContent));
-            Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(getClass().getResource("/images/icon.png").toString())); // Add icon to window
-            dialog.showAndWait();
-        });
     }
 
     private void clickOnChatList() {
