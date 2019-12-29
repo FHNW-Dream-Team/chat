@@ -8,26 +8,39 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import com.orbitrondev.Model.*;
-import com.orbitrondev.Model.SupportTables.ChatUserModel;
+import com.orbitrondev.Entity.*;
+import com.orbitrondev.Entity.SupportTables.ChatUserModel;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * A class to create a database connection.
+ *
+ * @author Manuele Vaccari
+ * @version %I%, %G%
+ * @since 0.0.1
+ */
 public class DatabaseController implements Closeable {
     private ConnectionSource connectionSource;
 
-    public Dao<ChatModel, String> chatDao;
-    public Dao<MessageModel, String> messageDao;
-    public Dao<UserModel, String> userDao;
-    public Dao<ChatUserModel, String> chatUserDao;
+    private Dao<ChatModel, String> chatDao;
+    private Dao<MessageModel, String> messageDao;
+    private Dao<UserModel, String> userDao;
+    private Dao<ChatUserModel, String> chatUserDao;
 
-    public Dao<LoginModel, String> loginDao;
-    public Dao<ServerModel, String> serverDao;
+    private Dao<LoginModel, String> loginDao;
+    private Dao<ServerModel, String> serverDao;
 
+    /**
+     * Create a database connection
+     *
+     * @param databaseLocation A string containing the location of the file to be accessed (and if necessary created)
+     *
+     * @since 0.0.1
+     */
     public DatabaseController(String databaseLocation) {
         try {
             // this uses h2 but you can change it to match your database
@@ -37,7 +50,7 @@ public class DatabaseController implements Closeable {
             connectionSource = new JdbcConnectionSource(databaseUrl);
 
             // setup our database and DAOs
-            setupDatabase(connectionSource);
+            setupDatabase();
         } catch (SQLException e) {
             // TODO: Handle exception
             e.printStackTrace();
@@ -45,9 +58,12 @@ public class DatabaseController implements Closeable {
     }
 
     /**
-     * Setup our database and DAOs
+     * Setup our database and DAOs, for the created connection.
+     *
+     * @throws SQLException If an SQL error occurs.
+     * @since 0.0.1
      */
-    private void setupDatabase(ConnectionSource connectionSource) throws SQLException {
+    private void setupDatabase() throws SQLException {
 
         /*
          * Create our DAOs. One for each class and associated table.
@@ -62,7 +78,7 @@ public class DatabaseController implements Closeable {
         serverDao = DaoManager.createDao(connectionSource, ServerModel.class);
 
         /*
-         * Create the tables for our example. This would not be necessary if the tables already existed.
+         * Create the tables, if they don't exist yet.
          */
         TableUtils.createTableIfNotExists(connectionSource, ChatModel.class);
         TableUtils.createTableIfNotExists(connectionSource, MessageModel.class);
@@ -74,6 +90,11 @@ public class DatabaseController implements Closeable {
         TableUtils.createTableIfNotExists(connectionSource, ServerModel.class);
     }
 
+    /**
+     * Close the database connection.
+     *
+     * @since 0.0.1
+     */
     @Override
     public void close() {
         if (connectionSource != null) try {
@@ -83,6 +104,110 @@ public class DatabaseController implements Closeable {
         }
     }
 
+
+    /**
+     * @return DAO object for the chats
+     *
+     * @since 0.0.2
+     */
+    public Dao<ChatModel, String> getChatDao() {
+        return chatDao;
+    }
+
+    /**
+     * @return DAO object for the messages inside chats
+     *
+     * @since 0.0.2
+     */
+    public Dao<MessageModel, String> getMessageDao() {
+        return messageDao;
+    }
+
+    /**
+     * @return DAO object for the users
+     *
+     * @since 0.0.2
+     */
+    public Dao<UserModel, String> getUserDao() {
+        return userDao;
+    }
+
+    /**
+     * @return DAO object for the many-to-many connection between chats and users
+     *
+     * @since 0.0.2
+     */
+    public Dao<ChatUserModel, String> getChatUserDao() {
+        return chatUserDao;
+    }
+
+    /**
+     * @return DAO object for the saved logins
+     *
+     * @since 0.0.2
+     */
+    public Dao<LoginModel, String> getLoginDao() {
+        return loginDao;
+    }
+
+    /**
+     * @return DAO object for the saved servers
+     *
+     * @since 0.0.2
+     */
+    public Dao<ServerModel, String> getServerDao() {
+        return serverDao;
+    }
+
+    /*
+     * Quick functions
+     */
+
+    /**
+     * Check inside the database if the user already exists and return it, or create a new object for it, and save it in
+     * the database.
+     *
+     * @param username A string containing the name of the user
+     *
+     * @return A UserModel object containing the user that was either found in the database or was created.
+     *
+     * @throws SQLException If an SQL error occurs.
+     * @since 0.0.2
+     */
+    public UserModel getUserOrCreate(String username) throws SQLException {
+        UserModel user;
+        List<UserModel> results = userDao.queryBuilder().where().eq("username", username).query();
+        if (results.size() != 0) {
+            user = results.get(0);
+        } else {
+            user = new UserModel(username);
+            userDao.create(user);
+        }
+        return user;
+    }
+
+    /**
+     * Check inside the database if the chat already exists and return it, or create a new object for it, and save it in
+     * the database.
+     *
+     * @param name A string containing the name of the group chat.
+     *
+     * @return A ChatModel object containing the chat that was either found in the database or was created.
+     *
+     * @throws SQLException If an SQL error occurs.
+     * @since 0.0.2
+     */
+    public ChatModel getGroupChatOrCreate(String name, ChatType chatType) throws SQLException {
+        ChatModel group;
+        List<ChatModel> results = chatDao.queryBuilder().where().eq("name", name).query();
+        if (results.size() != 0) {
+            group = results.get(0);
+        } else {
+            group = new ChatModel(name, chatType);
+            chatDao.create(group);
+        }
+        return group;
+    }
 
     /* Create Many-To-Many Relations ************************************************/
     /**
@@ -142,5 +267,4 @@ public class DatabaseController implements Closeable {
         userQb.where().in("id", userChatQb);
         return userQb.prepare();
     }
-
 }

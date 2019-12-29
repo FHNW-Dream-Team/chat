@@ -1,0 +1,94 @@
+/*
+primary: #2e7d32;
+light: #60ad5e;
+dark: #005005;
+*/
+
+.background-white {
+    -fx-background-color: white;
+}
+
+.menu-bar {
+    -fx-background-color: white;
+}
+
+.custom-container {
+    -fx-padding: 20px;
+    -fx-border-insets: 20px;
+    -fx-background-insets: 20px;
+}
+
+.navbar {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 15px 20px;
+    -fx-background-color: #2e7d32;
+}
+
+.jfx-button.primary {
+    -fx-padding: 10px 6px;
+    -fx-font-size: 12px;
+    -jfx-button-type: RAISED;
+    -fx-background-color: #2e7d32;
+    -fx-pref-width: 328;
+    -fx-text-fill: white;
+}
+
+.jfx-button.secondary {
+    -fx-padding: 10px 6px;
+    -fx-font-size: 12px;
+    -jfx-button-type: RAISED;
+    -fx-background-color: #eeeeee;
+    -fx-border-color: #616161;
+    -fx-border-radius: 3px; /* There is no radius by default */
+    -fx-pref-width: 328;
+    -fx-text-fill: black;
+}
+
+.jfx-button.square {
+    -fx-padding: 6px;
+    -fx-min-width: 40px;
+    -fx-max-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-height: 40px;
+}
+
+.tab-header-background {
+    -fx-background-color: #2e7d32;
+}
+
+/* Menu button in dashboard */
+.jfx-hamburger StackPane { /* This corresponds to every line in the hamburger */
+    -fx-background-color: white;
+    -fx-pref-width: 25px;
+    -fx-pref-height: 3px;
+}
+
+.jfx-hamburger {
+    -fx-cursor: hand;
+}
+
+.jfx-popup-container {
+    -fx-background-color: white;
+}
+
+.jfx-list-cell.selected {
+    -fx-background-color: #2e7d32;
+}
+
+.jfx-list-cell .jfx-rippler {
+    -fx-rippler-fill: #60ad5e;
+}
+
+.fx-list-cell:hover {
+    -fx-background-color: #60ad5e;
+}
+
+.animated-option-button {
+    -fx-pref-width: 50px;
+    -fx-pref-height: 50px;
+    -fx-text-fill: white;
+    -fx-background-color: #005005;
+    -fx-background-radius: 50px;
+    -fx-border-radius: 50px;
+}

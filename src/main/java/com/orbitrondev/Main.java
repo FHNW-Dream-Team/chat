@@ -1,12 +1,16 @@
 package com.orbitrondev;
 
 import com.orbitrondev.Controller.CliController;
-import com.orbitrondev.Model.MainModel;
 import org.apache.commons.cli.*;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
 
 public class Main {
     public static boolean connectToDb = true;
     public static String dbLocation = "chat.sqlite3";
+    public static boolean isGui = false;
 
     public static void main(String[] args) {
         Options options = new Options();
@@ -22,6 +26,10 @@ public class Main {
         Option dbLocationOption = new Option("l", "db-location", true, "Define where the database is saved");
         dbLocationOption.setOptionalArg(true);
         options.addOption(dbLocationOption);
+
+        Option verboseOption = new Option("v", "verbose", true, "Show more extensive logs");
+        verboseOption.setOptionalArg(true);
+        options.addOption(verboseOption);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -41,15 +49,24 @@ public class Main {
 
         if (cmd.hasOption("no-db")) {
             connectToDb = false;
-        } else if (cmd.hasOption("db-location")) {
+        }
+        if (cmd.hasOption("db-location")) {
             dbLocation = cmd.getOptionValue("db-location");
+        }
+        if (cmd.hasOption("verbose")) {
+            final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+            final Configuration config = ctx.getConfiguration();
+            config.getRootLogger().addAppender(config.getAppender("Console"), Level.INFO, null);
+            ctx.updateLoggers();
         }
 
         if (!cmd.hasOption("no-gui")) {
+            isGui = true;
             MainGui.main(args);
         } else {
-            MainModel model = new MainModel();
-            new CliController(model);
+            new CliController();
         }
+        // TODO: There is a bug inside IntelliJ which doesn't close the application, so we do it manually
+        System.exit(0);
     }
 }

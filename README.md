@@ -2,13 +2,78 @@
 
 Java project for running the client part of the chat program
 
+## Features
+
+Use a console version or GUI version. When running there are additional options (check the usage part).
+
+### Basic features: Functionality
+* ✔ Set server address and port
+* ✔ Create new login
+* ✔ Change password
+* ✔ Delete account
+* ✔ Login
+* ✔ Logout
+* ✔ List group chats
+* ✔ Join a particular group chats
+* ✔ See messages in the group chats
+* ✔ Send a message to the group chats
+ 
+### Basic features: Architecture and GUI
+* ✔ MVC structure: Separate the UI from the logic
+* ✔ Multilingual application: English, German, Italian, French
+* ✔ Reasonable user interface
+* ✔ Platform independent
+* ✔ User errors do not crash the program
+* ✔ Controls enable/disable as appropriate
+
+### Optional: Contacts and private messaging
+#### Simple: Maintain a list of contacts
+* ❌ Display status of contact
+* ✔ Be able to send/receive private messages to a contact
+* ✔ How will you distinguish private messages from public chat? Different tabs!
+#### Advanced: Maintain a block list
+* ❌ Users whose private messages will be ignored
+* ❌ Users whose chat room messages will not be displayed
+* ❌ Are these the same users, or two different lists?
+
+### Optional: GUI features
+#### Simple: Implement a nice GUI
+* ✔ Nice design, good use of color
+* ✔ Good error messages
+* ✔ Sensible resizing behavior
+* ✔ All controls enabled/disabled when it makes sense
+#### Advanced: “Wow” factor
+* ✔ Subjective…
+* ❌ For example: animations for user feedback
+
+### Optional: Chat room usability features
+#### Simple
+* ❌ Logout / Login – pick up where you left off (Annoying feature)
+* ❌ Display list of users in the group chats
+
+#### Advanced
+* ✔ Be able to join multiple chat rooms
+* ❌ Manage a private chat room (Add and remove users)
+
+### Optional: Further features
+* ✔ Maintain long-term history of chats
+* ❌ Be able to select portion of chat to look at
+* ❌ Offer search/filter functionality – by user, by content, by date
+
 ## Installation
 
 Import to your IDE and run
 
 ## Usage
 
-Use your brain
+When running you can add following options:
+
+| Short | Long          | Description                                                                   |
+|-------|---------------|-------------------------------------------------------------------------------|
+| -g    | --no-gui      | Uses the console as interface instead of a window                             |
+| -d    | --no-db       | Don't use the internal db. Data will never be saved.                          |
+| -l    | --db-location | If using a DB (by default on), use a custom location for the file             |
+| -v    | --verbose     | Show more information in the console. Useful for debuggin and finding errors. |
 
 ## Contributing
 
@@ -26,20 +91,20 @@ Please make sure to update tests as appropriate.
 
 | MessageType       | Data               | Notes                                                                                                         |
 |-------------------|--------------------|---------------------------------------------------------------------------------------------------------------|
-| CreateLogin       | Username, Password | Fails if name already taken (user or chatroom), or invalid After creating an account, you still have to login |
+| CreateLogin       | Username, Password | Fails if name already taken (user or group chat), or invalid After creating an account, you still have to login |
 | Login             | Username, Password | Fails if name/password do not match                                                                           |
 | ChangePassword    | New password       | Fails only if token is invalid                                                                                |
 | DeleteLogin       | -                  | Fails only if token is invalid; after delete, token becomes invalid                                           |
 | Logout            | -                  | Never fails; token becomes invalid                                                                            |
-| CreateChatroom    | Name, isPublic     | Fails if name already taken (user or chatroom), or invalid After creating a chatroom, you still have to join  |
-| JoinChatroom      | Chatroom, User     | User can add themselves to public chatrooms Only the creator can add user to a private chatroom               |
-| LeaveChatroom     | Chatroom, User     | You can always remove yourself Chatroom creator can remove anyone                                             |
-| DeleteChatroom    | Chatroom           | Only the creator can delete a chatroom                                                                        |
-| ListChatrooms     | -                  | Returns a list of all public chatrooms                                                                        |
+| CreateChatroom    | Name, isPublic     | Fails if name already taken (user or group chat), or invalid After creating a group chat, you still have to join  |
+| JoinChatroom      | Chatroom, User     | User can add themselves to public group chat Only the creator can add user to a private group chat               |
+| LeaveChatroom     | Chatroom, User     | You can always remove yourself. Group chat creator can remove anyone                                             |
+| DeleteChatroom    | Chatroom           | Only the creator can delete a group chat                                                                        |
+| ListChatrooms     | -                  | Returns a list of all public group chats                                                                        |
 | Ping              | [Token]            | Without a token: always succeeds With token: succeeds only if token is valid                                  |
-| SendMessage       | Target, Message    | Send message to user or chatroom Fails if user not online / Fails if not a member of the chatroom             |
+| SendMessage       | Target, Message    | Send message to user or group chat. Fails if user not online / Fails if not a member of the group chat             |
 | UserOnline        | User               | Succeeds if the user is currently logged in                                                                   |
-| ListChatroomUsers | Chatroom           | Returns a list of all users in the given chatroom You must be a member of this chatroom                       |
+| ListChatroomUsers | Chatroom           | Returns a list of all users in the given group chat. You must be a member of this group chat                       |
 
 ## Client <- Server
 
@@ -54,53 +119,7 @@ Please make sure to update tests as appropriate.
 
 | MessageType | Data               | Notes                                                                                                    |
 |-------------|--------------------|----------------------------------------------------------------------------------------------------------|
-| MessageText | Name, Target, Text | Name of user sending message Target is where the message was sent (chatroom or user) Text of the message |
-
-## Example console log
-
-Enter a valid IP address
-
-127.0.0.1
-
-Enter a valid port number
-
-31415
-
-Enter commands to server or ctrl-D to quit
-
-CreateLogin|brad|mypassword
-
-Received: Result|true
-
-Login|brad|mypassword
-
-Received: Result|true|4FA4563A5C2FFD1E703B49190DC348BD
-
-CreateChatroom|4FA4563A5C2FFD1E703B49190DC348BD|CatChat|true
-
-Received: Result|true
-
-JoinChatroom|4FA4563A5C2FFD1E703B49190DC348BD|CatChat|brad
-
-Received: Result|true
-
-SendMessage|4FA4563A5C2FFD1E703B49190DC348BD|CatChat|Hello, all cat people!
-
-Received: MessageText|brad|CatChat|Hello, all cat people!
-
-Received: Result|true
-
-SomeInvalidCommand
-
-Received: MessageError|Invalid command
-
-SendMessage|Wrong|Parameters
-
-Received: MessageError|Invalid command
-
-Logout
-
-Received: Result|true
+| MessageText | Name, Target, Text | Name of user sending message Target is where the message was sent (group chat or user) Text of the message |
 
 ## License
 [MIT](LICENSE.txt)
