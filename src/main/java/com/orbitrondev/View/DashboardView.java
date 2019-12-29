@@ -24,7 +24,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
 import jiconfont.javafx.IconFontFX;
-import jiconfont.javafx.IconNode;
 
 public class DashboardView extends View<DashboardModel> {
     private Label itemChangePassword;
@@ -92,15 +91,9 @@ public class DashboardView extends View<DashboardModel> {
         JFXListView<Label> list = new JFXListView<>();
         JFXPopup popup = new JFXPopup(list);
         IconFontFX.register(GoogleMaterialDesignIcons.getIconFont());
-        itemChangePassword = new Label();
-        itemChangePassword.setGraphic(new IconNode(GoogleMaterialDesignIcons.MODE_EDIT));
-        itemChangePassword.textProperty().bind(I18nController.createStringBinding("gui.dashboard.menu.changePassword"));
-        itemDeleteAccount = new Label();
-        itemDeleteAccount.setGraphic(new IconNode(GoogleMaterialDesignIcons.DELETE));
-        itemDeleteAccount.textProperty().bind(I18nController.createStringBinding("gui.dashboard.menu.deleteAccount"));
-        itemLogout = new Label();
-        itemLogout.setGraphic(new IconNode(GoogleMaterialDesignIcons.EXIT_TO_APP));
-        itemLogout.textProperty().bind(I18nController.createStringBinding("gui.dashboard.menu.logout"));
+        itemChangePassword = Helper.useLabel("gui.dashboard.menu.changePassword", Helper.useIconEdit(Color.BLACK));
+        itemDeleteAccount = Helper.useLabel("gui.dashboard.menu.deleteAccount", Helper.useIconDelete(Color.BLACK));
+        itemLogout = Helper.useLabel("gui.dashboard.menu.logout", Helper.useIconExit(Color.BLACK));
         list.getItems().addAll(itemChangePassword, itemDeleteAccount, itemLogout);
 
         AnchorPane container = new AnchorPane();

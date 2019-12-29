@@ -60,6 +60,18 @@ public class Helper {
         return textField;
     }
 
+    public static Label useLabel(String translatorKey) {
+        Label label = new Label();
+        label.textProperty().bind(I18nController.createStringBinding(translatorKey));
+        return label;
+    }
+
+    public static Label useLabel(String translatorKey, IconNode icon) {
+        Label label = useLabel(translatorKey);
+        label.setGraphic(icon);
+        return label;
+    }
+
     public static JFXTextField useTextField(String translatorKey) {
         JFXTextField textField = new JFXTextField();
         textField.setLabelFloat(true);
@@ -253,5 +265,17 @@ public class Helper {
 
     public static IconNode useIconSend(Color color) {
         return useIcon(GoogleMaterialDesignIcons.SEND, color);
+    }
+
+    public static IconNode useIconExit(Color color) {
+        return useIcon(GoogleMaterialDesignIcons.EXIT_TO_APP, color);
+    }
+
+    public static IconNode useIconDelete(Color color) {
+        return useIcon(GoogleMaterialDesignIcons.DELETE, color);
+    }
+
+    public static IconNode useIconEdit(Color color) {
+        return useIcon(GoogleMaterialDesignIcons.MODE_EDIT, color);
     }
 }
