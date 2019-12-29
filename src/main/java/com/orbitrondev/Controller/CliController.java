@@ -6,7 +6,6 @@ import com.orbitrondev.EventListener.MessageTextEventListener;
 import com.orbitrondev.Exception.InvalidIpException;
 import com.orbitrondev.Exception.InvalidPortException;
 import com.orbitrondev.Main;
-import com.orbitrondev.Model.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,10 +23,8 @@ import java.util.Scanner;
  * @since 0.0.1
  */
 public class CliController implements MessageTextEventListener, MessageErrorEventListener {
-    private ServiceLocator sl;
+    private ServiceLocator serviceLocator;
     private static final Logger logger = LogManager.getLogger(CliController.class);
-
-    private MainModel model;
 
     private BackendController backend;
 
@@ -37,14 +34,10 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * If desired, connect to the local database and use it's information. If nowhere saved, ask for IP address, port
      * and whether to use SSL.
      *
-     * @param model An object containing the model to access all data and DB.
-     *
      * @since 0.0.1
      */
-    public CliController(MainModel model) {
-        this.model = model;
-        sl = ServiceLocator.getServiceLocator();
-        sl.setModel(model);
+    public CliController() {
+        serviceLocator = ServiceLocator.getServiceLocator();
 
         String ipAddress = null;
         int portNumber = -1;
@@ -55,7 +48,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         input = new Scanner(System.in);
 
         if (Main.connectToDb) {
-            sl.setDb(new DatabaseController(Main.dbLocation));
+            serviceLocator.setDb(new DatabaseController(Main.dbLocation));
 
             int serverCounter = 0;
             ArrayList<ServerModel> serverList = new ArrayList<>();
@@ -63,7 +56,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
             // Print all saved connections inside the database
             System.out.println(I18nController.get("console.setup.server.select"));
             System.out.println(I18nController.get("console.setup.server.create"));
-            for (ServerModel server : sl.getDb().getServerDao()) {
+            for (ServerModel server : serviceLocator.getDb().getServerDao()) {
                 serverCounter++;
                 serverList.add(server);
                 if (server.isSecure()) {
@@ -196,9 +189,9 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
 
         ServerModel server = new ServerModel(ipAddress, portNumber, secure);
 
-        if (Main.connectToDb && sl.getDb() != null && addToDB) {
+        if (Main.connectToDb && serviceLocator.getDb() != null && addToDB) {
             try {
-                sl.getDb().getServerDao().create(server);
+                serviceLocator.getDb().getServerDao().create(server);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -348,7 +341,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
 
         String tokenTemp = backend.sendLogin(username, password);
         if (tokenTemp != null) {
-            model.setCurrentLogin(new LoginModel(username, password, tokenTemp));
+            serviceLocator.setCurrentLogin(new LoginModel(username, password, tokenTemp));
             System.out.println(I18nController.get("console.login.success"));
         } else {
             System.out.println(I18nController.get("console.login.fail"));
@@ -362,7 +355,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * @since 0.0.1
      */
     private void handleChangePasswordCommand() throws IOException {
-        if (model.getCurrentLogin() == null) {
+        if (serviceLocator.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -385,7 +378,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         }
 
         if (newPassword != null) {
-            if (backend.sendChangePassword(model.getCurrentLogin().getToken(), newPassword)) {
+            if (backend.sendChangePassword(serviceLocator.getCurrentLogin().getToken(), newPassword)) {
                 System.out.println(I18nController.get("console.changePassword.success"));
             } else {
                 System.out.println(I18nController.get("console.changePassword.fail"));
@@ -400,7 +393,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * @since 0.0.1
      */
     private void handleDeleteLoginCommand() throws IOException {
-        if (model.getCurrentLogin() == null) {
+        if (serviceLocator.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -413,7 +406,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         verify = s.equalsIgnoreCase("yes");
 
         if (verify) {
-            if (backend.sendDeleteLogin(model.getCurrentLogin().getToken())) {
+            if (backend.sendDeleteLogin(serviceLocator.getCurrentLogin().getToken())) {
                 System.out.println(I18nController.get("console.deleteLogin.success"));
 
                 handleLogoutCommand();
@@ -430,7 +423,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * @since 0.0.1
      */
     private void handleLogoutCommand() throws IOException {
-        if (model.getCurrentLogin() == null) {
+        if (serviceLocator.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -438,7 +431,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         System.out.println(I18nController.get("console.logout.init"));
         if (backend.sendLogout()) {
             System.out.println(I18nController.get("console.logout.success"));
-            model.setCurrentLogin(null);
+            serviceLocator.setCurrentLogin(null);
         } else {
             System.out.println(I18nController.get("console.logout.fail"));
         }
@@ -451,9 +444,9 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * @since 0.0.1
      */
     private void handlePingCommand() throws IOException {
-        if (model.getCurrentLogin() != null) {
+        if (serviceLocator.getCurrentLogin() != null) {
             System.out.println(I18nController.get("console.ping.token.init"));
-            if (backend.sendPing(model.getCurrentLogin().getToken())) {
+            if (backend.sendPing(serviceLocator.getCurrentLogin().getToken())) {
                 System.out.println(I18nController.get("console.ping.success"));
             } else {
                 System.out.println(I18nController.get("console.ping.fail"));
@@ -475,7 +468,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * @since 0.0.1
      */
     private void handleCreateChatroomCommand() throws IOException {
-        if (model.getCurrentLogin() == null) {
+        if (serviceLocator.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -490,11 +483,11 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         String s = input.nextLine().trim();
         isPublic = s.equalsIgnoreCase("yes");
 
-        if (backend.sendCreateChatroom(model.getCurrentLogin().getToken(), name, isPublic)) {
+        if (backend.sendCreateChatroom(serviceLocator.getCurrentLogin().getToken(), name, isPublic)) {
             System.out.println(I18nController.get("console.createGroupChat.success"));
 
             System.out.println(I18nController.get("console.joinChatroom.task"));
-            if (backend.sendJoinChatroom(model.getCurrentLogin().getToken(), name, model.getCurrentLogin().getUsername())) {
+            if (backend.sendJoinChatroom(serviceLocator.getCurrentLogin().getToken(), name, serviceLocator.getCurrentLogin().getUsername())) {
                 System.out.println(I18nController.get("console.joinChatroom.success"));
             } else {
                 System.out.println(I18nController.get("console.joinChatroom.fail"));
@@ -511,7 +504,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * @since 0.0.1
      */
     private void handleJoinChatroomCommand() throws IOException {
-        if (model.getCurrentLogin() == null) {
+        if (serviceLocator.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -521,7 +514,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
 
         System.out.println(I18nController.get("console.joinChatroom.init"));
         handleListChatroomsCommand();
-        ArrayList<String> chatrooms = backend.sendListChatrooms(model.getCurrentLogin().getToken());
+        ArrayList<String> chatrooms = backend.sendListChatrooms(serviceLocator.getCurrentLogin().getToken());
         while (!validRoomName) {
             System.out.print(I18nController.get("console.joinChatroom.name") + " ");
             roomName = input.nextLine();
@@ -537,7 +530,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         username = input.nextLine();
 
         System.out.println(I18nController.get("console.joinChatroom.task"));
-        if (backend.sendJoinChatroom(model.getCurrentLogin().getToken(), roomName, username)) {
+        if (backend.sendJoinChatroom(serviceLocator.getCurrentLogin().getToken(), roomName, username)) {
             System.out.println(I18nController.get("console.joinChatroom.success"));
         } else {
             System.out.println(I18nController.get("console.joinChatroom.fail"));
@@ -551,7 +544,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * @since 0.0.1
      */
     private void handleLeaveChatroomCommand() throws IOException {
-        if (model.getCurrentLogin() == null) {
+        if (serviceLocator.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -560,7 +553,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         boolean validRoomName = false;
 
         handleListChatroomsCommand();
-        ArrayList<String> chatrooms = backend.sendListChatrooms(model.getCurrentLogin().getToken());
+        ArrayList<String> chatrooms = backend.sendListChatrooms(serviceLocator.getCurrentLogin().getToken());
         while (!validRoomName) {
             System.out.print(I18nController.get("console.leaveChatroom.name") + " ");
             roomName = input.nextLine();
@@ -575,7 +568,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         System.out.print(I18nController.get("console.leaveChatroom.user") + " ");
         username = input.nextLine();
 
-        if (backend.sendLeaveChatroom(model.getCurrentLogin().getToken(), roomName, username)) {
+        if (backend.sendLeaveChatroom(serviceLocator.getCurrentLogin().getToken(), roomName, username)) {
             System.out.println(I18nController.get("console.leaveChatroom.success"));
         } else {
             System.out.println(I18nController.get("console.leaveChatroom.fail"));
@@ -589,7 +582,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * @since 0.0.1
      */
     private void handleDeleteChatroomCommand() throws IOException {
-        if (model.getCurrentLogin() == null) {
+        if (serviceLocator.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -598,7 +591,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         boolean validRoomName = false;
 
         handleListChatroomsCommand();
-        ArrayList<String> chatrooms = backend.sendListChatrooms(model.getCurrentLogin().getToken());
+        ArrayList<String> chatrooms = backend.sendListChatrooms(serviceLocator.getCurrentLogin().getToken());
         while (!validRoomName) {
             System.out.print(I18nController.get("console.deleteChatroom.name") + " ");
             roomName = input.nextLine();
@@ -610,7 +603,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
             }
         }
 
-        if (backend.sendDeleteChatroom(model.getCurrentLogin().getToken(), roomName)) {
+        if (backend.sendDeleteChatroom(serviceLocator.getCurrentLogin().getToken(), roomName)) {
             System.out.println(I18nController.get("console.deleteChatroom.success"));
         } else {
             System.out.println(I18nController.get("console.deleteChatroom.fail"));
@@ -624,12 +617,12 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * @since 0.0.1
      */
     private void handleListChatroomsCommand() throws IOException {
-        if (model.getCurrentLogin() == null) {
+        if (serviceLocator.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
 
-        ArrayList<String> chatrooms = backend.sendListChatrooms(model.getCurrentLogin().getToken());
+        ArrayList<String> chatrooms = backend.sendListChatrooms(serviceLocator.getCurrentLogin().getToken());
         if (chatrooms == null) {
             System.out.println(I18nController.get("console.listChatrooms.fail"));
         } else if (chatrooms.size() > 0) {
@@ -647,7 +640,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * @since 0.0.1
      */
     private void handleSendMessageCommand() throws IOException {
-        if (model.getCurrentLogin() == null) {
+        if (serviceLocator.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -657,7 +650,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
 
         System.out.println(I18nController.get("console.sendMessage.init"));
         handleListChatroomsCommand();
-        ArrayList<String> chatrooms = backend.sendListChatrooms(model.getCurrentLogin().getToken());
+        ArrayList<String> chatrooms = backend.sendListChatrooms(serviceLocator.getCurrentLogin().getToken());
 
         while (!validTarget) {
             System.out.print(I18nController.get("console.sendMessage.target") + " ");
@@ -667,7 +660,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
             if (chatrooms.contains(target)) {
                 validTarget = true;
             } else {
-                if (backend.sendUserOnline(model.getCurrentLogin().getToken(), target)) {
+                if (backend.sendUserOnline(serviceLocator.getCurrentLogin().getToken(), target)) {
                     validTarget = true;
                 } else {
                     System.out.println(I18nController.get("console.sendMessage.target.invalid"));
@@ -687,7 +680,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
             }
         }
 
-        MessageModel messageModel = backend.sendSendMessage(model.getCurrentLogin().getToken(), target, message);
+        MessageModel messageModel = backend.sendSendMessage(serviceLocator.getCurrentLogin().getToken(), target, message);
         if (messageModel != null) {
             System.out.println(I18nController.get("console.sendMessage.success"));
         } else {
@@ -702,7 +695,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * @since 0.0.1
      */
     private void handleUserOnlineCommand() throws IOException {
-        if (model.getCurrentLogin() == null) {
+        if (serviceLocator.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -711,7 +704,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         System.out.print(I18nController.get("console.userOnline.user") + " ");
         username = input.nextLine();
 
-        if (backend.sendUserOnline(model.getCurrentLogin().getToken(), username)) {
+        if (backend.sendUserOnline(serviceLocator.getCurrentLogin().getToken(), username)) {
             System.out.println(I18nController.get("console.userOnline.success"));
         } else {
             System.out.println(I18nController.get("console.userOnline.fail"));
@@ -725,7 +718,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
      * @since 0.0.1
      */
     private void handleListChatroomUsersCommand() throws IOException {
-        if (model.getCurrentLogin() == null) {
+        if (serviceLocator.getCurrentLogin() == null) {
             System.out.println(I18nController.get("console.login.required"));
             return;
         }
@@ -738,7 +731,7 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
         System.out.print(I18nController.get("console.listChatroomUsers.name") + " ");
         chatroom = input.nextLine();
 
-        usersInChatroom = backend.sendListChatroomUsers(model.getCurrentLogin().getToken(), chatroom);
+        usersInChatroom = backend.sendListChatroomUsers(serviceLocator.getCurrentLogin().getToken(), chatroom);
         if (usersInChatroom == null) {
             System.out.println(I18nController.get("console.listChatroomUsers.failed"));
         } else if (usersInChatroom.size() > 0) {
@@ -786,9 +779,9 @@ public class CliController implements MessageTextEventListener, MessageErrorEven
     @Override
     public void onMessageTextEvent(UserModel user, ChatModel chat, MessageModel message) {
         // The server also sends a message when we send one. So only show messages without our username.
-        if (!user.getUsername().equals(sl.getModel().getCurrentLogin().getUsername())) {
+        if (!user.getUsername().equals(serviceLocator.getCurrentLogin().getUsername())) {
             try {
-                sl.getDb().getMessageDao().create(message);
+                serviceLocator.getDb().getMessageDao().create(message);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

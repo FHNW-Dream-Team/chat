@@ -82,14 +82,6 @@ public class DeleteAccountController extends Controller<DeleteAccountModel, Dele
         // Disable everything to prevent something while working on the data
         disableAll();
 
-        MainModel mainModel;
-        if (serviceLocator.getModel() == null) {
-            mainModel = new MainModel();
-            serviceLocator.setModel(mainModel);
-        } else {
-            mainModel = serviceLocator.getModel();
-        }
-
         // Connection would freeze window (and the animations) so do it in a different thread.
         Runnable logoutTask = () -> {
             boolean userLoggedOut = false;
@@ -103,7 +95,7 @@ public class DeleteAccountController extends Controller<DeleteAccountModel, Dele
             }
 
             if (userLoggedOut) {
-                mainModel.setCurrentLogin(null);
+                serviceLocator.setCurrentLogin(null);
                 openLoginWindow();
             } else {
                 enableAll();
@@ -114,7 +106,7 @@ public class DeleteAccountController extends Controller<DeleteAccountModel, Dele
             boolean userDeleted = false;
             try {
                 // Try to delete the account
-                userDeleted = serviceLocator.getBackend().sendDeleteLogin(serviceLocator.getModel().getCurrentLogin().getToken());
+                userDeleted = serviceLocator.getBackend().sendDeleteLogin(serviceLocator.getCurrentLogin().getToken());
             } catch (IOException e) {
                 // This exception contains ConnectException, which basically means, it couldn't connect to the server.
                 enableAll();

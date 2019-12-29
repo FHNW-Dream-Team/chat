@@ -113,14 +113,6 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
     }
 
     private void clickOnMenuLogout() {
-        MainModel mainModel;
-        if (serviceLocator.getModel() == null) {
-            mainModel = new MainModel();
-            serviceLocator.setModel(mainModel);
-        } else {
-            mainModel = serviceLocator.getModel();
-        }
-
         // Connection would freeze window (and the animations) so do it in a different thread.
         Runnable logoutTask = () -> {
             boolean userLoggedOut = false;
@@ -132,7 +124,7 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
             }
 
             if (userLoggedOut) {
-                mainModel.setCurrentLogin(null);
+                serviceLocator.setCurrentLogin(null);
                 openLoginWindow();
             }
         };
@@ -141,7 +133,7 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
 
     private void clickOnAddChat() {
         final BackendController backend = serviceLocator.getBackend();
-        final LoginModel login = serviceLocator.getModel().getCurrentLogin();
+        final LoginModel login = serviceLocator.getCurrentLogin();
         final String token = login.getToken();
         final DatabaseController db = serviceLocator.getDb();
 
@@ -220,7 +212,7 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
         dialog.titleProperty().bind(I18nController.createStringBinding("gui.dashboard.addChat.title"));
         AtomicReference<String> chatList = new AtomicReference<>("");
         try {
-            serviceLocator.getBackend().sendListChatrooms(serviceLocator.getModel().getCurrentLogin().getToken()).forEach(chat -> {
+            serviceLocator.getBackend().sendListChatrooms(serviceLocator.getCurrentLogin().getToken()).forEach(chat -> {
                 if (chatList.get().length() != 0) {
                     chatList.set(chatList.get() + ", ");
                 }
@@ -270,7 +262,7 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
         }
 
         try {
-            if (serviceLocator.getBackend().sendUserOnline(serviceLocator.getModel().getCurrentLogin().getToken(), username)) {
+            if (serviceLocator.getBackend().sendUserOnline(serviceLocator.getCurrentLogin().getToken(), username)) {
                 if (user == null) {
                     // Create a new model if we didn't have it yet
                     user = serviceLocator.getDb().getUserOrCreate(username);
@@ -328,7 +320,7 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
 
     private void clickOnContactList() {
         DatabaseController db = serviceLocator.getDb();
-        LoginModel login = serviceLocator.getModel().getCurrentLogin();
+        LoginModel login = serviceLocator.getCurrentLogin();
 
         UserModel selectedItem = view.getContactList().getSelectionModel().getSelectedItem();
         ChatModel chat = null;
@@ -364,7 +356,7 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
         }
 
         BackendController backend = serviceLocator.getBackend();
-        LoginModel login = serviceLocator.getModel().getCurrentLogin();
+        LoginModel login = serviceLocator.getCurrentLogin();
 
         Runnable sendTask = () -> {
             try {
@@ -397,7 +389,7 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
     @Override
     public void onMessageTextEvent(UserModel user, ChatModel chat, MessageModel message) {
         // The server also sends a message when we send one. So only show messages without our username.
-        if (!user.getUsername().equals(serviceLocator.getModel().getCurrentLogin().getUsername())) {
+        if (!user.getUsername().equals(serviceLocator.getCurrentLogin().getUsername())) {
             try {
                 serviceLocator.getDb().getMessageDao().create(message);
             } catch (SQLException e) {

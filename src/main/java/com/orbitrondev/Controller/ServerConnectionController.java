@@ -72,11 +72,8 @@ public class ServerConnectionController extends Controller<ServerConnectionModel
         // Disable everything to prevent something while working on the data
         disableAll();
 
-        MainModel mainModel = new MainModel();
-        serviceLocator.setModel(mainModel);
-
         ServerModel server = new ServerModel(view.getServerIp().getText(), Integer.parseInt(view.getPort().getText()));
-        mainModel.setCurrentServer(server);
+        serviceLocator.setCurrentServer(server);
 
         // Connection would freeze window (and the animations) so do it in a different thread.
         Runnable connect = () -> {

@@ -110,17 +110,9 @@ public class ChangePasswordController extends Controller<ChangePasswordModel, Ch
         // Disable everything to prevent something while working on the data
         disableAll();
 
-        MainModel mainModel;
-        if (serviceLocator.getModel() == null) {
-            mainModel = new MainModel();
-            serviceLocator.setModel(mainModel);
-        } else {
-            mainModel = serviceLocator.getModel();
-        }
-
         // Connection would freeze window (and the animations) so do it in a different thread.
         Runnable changePasswordTask = () -> {
-            LoginModel login = mainModel.getCurrentLogin();
+            LoginModel login = serviceLocator.getCurrentLogin();
             LoginModel newLogin = new LoginModel(login.getUsername(), view.getNewPassword().getText(), login.getToken());
             boolean passwordChanged = false;
             try {
@@ -133,7 +125,7 @@ public class ChangePasswordController extends Controller<ChangePasswordModel, Ch
             }
 
             if (passwordChanged) {
-                mainModel.setCurrentLogin(newLogin);
+                serviceLocator.setCurrentLogin(newLogin);
                 openDashboardWindow();
             } else {
                 enableAll();

@@ -124,14 +124,6 @@ public class RegisterController extends Controller<RegisterModel, RegisterView> 
         // Disable everything to prevent something while working on the data
         disableAll();
 
-        MainModel mainModel;
-        if (serviceLocator.getModel() == null) {
-            mainModel = new MainModel();
-            serviceLocator.setModel(mainModel);
-        } else {
-            mainModel = serviceLocator.getModel();
-        }
-
         LoginModel login = new LoginModel(view.getUsername().getText(), view.getPassword().getText());
 
         // Connection would freeze window (and the animations) so do it in a different thread.
@@ -146,7 +138,7 @@ public class RegisterController extends Controller<RegisterModel, RegisterView> 
             }
 
             if (login.getToken() != null) {
-                mainModel.setCurrentLogin(login);
+                serviceLocator.setCurrentLogin(login);
                 openDashboardWindow();
             } else {
                 enableAll();

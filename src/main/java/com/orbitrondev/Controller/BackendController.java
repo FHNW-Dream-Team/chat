@@ -32,7 +32,7 @@ import java.util.List;
  * @since 0.0.1
  */
 public class BackendController implements Closeable {
-    private ServiceLocator sl;
+    private ServiceLocator serviceLocator;
     private static final Logger logger = LogManager.getLogger(BackendController.class);
 
     private Socket socket;
@@ -64,7 +64,7 @@ public class BackendController implements Closeable {
         if (!isValidPortNumber(port)) {
             throw new InvalidPortException();
         }
-        sl = ServiceLocator.getServiceLocator();
+        serviceLocator = ServiceLocator.getServiceLocator();
 
         createStandardSocket(ipAddress, port);
 
@@ -92,7 +92,7 @@ public class BackendController implements Closeable {
         if (!isValidPortNumber(port)) {
             throw new InvalidPortException();
         }
-        sl = ServiceLocator.getServiceLocator();
+        serviceLocator = ServiceLocator.getServiceLocator();
 
         try {
             if (secure) {
@@ -202,8 +202,8 @@ public class BackendController implements Closeable {
      */
     private void receivedMessageText(String username, String targetChat, String text) {
         logger.debug("Handling incoming message...");
-        DatabaseController db = sl.getDb();
-        LoginModel login = sl.getModel().getCurrentLogin();
+        DatabaseController db = serviceLocator.getDb();
+        LoginModel login = serviceLocator.getCurrentLogin();
         UserModel loginUser;
 
         UserModel fromUser = null;
@@ -364,9 +364,9 @@ public class BackendController implements Closeable {
         if (lastMessage.get(1).equals("true")) {
             String token = lastMessage.get(2);
             LoginModel login = new LoginModel(username, password, token);
-            sl.getModel().setCurrentLogin(login);
+            serviceLocator.setCurrentLogin(login);
             try {
-                sl.getDb().getLoginDao().create(login);
+                serviceLocator.getDb().getLoginDao().create(login);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -393,9 +393,9 @@ public class BackendController implements Closeable {
         waitForResultResponse();
         if (lastMessage.get(1).equals("true")) {
             login.setToken(lastMessage.get(2));
-            sl.getModel().setCurrentLogin(login);
+            serviceLocator.setCurrentLogin(login);
             try {
-                sl.getDb().getLoginDao().create(login);
+                serviceLocator.getDb().getLoginDao().create(login);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -412,7 +412,7 @@ public class BackendController implements Closeable {
      * @since 0.0.2
      */
     public boolean isLoggedIn() {
-        return sl.getModel().getCurrentLogin() != null;
+        return serviceLocator.getCurrentLogin() != null;
     }
 
     /**
@@ -422,7 +422,7 @@ public class BackendController implements Closeable {
      */
     public String getToken() {
         if (isLoggedIn()) {
-            return sl.getModel().getCurrentLogin().getToken();
+            return serviceLocator.getCurrentLogin().getToken();
         }
         return null;
     }
@@ -503,7 +503,7 @@ public class BackendController implements Closeable {
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
         if (result) {
             try {
-                sl.getDb().getGroupChatOrCreate(name, isPublic ? ChatType.PublicGroupChat : ChatType.PrivateGroupChat);
+                serviceLocator.getDb().getGroupChatOrCreate(name, isPublic ? ChatType.PublicGroupChat : ChatType.PrivateGroupChat);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -532,9 +532,9 @@ public class BackendController implements Closeable {
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
         if (result) {
             try {
-                UserModel user = sl.getDb().getUserOrCreate(username);
+                UserModel user = serviceLocator.getDb().getUserOrCreate(username);
                 // TODO: We can't really know the chat type, so we have to guess it's public
-                ChatModel chat = sl.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);
+                ChatModel chat = serviceLocator.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);
                 chat.addMember(user);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -581,9 +581,9 @@ public class BackendController implements Closeable {
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
         if (result) {
             try {
-                UserModel user = sl.getDb().getUserOrCreate(username);
+                UserModel user = serviceLocator.getDb().getUserOrCreate(username);
                 // TODO: We can't really know the chat type, so we have to guess it's public
-                ChatModel chat = sl.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);
+                ChatModel chat = serviceLocator.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);
                 chat.removeMember(user);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -627,8 +627,8 @@ public class BackendController implements Closeable {
         if (result) {
             try {
                 // TODO: We can't really know the chat type, so we have to guess it's public
-                ChatModel chat = sl.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);
-                sl.getDb().getChatDao().delete(chat);
+                ChatModel chat = serviceLocator.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);
+                serviceLocator.getDb().getChatDao().delete(chat);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -657,7 +657,7 @@ public class BackendController implements Closeable {
             ArrayList<String> groupChatList = new ArrayList<>(lastMessage);
 
             // Save the list to the DB
-            DatabaseController db = sl.getDb();
+            DatabaseController db = serviceLocator.getDb();
             groupChatList.forEach(s -> {
                 try {
                     db.getGroupChatOrCreate(s, ChatType.PublicGroupChat);
@@ -731,28 +731,30 @@ public class BackendController implements Closeable {
         MessageModel messageObject = null;
         if (result) {
             try {
+                DatabaseController db = serviceLocator.getDb();
+                LoginModel login = serviceLocator.getCurrentLogin();
                 ChatModel chat = null;
-                List<UserModel> results = sl.getDb().getUserDao().queryBuilder().where().eq("username", target).query();
+                List<UserModel> results = db.getUserDao().queryBuilder().where().eq("username", target).query();
                 if (results.size() != 0) {
                     // It's a message which is between two users
-                    chat = sl.getDb().getGroupChatOrCreate(sl.getModel().getCurrentLogin().getUsername() + "_" + target, ChatType.DirectChat);
+                    chat = db.getGroupChatOrCreate(login.getUsername() + "_" + target, ChatType.DirectChat);
                 } else {
-                    List<ChatModel> results2 = sl.getDb().getChatDao().queryBuilder().where().eq("name", target).query();
+                    List<ChatModel> results2 = db.getChatDao().queryBuilder().where().eq("name", target).query();
                     if (results.size() != 0) {
                         // It's a message which is inside a known group chat (public, private)
                         chat = results2.get(0);
                     } else {
                         // It's a message for a group we don't know yet
-                        ArrayList<String> groupList = sendListChatrooms(sl.getModel().getCurrentLogin().getToken());
+                        ArrayList<String> groupList = sendListChatrooms(login.getToken());
                         for (String groupInList : groupList) {
                             if (groupInList.equals(target)) {
-                                chat = sl.getDb().getGroupChatOrCreate(groupInList, ChatType.PublicGroupChat);
+                                chat = db.getGroupChatOrCreate(groupInList, ChatType.PublicGroupChat);
                             }
                         }
                     }
                 }
-                messageObject = new MessageModel(message, chat, new Date(), sl.getDb().getUserOrCreate(sl.getModel().getCurrentLogin().getUsername()));
-                sl.getDb().getMessageDao().create(messageObject);
+                messageObject = new MessageModel(message, chat, new Date(), db.getUserOrCreate(login.getUsername()));
+                db.getMessageDao().create(messageObject);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -778,13 +780,13 @@ public class BackendController implements Closeable {
         waitForResultResponse();
         boolean result = Boolean.parseBoolean(lastMessage.get(1));
         try {
-            UserModel user = sl.getDb().getUserOrCreate(username);
+            UserModel user = serviceLocator.getDb().getUserOrCreate(username);
             if (result) {
                 user.setOnline();
             } else {
                 user.setOffline();
             }
-            sl.getDb().getUserDao().update(user);
+            serviceLocator.getDb().getUserDao().update(user);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -830,10 +832,10 @@ public class BackendController implements Closeable {
             if (usersList.size() > 0) {
                 try {
                     // TODO: We can't really know the chat type, so we have to guess it's public
-                    ChatModel chat = sl.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);
+                    ChatModel chat = serviceLocator.getDb().getGroupChatOrCreate(chatroom, ChatType.PublicGroupChat);
                     usersList.forEach(s -> {
                         try {
-                            UserModel user = sl.getDb().getUserOrCreate(s);
+                            UserModel user = serviceLocator.getDb().getUserOrCreate(s);
                             // TODO: Add him only, if he isn't yet!
                             chat.addMember(user);
                         } catch (SQLException e) {

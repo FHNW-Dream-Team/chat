@@ -119,16 +119,8 @@ public class LoginController extends Controller<LoginsModel, LoginView> {
         // Disable everything to prevent something while working on the data
         disableAll();
 
-        MainModel mainModel;
-        if (serviceLocator.getModel() == null) {
-            mainModel = new MainModel();
-            serviceLocator.setModel(mainModel);
-        } else {
-            mainModel = serviceLocator.getModel();
-        }
-
         LoginModel login = new LoginModel(view.getUsername().getText(), view.getPassword().getText());
-        mainModel.setCurrentLogin(login);
+        serviceLocator.setCurrentLogin(login);
 
         // Connection would freeze window (and the animations) so do it in a different thread.
         Runnable loginTask = () -> {

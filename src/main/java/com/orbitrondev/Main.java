@@ -1,7 +1,6 @@
 package com.orbitrondev;
 
 import com.orbitrondev.Controller.CliController;
-import com.orbitrondev.Model.MainModel;
 import org.apache.commons.cli.*;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -65,8 +64,7 @@ public class Main {
             isGui = true;
             MainGui.main(args);
         } else {
-            MainModel model = new MainModel();
-            new CliController(model);
+            new CliController();
         }
         // TODO: There is a bug inside IntelliJ which doesn't close the application, so we do it manually
         System.exit(0);

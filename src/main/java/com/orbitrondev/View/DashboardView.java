@@ -80,7 +80,7 @@ public class DashboardView extends View<DashboardModel> {
         VBox bodyLeft = new VBox();
 
         // Create nav bar
-        HBox navBar = Helper.useStaticNavBar(serviceLocator.getModel().getCurrentLogin().getUsername());
+        HBox navBar = Helper.useStaticNavBar(serviceLocator.getCurrentLogin().getUsername());
 
         // Create spacer in nav bar
         Region spacer = new Region();
@@ -313,7 +313,7 @@ public class DashboardView extends View<DashboardModel> {
 
     // https://github.com/sarafinmahtab/MakeChat-App/blob/master/MakeChatClient/src/application/chatboard/ChatBoard.java
     public void addMessage(MessageModel message) {
-        LoginModel login = serviceLocator.getModel().getCurrentLogin();
+        LoginModel login = serviceLocator.getCurrentLogin();
         boolean isLoggedInUser = message.getUser().getUsername().equals(login.getUsername());
 
         Label messageLabel = new Label();

@@ -1,14 +1,16 @@
 package com.orbitrondev.Controller;
 
-import com.orbitrondev.Model.MainModel;
+import com.orbitrondev.Entity.LoginModel;
+import com.orbitrondev.Entity.ServerModel;
 
 public class ServiceLocator {
     private static ServiceLocator serviceLocator; // singleton
-    // Resources
 
-    private DatabaseController db;
-    private MainModel model;
-    private BackendController backend;
+    // Resources
+    private DatabaseController db = null;
+    private BackendController backend = null;
+    private ServerModel currentServer = null;
+    private LoginModel currentLogin = null;
 
     /**
      * Factory method for returning the singleton
@@ -26,6 +28,7 @@ public class ServiceLocator {
     private ServiceLocator() {
     }
 
+    // Database
     public DatabaseController getDb() {
         return db;
     }
@@ -34,19 +37,30 @@ public class ServiceLocator {
         this.db = db;
     }
 
-    public MainModel getModel() {
-        return model;
-    }
-
-    public void setModel(MainModel model) {
-        this.model = model;
-    }
-
+    // Backend
     public BackendController getBackend() {
         return backend;
     }
 
     public void setBackend(BackendController backend) {
         this.backend = backend;
+    }
+
+    // Server
+    public ServerModel getCurrentServer() {
+        return currentServer;
+    }
+
+    public void setCurrentServer(ServerModel currentServer) {
+        this.currentServer = currentServer;
+    }
+
+    // Login
+    public LoginModel getCurrentLogin() {
+        return currentLogin;
+    }
+
+    public void setCurrentLogin(LoginModel currentLogin) {
+        this.currentLogin = currentLogin;
     }
 }
