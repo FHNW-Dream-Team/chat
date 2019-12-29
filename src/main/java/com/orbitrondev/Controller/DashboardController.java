@@ -331,6 +331,10 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
 
         UserModel selectedItem = view.getContactList().getSelectionModel().getSelectedItem();
         ChatModel chat = null;
+        if (selectedItem == null) {
+            // Clicked on random place, so do nothing
+            return;
+        }
         try {
             chat = db.getGroupChatOrCreate(login.getUsername() + "_" + selectedItem.getUsername(), ChatType.DirectChat);
         } catch (SQLException e) {
@@ -363,7 +367,14 @@ public class DashboardController extends Controller<DashboardModel, DashboardVie
 
         Runnable sendTask = () -> {
             try {
-                if (!backend.sendUserOnline(login.getToken(), view.getNavBarTitleRight())) {
+                boolean isUser = false;
+                for (UserModel user : serviceLocator.getDb().getUserDao()) {
+                    if (view.getNavBarTitleRight().equals(user.getUsername())) {
+                        isUser = true;
+                        break;
+                    }
+                }
+                if (isUser && !backend.sendUserOnline(login.getToken(), view.getNavBarTitleRight())) {
                     showErrorDialogue("gui.dashboard.sendMessage.error.offline.title", "gui.dashboard.sendMessage.error.offline.content");
                     return;
                 }
