@@ -101,8 +101,8 @@ public class RegisterView extends View<RegisterModel> {
         scene.setOnKeyPressed(event -> {
             // Click the connect button by clicking ENTER
             if (event.getCode() == KeyCode.ENTER) {
-                if (!btnLogin.isDisable()) {
-                    btnLogin.fire();
+                if (!btnRegister.isDisable()) {
+                    btnRegister.fire();
                 }
             }
         });
