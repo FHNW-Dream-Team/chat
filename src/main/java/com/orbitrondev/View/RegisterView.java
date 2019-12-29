@@ -12,8 +12,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class RegisterView extends View<RegisterModel> {
     private VBox errorMessage;
     private JFXTextField username;
@@ -67,36 +65,6 @@ public class RegisterView extends View<RegisterModel> {
         // Create button to register
         btnRegister = Helper.usePrimaryButton("gui.register.register");
         btnRegister.setDisable(true);
-
-        // Disable/Enable the login button depending on if the inputs are valid
-        AtomicBoolean usernameValid = new AtomicBoolean(false);
-        AtomicBoolean passwordValid = new AtomicBoolean(false);
-        AtomicBoolean repeatPasswordValid = new AtomicBoolean(false);
-        Runnable updateButtonClickable = () -> {
-            if (!usernameValid.get() || !passwordValid.get() || !repeatPasswordValid.get()) {
-                btnRegister.setDisable(true);
-            } else {
-                btnRegister.setDisable(false);
-            }
-        };
-        username.textProperty().addListener((o, oldVal, newVal) -> {
-            if (!oldVal.equals(newVal)) {
-                usernameValid.set(username.validate());
-                updateButtonClickable.run();
-            }
-        });
-        password.textProperty().addListener((o, oldVal, newVal) -> {
-            if (!oldVal.equals(newVal)) {
-                passwordValid.set(password.validate());
-                updateButtonClickable.run();
-            }
-        });
-        repeatPassword.textProperty().addListener((o, oldVal, newVal) -> {
-            if (!oldVal.equals(newVal)) {
-                repeatPasswordValid.set(repeatPassword.validate());
-                updateButtonClickable.run();
-            }
-        });
 
         // Create button to login
         btnLogin = Helper.useSecondaryButton("gui.register.login");
