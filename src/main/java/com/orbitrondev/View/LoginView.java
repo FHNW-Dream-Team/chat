@@ -12,8 +12,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class LoginView extends View<LoginsModel> {
     private VBox errorMessage;
     private JFXTextField username;
@@ -60,29 +58,6 @@ public class LoginView extends View<LoginsModel> {
         // Create button to login
         btnLogin = Helper.usePrimaryButton("gui.login.login");
         btnLogin.setDisable(true);
-
-        // Disable/Enable the login button depending on if the inputs are valid
-        AtomicBoolean usernameValid = new AtomicBoolean(false);
-        AtomicBoolean passwordValid = new AtomicBoolean(false);
-        Runnable updateButtonClickable = () -> {
-            if (!usernameValid.get() || !passwordValid.get()) {
-                btnLogin.setDisable(true);
-            } else {
-                btnLogin.setDisable(false);
-            }
-        };
-        username.textProperty().addListener((o, oldVal, newVal) -> {
-            if (!oldVal.equals(newVal)) {
-                usernameValid.set(username.validate());
-                updateButtonClickable.run();
-            }
-        });
-        password.textProperty().addListener((o, oldVal, newVal) -> {
-            if (!oldVal.equals(newVal)) {
-                passwordValid.set(password.validate());
-                updateButtonClickable.run();
-            }
-        });
 
         // Create button to register
         btnRegister = Helper.useSecondaryButton("gui.login.register");

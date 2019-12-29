@@ -12,6 +12,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LoginController extends Controller<LoginsModel, LoginView> {
     protected LoginController(LoginsModel model, LoginView view) {
@@ -19,9 +20,30 @@ public class LoginController extends Controller<LoginsModel, LoginView> {
 
         // register ourselves to listen for button clicks
         view.getBtnLogin().setOnAction(event -> clickOnLogin());
-
-        // register ourselves to listen for button clicks
         view.getBtnRegister().setOnAction(event -> clickOnRegister());
+
+        // Disable/Enable the login button depending on if the inputs are valid
+        AtomicBoolean usernameValid = new AtomicBoolean(false);
+        AtomicBoolean passwordValid = new AtomicBoolean(false);
+        Runnable updateButtonClickable = () -> {
+            if (!usernameValid.get() || !passwordValid.get()) {
+                view.getBtnLogin().setDisable(true);
+            } else {
+                view.getBtnLogin().setDisable(false);
+            }
+        };
+        view.getUsername().textProperty().addListener((o, oldVal, newVal) -> {
+            if (!oldVal.equals(newVal)) {
+                usernameValid.set(view.getUsername().validate());
+                updateButtonClickable.run();
+            }
+        });
+        view.getPassword().textProperty().addListener((o, oldVal, newVal) -> {
+            if (!oldVal.equals(newVal)) {
+                passwordValid.set(view.getPassword().validate());
+                updateButtonClickable.run();
+            }
+        });
 
         // register ourselves to handle window-closing event
         view.getStage().setOnCloseRequest(event -> Platform.exit());
@@ -49,9 +71,21 @@ public class LoginController extends Controller<LoginsModel, LoginView> {
         view.getBtnRegister().setDisable(false);
     }
 
-    public void clickOnRegister() {
+    public void setErrorMessage(String translatorKey) {
         Platform.runLater(() -> {
-            // Open login window and close server connection window
+            if (view.getErrorMessage().getChildren().size() == 0) {
+                // Make window larger, so it doesn't become crammed, only if we haven't done so yet
+                view.getStage().setHeight(view.getStage().getHeight() + 30);
+            }
+            Text text = Helper.useText(translatorKey);
+            text.setFill(Color.RED);
+            view.getErrorMessage().getChildren().clear();
+            view.getErrorMessage().getChildren().addAll(text, Helper.useSpacer(20));
+        });
+    }
+
+    private void openRegisterWindow() {
+        Platform.runLater(() -> {
             Stage appStage = new Stage();
             RegisterModel model = new RegisterModel();
             RegisterView newView = new RegisterView(appStage, model);
@@ -61,6 +95,23 @@ public class LoginController extends Controller<LoginsModel, LoginView> {
             view = null;
             newView.start();
         });
+    }
+
+    private void openDashboardWindow() {
+        Platform.runLater(() -> {
+            Stage appStage = new Stage();
+            DashboardModel model = new DashboardModel();
+            DashboardView newView = new DashboardView(appStage, model);
+            new DashboardController(model, newView);
+
+            view.stop();
+            view = null;
+            newView.start();
+        });
+    }
+
+    public void clickOnRegister() {
+        openRegisterWindow();
     }
 
     public void clickOnLogin() {
@@ -86,42 +137,14 @@ public class LoginController extends Controller<LoginsModel, LoginView> {
             } catch (IOException e) {
                 // This exception contains ConnectException, which basically means, it couldn't connect to the server.
                 enableAll();
-                Platform.runLater(() -> {
-                    if (view.getErrorMessage().getChildren().size() == 0) {
-                        // Make window larger, so it doesn't become crammed, only if we haven't done so yet
-                        view.getStage().setHeight(view.getStage().getHeight() + 30);
-                    }
-                    Text text = Helper.useText("gui.login.loginFailed");
-                    text.setFill(Color.RED);
-                    view.getErrorMessage().getChildren().clear();
-                    view.getErrorMessage().getChildren().addAll(text, Helper.useSpacer(20));
-                });
+                setErrorMessage("gui.login.loginFailed");
             }
 
             if (login.getToken() != null) {
-                Platform.runLater(() -> {
-                    // Open login window and close server connection window
-                    Stage appStage = new Stage();
-                    DashboardModel model = new DashboardModel();
-                    DashboardView newView = new DashboardView(appStage, model);
-                    new DashboardController(model, newView);
-
-                    view.stop();
-                    view = null;
-                    newView.start();
-                });
+                openDashboardWindow();
             } else {
                 enableAll();
-                Platform.runLater(() -> {
-                    if (view.getErrorMessage().getChildren().size() == 0) {
-                        // Make window larger, so it doesn't become crammed, only if we haven't done so yet
-                        view.getStage().setHeight(view.getStage().getHeight() + 30);
-                    }
-                    Text text = Helper.useText("gui.login.loginFailed");
-                    text.setFill(Color.RED);
-                    view.getErrorMessage().getChildren().clear();
-                    view.getErrorMessage().getChildren().addAll(text, Helper.useSpacer(20));
-                });
+                setErrorMessage("gui.login.loginFailed");
             }
         };
         new Thread(loginTask).start();
