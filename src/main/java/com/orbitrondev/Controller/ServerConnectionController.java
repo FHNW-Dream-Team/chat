@@ -12,11 +12,13 @@ import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ServerConnectionController extends Controller<ServerConnectionModel, ServerConnectionView> {
     private static final Logger logger = LogManager.getLogger(ServerConnectionController.class);
@@ -28,7 +30,55 @@ public class ServerConnectionController extends Controller<ServerConnectionModel
         view.getChooseServer().setOnAction(event -> updateChosenServer());
 
         // register ourselves to listen for button clicks
-        view.getBtnConnect().setOnAction(event -> buttonClick());
+        view.getBtnConnect().setOnAction(event -> clickOnConnect());
+
+        // Add options to server list drop down
+        view.getChooseServer().setConverter(new StringConverter<ServerModel>() {
+            @Override
+            public String toString(ServerModel server) {
+                return
+                    server == null || server.getIp() == null
+                        ? I18nController.get("gui.serverConnection.create")
+                        : (
+                        server.isSecure()
+                            ? I18nController.get("gui.serverConnection.entry.ssl", server.getIp(), Integer.toString(server.getPort()))
+                            : I18nController.get("gui.serverConnection.entry", server.getIp(), Integer.toString(server.getPort()))
+                    );
+            }
+
+            @Override
+            public ServerModel fromString(String string) {
+                return null;
+            }
+        });
+        view.getChooseServer().getItems().add(new ServerModel(null, 0));
+        view.getChooseServer().getSelectionModel().selectFirst();
+        for (ServerModel server : serviceLocator.getDb().getServerDao()) {
+            view.getChooseServer().getItems().add(server);
+        }
+
+        // Disable/Enable the Connect button depending on if the inputs are valid
+        AtomicBoolean serverIpValid = new AtomicBoolean(false);
+        AtomicBoolean portValid = new AtomicBoolean(false);
+        Runnable updateButtonClickable = () -> {
+            if (!serverIpValid.get() || !portValid.get()) {
+                view.getBtnConnect().setDisable(true);
+            } else {
+                view.getBtnConnect().setDisable(false);
+            }
+        };
+        view.getServerIp().textProperty().addListener((o, oldVal, newVal) -> {
+            if (!oldVal.equals(newVal)) {
+                serverIpValid.set(view.getServerIp().validate());
+                updateButtonClickable.run();
+            }
+        });
+        view.getPort().textProperty().addListener((o, oldVal, newVal) -> {
+            if (!oldVal.equals(newVal)) {
+                portValid.set(view.getPort().validate());
+                updateButtonClickable.run();
+            }
+        });
 
         // register ourselves to handle window-closing event
         view.getStage().setOnCloseRequest(event -> Platform.exit());
@@ -68,7 +118,7 @@ public class ServerConnectionController extends Controller<ServerConnectionModel
         view.getBtnConnect().setDisable(false);
     }
 
-    public void buttonClick() {
+    public void clickOnConnect() {
         // Disable everything to prevent something while working on the data
         disableAll();
 

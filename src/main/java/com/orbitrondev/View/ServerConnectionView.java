@@ -11,9 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ServerConnectionView extends View<ServerConnectionModel> {
     private VBox errorMessage;
@@ -43,29 +40,6 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
 
         // Create dropdown to choose existing server connection
         chooseServer = new JFXComboBox<>();
-        chooseServer.setConverter(new StringConverter<ServerModel>() {
-            @Override
-            public String toString(ServerModel server) {
-                return
-                    server == null || server.getIp() == null
-                        ? I18nController.get("gui.serverConnection.create")
-                        : (
-                        server.isSecure()
-                            ? I18nController.get("gui.serverConnection.entry.ssl", server.getIp(), Integer.toString(server.getPort()))
-                            : I18nController.get("gui.serverConnection.entry", server.getIp(), Integer.toString(server.getPort()))
-                    );
-            }
-
-            @Override
-            public ServerModel fromString(String string) {
-                return null;
-            }
-        });
-        chooseServer.getItems().add(new ServerModel(null, 0));
-        chooseServer.getSelectionModel().selectFirst();
-        for (ServerModel server : serviceLocator.getDb().getServerDao()) {
-            chooseServer.getItems().add(server);
-        }
 
         // Create server ip input field
         serverIp = Helper.useTextField("gui.serverConnection.ip");
@@ -85,29 +59,6 @@ public class ServerConnectionView extends View<ServerConnectionModel> {
         // Create button to connect
         btnConnect = Helper.usePrimaryButton("gui.serverConnection.connect");
         btnConnect.setDisable(true);
-
-        // Disable/Enable the Connect button depending on if the inputs are valid
-        AtomicBoolean serverIpValid = new AtomicBoolean(false);
-        AtomicBoolean portValid = new AtomicBoolean(false);
-        Runnable updateButtonClickable = () -> {
-            if (!serverIpValid.get() || !portValid.get()) {
-                btnConnect.setDisable(true);
-            } else {
-                btnConnect.setDisable(false);
-            }
-        };
-        serverIp.textProperty().addListener((o, oldVal, newVal) -> {
-            if (!oldVal.equals(newVal)) {
-                serverIpValid.set(serverIp.validate());
-                updateButtonClickable.run();
-            }
-        });
-        port.textProperty().addListener((o, oldVal, newVal) -> {
-            if (!oldVal.equals(newVal)) {
-                portValid.set(port.validate());
-                updateButtonClickable.run();
-            }
-        });
 
         // Add body content to body
         body.getChildren().addAll(
