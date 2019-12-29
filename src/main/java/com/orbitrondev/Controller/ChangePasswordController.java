@@ -1,6 +1,7 @@
 package com.orbitrondev.Controller;
 
 import com.orbitrondev.Abstract.Controller;
+import com.orbitrondev.Entity.LoginModel;
 import com.orbitrondev.Model.*;
 import com.orbitrondev.View.ChangePasswordView;
 import com.orbitrondev.View.DashboardView;

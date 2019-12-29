@@ -1,8 +1,8 @@
-package com.orbitrondev.Model.SupportTables;
+package com.orbitrondev.Entity.SupportTables;
 
 import com.j256.ormlite.field.DatabaseField;
-import com.orbitrondev.Model.ChatModel;
-import com.orbitrondev.Model.UserModel;
+import com.orbitrondev.Entity.ChatModel;
+import com.orbitrondev.Entity.UserModel;
 
 public class ChatUserModel {
 

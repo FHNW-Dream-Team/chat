@@ -1,6 +1,7 @@
 package com.orbitrondev.Controller;
 
 import com.orbitrondev.Abstract.Controller;
+import com.orbitrondev.Entity.ServerModel;
 import com.orbitrondev.Exception.InvalidIpException;
 import com.orbitrondev.Exception.InvalidPortException;
 import com.orbitrondev.Model.*;

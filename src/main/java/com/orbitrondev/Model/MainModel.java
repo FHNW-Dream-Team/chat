@@ -1,5 +1,8 @@
 package com.orbitrondev.Model;
 
+import com.orbitrondev.Entity.LoginModel;
+import com.orbitrondev.Entity.ServerModel;
+
 public class MainModel {
     private ServerModel currentServer = null;
     private LoginModel currentLogin = null;

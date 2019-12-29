@@ -1,6 +1,9 @@
 package com.orbitrondev.Model;
 
 import com.orbitrondev.Abstract.Model;
+import com.orbitrondev.Entity.ChatModel;
+import com.orbitrondev.Entity.MessageModel;
+import com.orbitrondev.Entity.UserModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 

@@ -1,5 +1,6 @@
 package com.orbitrondev.Controller;
 
+import com.orbitrondev.Entity.*;
 import com.orbitrondev.EventListener.MessageErrorEventListener;
 import com.orbitrondev.EventListener.MessageTextEventListener;
 import com.orbitrondev.Exception.InvalidIpException;

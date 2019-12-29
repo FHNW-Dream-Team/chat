@@ -8,9 +8,8 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import com.orbitrondev.Model.*;
-import com.orbitrondev.Model.ChatType;
-import com.orbitrondev.Model.SupportTables.ChatUserModel;
+import com.orbitrondev.Entity.*;
+import com.orbitrondev.Entity.SupportTables.ChatUserModel;
 
 import java.io.Closeable;
 import java.io.IOException;

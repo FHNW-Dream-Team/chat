@@ -6,7 +6,7 @@ import com.jfoenix.controls.JFXTextField;
 import com.orbitrondev.Abstract.View;
 import com.orbitrondev.Controller.I18nController;
 import com.orbitrondev.Model.ServerConnectionModel;
-import com.orbitrondev.Model.ServerModel;
+import com.orbitrondev.Entity.ServerModel;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
