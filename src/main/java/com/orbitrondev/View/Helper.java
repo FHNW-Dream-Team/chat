@@ -239,10 +239,6 @@ public class Helper {
         return icon;
     }
 
-    public static IconNode useIcon(IconCode iconCode) {
-        return useIcon(iconCode, Color.BLACK);
-    }
-
     public static IconNode useIconAdd(Color color) {
         return useIcon(GoogleMaterialDesignIcons.ADD, color);
     }

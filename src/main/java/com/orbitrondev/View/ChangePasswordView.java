@@ -11,8 +11,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class ChangePasswordView extends View<ChangePasswordModel> {
     private VBox errorMessage;
     private JFXPasswordField oldPassword;
