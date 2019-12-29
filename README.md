@@ -13,10 +13,10 @@ Use a console version or GUI version. When running there are additional options 
 * ✔ Delete account
 * ✔ Login
 * ✔ Logout
-* ✔ List chatrooms
-* ✔ Join a particular chatroom
-* ✔ See messages in the chatroom
-* ✔ Send a message to the chatroom
+* ✔ List group chats
+* ✔ Join a particular group chats
+* ✔ See messages in the group chats
+* ✔ Send a message to the group chats
  
 ### Basic features: Architecture and GUI
 * ✔ MVC structure: Separate the UI from the logic
@@ -32,7 +32,7 @@ Use a console version or GUI version. When running there are additional options 
 * ✔ Be able to send/receive private messages to a contact
 * ✔ How will you distinguish private messages from public chat? Different tabs!
 #### Advanced: Maintain a block list
-* ❌ Users whose private messagaes will be ignored
+* ❌ Users whose private messages will be ignored
 * ❌ Users whose chat room messages will not be displayed
 * ❌ Are these the same users, or two different lists?
 
@@ -49,7 +49,7 @@ Use a console version or GUI version. When running there are additional options 
 ### Optional: Chat room usability features
 #### Simple
 * ❌ Logout / Login – pick up where you left off (Annoying feature)
-* ❌ Display list of users in the chatroom
+* ❌ Display list of users in the group chats
 
 #### Advanced
 * ✔ Be able to join multiple chat rooms
@@ -91,20 +91,20 @@ Please make sure to update tests as appropriate.
 
 | MessageType       | Data               | Notes                                                                                                         |
 |-------------------|--------------------|---------------------------------------------------------------------------------------------------------------|
-| CreateLogin       | Username, Password | Fails if name already taken (user or chatroom), or invalid After creating an account, you still have to login |
+| CreateLogin       | Username, Password | Fails if name already taken (user or group chat), or invalid After creating an account, you still have to login |
 | Login             | Username, Password | Fails if name/password do not match                                                                           |
 | ChangePassword    | New password       | Fails only if token is invalid                                                                                |
 | DeleteLogin       | -                  | Fails only if token is invalid; after delete, token becomes invalid                                           |
 | Logout            | -                  | Never fails; token becomes invalid                                                                            |
-| CreateChatroom    | Name, isPublic     | Fails if name already taken (user or chatroom), or invalid After creating a chatroom, you still have to join  |
-| JoinChatroom      | Chatroom, User     | User can add themselves to public chatrooms Only the creator can add user to a private chatroom               |
-| LeaveChatroom     | Chatroom, User     | You can always remove yourself Chatroom creator can remove anyone                                             |
-| DeleteChatroom    | Chatroom           | Only the creator can delete a chatroom                                                                        |
-| ListChatrooms     | -                  | Returns a list of all public chatrooms                                                                        |
+| CreateChatroom    | Name, isPublic     | Fails if name already taken (user or group chat), or invalid After creating a group chat, you still have to join  |
+| JoinChatroom      | Chatroom, User     | User can add themselves to public group chat Only the creator can add user to a private group chat               |
+| LeaveChatroom     | Chatroom, User     | You can always remove yourself. Group chat creator can remove anyone                                             |
+| DeleteChatroom    | Chatroom           | Only the creator can delete a group chat                                                                        |
+| ListChatrooms     | -                  | Returns a list of all public group chats                                                                        |
 | Ping              | [Token]            | Without a token: always succeeds With token: succeeds only if token is valid                                  |
-| SendMessage       | Target, Message    | Send message to user or chatroom Fails if user not online / Fails if not a member of the chatroom             |
+| SendMessage       | Target, Message    | Send message to user or group chat. Fails if user not online / Fails if not a member of the group chat             |
 | UserOnline        | User               | Succeeds if the user is currently logged in                                                                   |
-| ListChatroomUsers | Chatroom           | Returns a list of all users in the given chatroom You must be a member of this chatroom                       |
+| ListChatroomUsers | Chatroom           | Returns a list of all users in the given group chat. You must be a member of this group chat                       |
 
 ## Client <- Server
 
@@ -119,7 +119,7 @@ Please make sure to update tests as appropriate.
 
 | MessageType | Data               | Notes                                                                                                    |
 |-------------|--------------------|----------------------------------------------------------------------------------------------------------|
-| MessageText | Name, Target, Text | Name of user sending message Target is where the message was sent (chatroom or user) Text of the message |
+| MessageText | Name, Target, Text | Name of user sending message Target is where the message was sent (group chat or user) Text of the message |
 
 ## License
 [MIT](LICENSE.txt)
