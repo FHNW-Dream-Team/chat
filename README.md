@@ -1,8 +1,8 @@
-# Chat
+# fhnw-chat
 
 Java project for running the client part of the chat program
 
-## Features
+## Getting Started
 
 Use a console version or GUI version. When running there are additional options (check the usage part).
 
@@ -81,13 +81,13 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Please make sure to update tests as appropriate.
 
-# Documentation
+## Documentation
 
  * Official site: http://javaprojects.ch
  * Official ip: 147.86.8.31
  * Official port: 50001
 
-## Client -> Server
+### Client -> Server
 
 | MessageType       | Data               | Notes                                                                                                         |
 |-------------------|--------------------|---------------------------------------------------------------------------------------------------------------|
@@ -106,20 +106,45 @@ Please make sure to update tests as appropriate.
 | UserOnline        | User               | Succeeds if the user is currently logged in                                                                   |
 | ListChatroomUsers | Chatroom           | Returns a list of all users in the given group chat. You must be a member of this group chat                       |
 
-## Client <- Server
+### Client <- Server
 
-### Responses to client commands
+#### Responses to client commands
 
 | MessageType  | Data                               | Notes                                                                                                                                                              |
 |--------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Result       | Boolean Boolean Token Boolean List | True if the command succeeded, otherwise false After a successful login, also returns the authentication token When a list is requested, also returns list results |
 | MessageError | Error message                      | Incorrect commands, wrong number of arguments, etc.                                                                                                                |
 
-### Server initiated messages
+#### Server initiated messages
 
 | MessageType | Data               | Notes                                                                                                    |
 |-------------|--------------------|----------------------------------------------------------------------------------------------------------|
 | MessageText | Name, Target, Text | Name of user sending message Target is where the message was sent (group chat or user) Text of the message |
 
+## Built With
+
+* [Maven](https://maven.apache.org/) - Dependency Management
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/D3strukt0r/fhnw-chat/tags). 
+
+## Authors
+
+* **Manuele Vaccari** - *Initial work* - [D3strukt0r](https://github.com/D3strukt0r)
+
+See also the list of [contributors](https://github.com/D3strukt0r/fhnw-chat/contributors) who participated in this project.
+
 ## License
-[MIT](LICENSE.txt)
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE.txt](LICENSE.txt) file for details
+
+## Acknowledgments
+
+* Hat tip to anyone whose code was used
+* Inspiration
+* etc
