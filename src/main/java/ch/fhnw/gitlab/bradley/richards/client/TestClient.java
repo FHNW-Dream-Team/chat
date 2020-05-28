@@ -1,4 +1,4 @@
-package ch.fhnw.gitlab.bradley.richards;
+package ch.fhnw.gitlab.bradley.richards.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
