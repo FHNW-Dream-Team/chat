@@ -1,11 +1,11 @@
-package ch.fhnw.gitlab.bradley.richards.server.message;
+package chatroom.server.message;
 
 import chatroom.server.Account;
 import chatroom.server.Client;
 
 public class DeleteLogin extends Message {
 	private String token;
-	
+
 	public DeleteLogin(String[] data) {
 		super(data);
 		this.token = data[1];

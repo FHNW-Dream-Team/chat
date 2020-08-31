@@ -1,10 +1,10 @@
-package ch.fhnw.gitlab.bradley.richards.server.message;
+package chatroom.server.message;
 
 import chatroom.server.Client;
 
 public class Ping extends Message {
 	private String token;
-	
+
 	/**
 	 * The data may optionally contain a token
 	 */

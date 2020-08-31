@@ -1,4 +1,4 @@
-package ch.fhnw.gitlab.bradley.richards.server.message;
+package chatroom.server.message;
 
 import chatroom.server.Client;
 
@@ -14,7 +14,7 @@ public class UserOnline extends Message {
 
 	/**
 	 * Anyone can query a specific user: are they currently logged in?
-	 * 
+	 *
 	 * Note that "false" can also mean that the user asking the question is not
 	 * logged in, and therefore cannot ask this question.
 	 */

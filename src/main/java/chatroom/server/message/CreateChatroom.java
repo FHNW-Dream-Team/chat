@@ -1,4 +1,4 @@
-package ch.fhnw.gitlab.bradley.richards.server.message;
+package chatroom.server.message;
 
 import chatroom.server.Account;
 import chatroom.server.Chatroom;
@@ -8,7 +8,7 @@ public class CreateChatroom extends Message {
 	private String token;
 	private String name;
 	private boolean isPublic;
-	
+
 	public CreateChatroom(String[] data) {
 		super(data);
 		this.token = data[1];
@@ -28,7 +28,7 @@ public class CreateChatroom extends Message {
 			if (name.length() >= 3 && Account.exists(name) == null && Chatroom.exists(name) == null) {
 				Chatroom chatroom = new Chatroom(name, isPublic, client.getName());
 				Chatroom.add(chatroom);
-				result = true;				
+				result = true;
 			}
 		}
 		client.send(new Result(this.getClass(), result));

@@ -1,4 +1,4 @@
-package ch.fhnw.gitlab.bradley.richards.server.message;
+package chatroom.server.message;
 
 import chatroom.server.Account;
 import chatroom.server.Chatroom;

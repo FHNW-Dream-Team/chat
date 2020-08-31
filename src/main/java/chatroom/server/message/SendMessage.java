@@ -1,4 +1,4 @@
-package ch.fhnw.gitlab.bradley.richards.server.message;
+package chatroom.server.message;
 
 import chatroom.server.Chatroom;
 import chatroom.server.Client;
@@ -8,7 +8,7 @@ public class SendMessage extends Message {
 	private String token;
 	private String destination;
 	private String message;
-	
+
 	public SendMessage(String[] data) {
 		super(data);
 		this.token = data[1];
@@ -28,7 +28,7 @@ public class SendMessage extends Message {
 			// First check for an individual user
 			Client user = Client.exists(destination);
 			if (user != null && user.getToken() != null) target = user; // user exists and is logged in
-			
+
 			// If not an individual user, try a chatroom
 			if (target == null) {
 				Chatroom chatroom = Chatroom.exists(destination);

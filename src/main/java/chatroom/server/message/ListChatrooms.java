@@ -1,4 +1,4 @@
-package ch.fhnw.gitlab.bradley.richards.server.message;
+package chatroom.server.message;
 
 import java.util.ArrayList;
 
@@ -7,7 +7,7 @@ import chatroom.server.Client;
 
 public class ListChatrooms extends Message {
 	private String token;
-	
+
 	public ListChatrooms(String[] data) {
 		super(data);
 		this.token = data[1];
