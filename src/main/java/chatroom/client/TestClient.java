@@ -1,4 +1,4 @@
-package ch.fhnw.gitlab.bradley.richards.client;
+package chatroom.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
