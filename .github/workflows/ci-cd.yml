@@ -1,0 +1,42 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+    tags:
+      - "*"
+
+  # Run tests for any PRs.
+  pull_request:
+
+  workflow_dispatch:
+
+jobs:
+  # Run tests.
+  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8 # The JDK version to make available on the path.
+          java-package: jdk+fx # (jre, jdk, or jdk+fx) - defaults to jdk
+
+      # https://github.com/actions/cache/blob/main/examples.md#java---maven
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build
+        run: mvn -B package --file pom.xml
