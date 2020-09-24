@@ -2,20 +2,19 @@
 
 Java project for running the client part of the chat program
 
-**Project**
+Project
 
 [![License](https://img.shields.io/github/license/d3strukt0r/fhnw-chat)][license]
 
-**master**-branch (alias stable, latest)
+master-branch (alias stable, latest)
 
 [![GH Action CI/CD](https://github.com/D3strukt0r/fhnw-chat/workflows/CI/CD/badge.svg?branch=master)][gh-action]
+[![Codacy grade](https://img.shields.io/codacy/grade/15382f33edbe4e209d394a4e8a3b9801/master)][codacy]
 
-**develop**-branch (alias nightly)
+develop-branch (alias nightly)
 
 [![GH Action CI/CD](https://github.com/D3strukt0r/fhnw-chat/workflows/CI/CD/badge.svg?branch=develop)][gh-action]
-
-[license]: https://github.com/D3strukt0r/fhnw-chat/blob/master/LICENSE.txt
-[gh-action]: https://github.com/D3strukt0r/fhnw-chat/actions
+[![Codacy grade](https://img.shields.io/codacy/grade/15382f33edbe4e209d394a4e8a3b9801/develop)][codacy]
 
 ## Getting Started
 
@@ -104,15 +103,9 @@ When running you can add following options:
 | -l    | --db-location | If using a DB (by default on), use a custom location for the file             |
 | -v    | --verbose     | Show more information in the console. Useful for debuggin and finding errors. |
 
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
 ## Documentation
 
--   Official site: http://javaprojects.ch
+-   Official site: [http://javaprojects.ch](http://javaprojects.ch)
 -   Official ip: 147.86.8.31
 -   Official port: 50001
 
@@ -130,7 +123,7 @@ Please make sure to update tests as appropriate.
 | LeaveChatroom     | Chatroom, User     | You can always remove yourself. Group chat creator can remove anyone                                             |
 | DeleteChatroom    | Chatroom           | Only the creator can delete a group chat                                                                         |
 | ListChatrooms     | -                  | Returns a list of all public group chats                                                                         |
-| Ping              | [Token]            | Without a token: always succeeds With token: succeeds only if token is valid                                     |
+| Ping              | Token              | Without a token: always succeeds With token: succeeds only if token is valid                                     |
 | SendMessage       | Target, Message    | Send message to user or group chat. Fails if user not online / Fails if not a member of the group chat           |
 | UserOnline        | User               | Succeeds if the user is currently logged in                                                                      |
 | ListChatroomUsers | Chatroom           | Returns a list of all users in the given group chat. You must be a member of this group chat                     |
@@ -170,10 +163,14 @@ See also the list of [contributors](https://github.com/D3strukt0r/fhnw-chat/cont
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE.txt](LICENSE.txt) file for details
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE.txt](LICENSE.txt) file for details.
 
 ## Acknowledgments
 
 -   Hat tip to anyone whose code was used
 -   Inspiration
 -   etc
+
+[license]: https://github.com/D3strukt0r/fhnw-chat/blob/master/LICENSE.txt
+[gh-action]: https://github.com/D3strukt0r/fhnw-chat/actions
+[codacy]: https://app.codacy.com/manual/D3strukt0r/fhnw-chat/dashboard
